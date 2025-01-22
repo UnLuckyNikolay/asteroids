@@ -1,5 +1,4 @@
-import pygame
-import random
+import pygame, random
 from constants import *
 from circleshapes.asteroid import Asteroid
 
