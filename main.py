@@ -15,6 +15,7 @@ def main():
     clock = pygame.time.Clock()
     dt = 0
     score = 0
+    player_is_alive = True
 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
@@ -31,29 +32,39 @@ def main():
     gameinfo = GameInfo()
     asteroidfield = AsteroidField()
 
-    while True:
+    while player_is_alive:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
         
 
         screen.fill("black")
-        gameinfo.update(score)
+        #gameinfo.update(score)
         gameinfo.draw(screen)
+
         for object in updatable:
             object.update(dt)
+
         for object in drawable:
             object.draw(screen)
+
         for asteroid in asteroids:
-            if asteroid.check_colision(player):
-                print(f"Game over! Final score: {score}")
-                return
+            if asteroid.check_colision(player) and not player.is_invul:
+                #print(f"Game over! Final score: {score}")
+                #return
+                player_is_alive = player.got_shot(gameinfo)
+                if player_is_alive:
+                    asteroid.kill()
+                    explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
+                else:
+                    return
+                
             for shot in shots:
                 if shot.check_colision(asteroid):
                     shot.kill()
                     asteroid.split()
                     explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
-                    score += 1
+                    gameinfo.score += 1
 
 
         pygame.display.flip()

@@ -29,14 +29,6 @@ class Explosion(CircleShape):
                 random_radius = self.radius * random.uniform(0.7, 1) 
                 point_far = True                 
         return points
-    
-
-    def recalculate_points_for_drawing(self):
-        old_points = self.points_for_drawing
-        new_points = []
-        for point in old_points:
-            new_points.append((int(point[0]) + self.position.x, int(point[1]) + self.position.y))
-        return new_points
 
 
     def update(self, dt):
