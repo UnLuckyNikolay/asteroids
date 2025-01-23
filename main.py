@@ -5,6 +5,7 @@ from circleshapes.asteroid import Asteroid
 from asteroidfield import AsteroidField
 from circleshapes.shot import Shot
 from gameinfo import GameInfo
+from circleshapes.explosion import Explosion
 
 
 def main():
@@ -24,6 +25,7 @@ def main():
     Asteroid.containers = (asteroids, updatable, drawable)
     AsteroidField.containers = (updatable)
     Shot.containers = (shots, updatable, drawable)
+    Explosion.containers = (updatable, drawable)
 
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     gameinfo = GameInfo()
@@ -50,6 +52,7 @@ def main():
                 if shot.check_colision(asteroid):
                     shot.kill()
                     asteroid.split()
+                    explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
                     score += 1
 
 
