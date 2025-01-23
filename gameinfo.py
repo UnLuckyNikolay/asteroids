@@ -3,9 +3,10 @@ from constants import *
 
 
 class GameInfo():
-    def __init__(self):
-        self.score = 0
+    def __init__(self, player):
+        self._score = 0
         self.lives = PLAYER_LIVES
+        self.player = player
 
         pygame.font.init()
         self.font = pygame.font.Font(None, 36)
@@ -13,8 +14,17 @@ class GameInfo():
         self.color = (150, 150, 150)
 
 
-    #def update(self, score):
-    #    self.score = score
+    @property
+    def score(self):
+        return self._score
+    
+    @score.setter
+    def score(self, value):
+        self._score = value
+        if self._score > 10:
+            self.player.level_gun = 3
+        elif self._score > 5:
+            self.player.level_gun = 2
 
 
     def draw(self, screen):

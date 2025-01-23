@@ -29,7 +29,7 @@ def main():
     Explosion.containers = (updatable, drawable)
 
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-    gameinfo = GameInfo()
+    gameinfo = GameInfo(player)
     asteroidfield = AsteroidField()
 
     while player_is_alive:
@@ -39,7 +39,6 @@ def main():
         
 
         screen.fill("black")
-        #gameinfo.update(score)
         gameinfo.draw(screen)
 
         for object in updatable:
@@ -50,8 +49,6 @@ def main():
 
         for asteroid in asteroids:
             if asteroid.check_colision(player) and not player.is_invul:
-                #print(f"Game over! Final score: {score}")
-                #return
                 player_is_alive = player.got_shot(gameinfo)
                 if player_is_alive:
                     asteroid.kill()
