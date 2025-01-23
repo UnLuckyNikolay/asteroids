@@ -6,6 +6,7 @@ from asteroidfield import AsteroidField
 from circleshapes.shot import Shot
 from gameinfo import GameInfo
 from circleshapes.explosion import Explosion
+from starfield import StarField
 
 
 # To fix:
@@ -26,13 +27,16 @@ def main():
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
+    projectile = pygame.sprite.Group()
 
+    StarField.containers = (drawable)
     Player.containers = (updatable, drawable)
-    Asteroid.containers = (asteroids, updatable, drawable)
+    Asteroid.containers = (asteroids, updatable, drawable, projectile)
     AsteroidField.containers = (updatable)
-    Shot.containers = (shots, updatable, drawable)
+    Shot.containers = (shots, updatable, drawable, projectile)
     Explosion.containers = (updatable, drawable)
 
+    starfield = StarField()
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     gameinfo = GameInfo(player)
     asteroidfield = AsteroidField()
@@ -48,13 +52,13 @@ def main():
 
         for object in updatable:
             object.update(dt)
-        print(f"The amount of objects: {len(drawable)}")
 
-        for object in drawable:
+        for object in projectile:
             if object.is_off_screen():
                 object.kill()
-            else:
-                object.draw(screen)
+
+        for object in drawable:
+            object.draw(screen)
 
         for asteroid in asteroids:
             if asteroid.check_colision(player) and not player.is_invul:

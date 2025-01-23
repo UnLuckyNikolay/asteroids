@@ -27,8 +27,9 @@ class Player(CircleShape):
     
 
     def draw(self, screen):
-        pygame.draw.circle(screen, (50, 50, 50), self.position, 1, 2)
-        pygame.draw.circle(screen, (50, 50, 50), self.position, self.radius, 2)   # Draws hit-box in dark gray.
+        if PLAYER_SHOW_HITBOX:   # Draws player hit box in dark gray.
+            pygame.draw.circle(screen, (50, 50, 50), self.position, 1, 2)
+            pygame.draw.circle(screen, (50, 50, 50), self.position, self.radius, 2)
 
         for part in self.rotated_sprite:
             if len(part) == 2:
