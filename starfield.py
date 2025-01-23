@@ -18,11 +18,12 @@ class StarField(pygame.sprite.Sprite):
         for i in range (0, self.stars_amount):
             stars.append((random.randint(5, SCREEN_WIDTH - 5),
                           random.randint(5, SCREEN_HEIGHT - 5),
-                          random.randint(0, 3),
-                          (random.randint(200, 255), random.randint(200, 255), random.randint(200, 255))))
+                          random.randint(1, 4),
+                          (random.randint(150, 200), random.randint(150, 200), random.randint(150, 200))))
         return stars
     
 
     def draw(self, screen):
         for star in self.stars:
             pygame.gfxdraw.filled_circle(screen, star[0], star[1], star[2], star[3])
+            pygame.gfxdraw.filled_circle(screen, star[0], star[1], max(star[2] - 2, 0), (255, 255, 255))

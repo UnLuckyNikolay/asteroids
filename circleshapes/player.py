@@ -13,14 +13,17 @@ class Player(CircleShape):
         self.is_invul = False
         self.color_outline = list(PLAYER_COLOR_OUTLINE)
         self.color_fill = list(PLAYER_COLOR_FILL)
+        self.color_glass = list(PLAYER_COLOR_GLASS)
         self.level_gun = 1
         
-        self.parts = [[[-25, 4], [25, 4], [22, -5], [0, -11], [-22, -5]], # Wings
-                      [[20, 4], [20, 9]], [[-20, 4], [-20, 9]], # Wing guns
-                      [[15, 0], [-15, 0], [-10, -12], [10, -12]], # Center part
-                      [[-5, -12], [5, -12], [8, -20], [-8, -20]], # Engine
-                      [[7, 0], [-7, 0], [-4, 18], [4, 18]], # Cockpit
-                      [[0, 18], [0, 23]] # Gun
+        # Each part is [[color_override],  [dots]]
+        self.parts = [[[],  [[-25, 4], [25, 4], [22, -5], [0, -11], [-22, -5]]], # Wings
+                      [[],  [[20, 4], [20, 9]]],     [[],  [[-20, 4], [-20, 9]]], # Wing guns
+                      [[],  [[7, 0], [-7, 0], [-4, 18], [4, 18]]], # Cockpit
+                      [self.color_glass,  [[5, -3], [-5, -3], [-2, 15], [2, 15]]], # Cockpit window
+                      [[],  [[15, 0], [-15, 0], [-10, -12], [10, -12]]], # Center part
+                      [[],  [[-5, -12], [5, -12], [8, -20], [-8, -20]]], # Engine
+                      [[],  [[0, 18], [0, 23]]] # Gun
                       ]
         
         self.rotated_sprite = self.rotate_sprite()
@@ -32,21 +35,27 @@ class Player(CircleShape):
             pygame.draw.circle(screen, (50, 50, 50), self.position, self.radius, 2)
 
         for part in self.rotated_sprite:
-            if len(part) == 2:
-                pygame.gfxdraw.line(screen, part[0][0], part[0][1], part[1][0], part[1][1], self.color_outline)
-            elif len(part) > 2:
-                pygame.gfxdraw.filled_polygon(screen, part, self.color_fill)
-                pygame.gfxdraw.aapolygon(screen, part, self.color_outline)
+            if len(part[1]) == 2:
+                #pygame.gfxdraw.line(screen, part[0][0], part[0][1], part[1][0], part[1][1], self.color_outline)
+                pygame.draw.line(screen, self.color_outline, part[1][0], part[1][1], 2)
+            elif len(part[1]) > 2:
+                if len(part[0]) == 0:
+                    pygame.gfxdraw.filled_polygon(screen, part[1], self.color_fill)
+                    #pygame.gfxdraw.aapolygon(screen, part, self.color_outline)
+                    pygame.draw.polygon(screen, self.color_outline, part[1], 2)
+                else: 
+                    pygame.gfxdraw.filled_polygon(screen, part[1], part[0])
 
 
     def rotate_sprite(self):
         new_sprite = []
         for part in self.parts:
             current_part = []
-            for dot in part:
+            for dot in part[1]:
                 dot_rotated = pygame.Vector2(dot).rotate(self.rotation)
                 current_part.append((int(self.position.x + dot_rotated.x), int(self.position.y + dot_rotated.y)))
-            new_sprite.append(current_part)
+            new_sprite.append([part[0], current_part])
+            #print(f"{current_part}")
         return new_sprite
 
 
@@ -96,6 +105,7 @@ class Player(CircleShape):
                 for i in range(0, 4):
                     self.color_outline[i] = int(PLAYER_COLOR_OUTLINE[i] - min(self.timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * PLAYER_COLOR_OUTLINE[i])
                     self.color_fill[i] = int(PLAYER_COLOR_FILL[i] - min(self.timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * PLAYER_COLOR_FILL[i])
+                    self.color_glass[i] = int(PLAYER_COLOR_GLASS[i] - min(self.timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * PLAYER_COLOR_GLASS[i])
                 self.timer_invul -= dt
 
             if self.timer_invul <= 0:
