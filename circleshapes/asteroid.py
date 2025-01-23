@@ -33,6 +33,7 @@ class Asteroid(CircleShape):
     
     def draw(self, screen):
         #pygame.draw.circle(screen, "white", (self.position.x, self.position.y), self.radius, 2)
+        pygame.gfxdraw.filled_polygon(screen, self.recalculate_points_for_drawing(), (50, 50, 50))
         pygame.gfxdraw.aapolygon(screen, self.recalculate_points_for_drawing(), (255, 255, 255))
 
     

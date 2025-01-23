@@ -8,6 +8,14 @@ from gameinfo import GameInfo
 from circleshapes.explosion import Explosion
 
 
+# To fix:
+
+# --- Asteroids can be split multiple times
+# --- File "/home/niko/workspace/github.com/UnLuckyNikolay/asteroids/circleshapes/shot.py", line 12, in draw
+# pygame.gfxdraw.filled_circle(screen, int(self.position.x), int(self.position.y), self.radius, (150, 255, 150))
+# OverflowError: signed short integer is greater than maximum
+
+
 def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))

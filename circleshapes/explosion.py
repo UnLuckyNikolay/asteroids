@@ -8,34 +8,47 @@ class Explosion(CircleShape):
         super().__init__(x, y, radius)
         self.timer = 0
         self.explosion_count = 3
-        self.points_for_drawing = self.get_points_for_drawing()
+        self.points_for_drawing_big = []
+        self.points_for_drawing_medium = []
+        self.points_for_drawing_small = []
+
+        self.get_points_all()
 
 
-    def get_points_for_drawing(self):
+    def get_points_all(self):
+#        self.points_for_drawing_big = self.get_points_for_drawing(1)
+#        self.points_for_drawing_medium = self.get_points_for_drawing(0.8)
+#        self.points_for_drawing_small = self.get_points_for_drawing(0.6)
+        self.points_for_drawing_big, self.points_for_drawing_medium, self.points_for_drawing_small = self.get_points_for_drawing(1, 0.8, 0.6)
+
+
+    def get_points_for_drawing(self, size_L, size_M, size_S):
         amount_of_points = int(self.radius / ASTEROID_MIN_RADIUS * 2 + 6 + random.randint(1, 4) * 2)
-        points = []
+        points_L, points_M, points_S = [], [], []
         random_radius = self.radius * random.uniform(0.8, 1)
         point_far = True
 
         for i in range(amount_of_points):
             angle = (2 * math.pi * i) / amount_of_points
-            x = self.position.x + math.cos(angle) * random_radius
-            y = self.position.y + math.sin(angle) * random_radius
-            points.append((x, y))
+#            x = self.position.x + math.cos(angle) * random_radius
+#            y = self.position.y + math.sin(angle) * random_radius
+            points_L.append(((self.position.x + math.cos(angle) * random_radius * size_L), (self.position.y + math.sin(angle) * random_radius * size_L)))
+            points_M.append(((self.position.x + math.cos(angle) * random_radius * size_M), (self.position.y + math.sin(angle) * random_radius * size_M)))
+            points_S.append(((self.position.x + math.cos(angle) * random_radius * size_S), (self.position.y + math.sin(angle) * random_radius * size_S)))
             if point_far:
                 random_radius = self.radius * random.uniform(0.35, 0.6)
                 point_far = False
             else:
                 random_radius = self.radius * random.uniform(0.7, 1) 
                 point_far = True                 
-        return points
+        return points_L, points_M, points_S
 
 
     def update(self, dt):
         self.timer += dt
         if self.timer > 0.2:
             if self.explosion_count > 0:
-                self.points_for_drawing = self.get_points_for_drawing()
+                self.get_points_all()
                 self.timer = 0
                 self.explosion_count -= 1
             else:
@@ -43,4 +56,6 @@ class Explosion(CircleShape):
 
 
     def draw(self, screen):
-        pygame.gfxdraw.aapolygon(screen, self.points_for_drawing, (255, 100, 0))
+        pygame.gfxdraw.filled_polygon(screen, self.points_for_drawing_big, (80, 60, 40))
+        pygame.gfxdraw.filled_polygon(screen, self.points_for_drawing_medium, (255, 50, 0))
+        pygame.gfxdraw.filled_polygon(screen, self.points_for_drawing_small, (255, 200, 0))

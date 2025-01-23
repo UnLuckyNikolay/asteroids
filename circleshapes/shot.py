@@ -1,4 +1,4 @@
-import pygame
+import pygame, pygame.gfxdraw
 from constants import *
 from circleshape import CircleShape
 
@@ -9,7 +9,8 @@ class Shot(CircleShape):
 
     
     def draw(self, screen):
-        pygame.draw.circle(screen, "white", (self.position.x, self.position.y), self.radius, 2)
+        pygame.gfxdraw.filled_circle(screen, int(self.position.x), int(self.position.y), self.radius, (150, 255, 150))
+        pygame.gfxdraw.filled_circle(screen, int(self.position.x), int(self.position.y), int(self.radius * 0.6), (255, 255, 255))
 
     
     def update(self, dt):

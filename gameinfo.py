@@ -21,9 +21,9 @@ class GameInfo():
     @score.setter
     def score(self, value):
         self._score = value
-        if self._score > 10:
+        if self._score > 50:
             self.player.level_gun = 3
-        elif self._score > 5:
+        elif self._score > 25:
             self.player.level_gun = 2
 
 
