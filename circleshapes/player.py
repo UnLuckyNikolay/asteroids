@@ -2,7 +2,6 @@ import pygame, pygame.gfxdraw, copy, math
 from constants import *
 from circleshape import CircleShape
 from circleshapes.shot import Shot
-#from gameinfo import GameInfo
 
 
 class Player(CircleShape):
@@ -25,26 +24,14 @@ class Player(CircleShape):
                       ]
         
         self.rotated_sprite = self.rotate_sprite()
-
-
-#    def triangle(self):   # Old sprite
-#        forward = pygame.Vector2(0, 1).rotate(self.rotation)
-#        right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
-#        a = self.position + forward * self.radius
-#        b = self.position - forward * self.radius - right
-#        c = self.position - forward * self.radius + right
-#       return [a, b, c]
     
 
     def draw(self, screen):
         pygame.draw.circle(screen, (50, 50, 50), self.position, 1, 2)
         pygame.draw.circle(screen, (50, 50, 50), self.position, self.radius, 2)   # Draws hit-box in dark gray.
 
-        #pygame.draw.polygon(screen, self.color, self.triangle(), 2)   # Old sprite
-
         for part in self.rotated_sprite:
             if len(part) == 2:
-                #pygame.draw.line(screen, self.color_outline, part[0], part[1])
                 pygame.gfxdraw.line(screen, part[0][0], part[0][1], part[1][0], part[1][1], self.color_outline)
             elif len(part) > 2:
                 pygame.gfxdraw.filled_polygon(screen, part, self.color_fill)
@@ -108,8 +95,6 @@ class Player(CircleShape):
                 for i in range(0, 4):
                     self.color_outline[i] = int(PLAYER_COLOR_OUTLINE[i] - min(self.timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * PLAYER_COLOR_OUTLINE[i])
                     self.color_fill[i] = int(PLAYER_COLOR_FILL[i] - min(self.timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * PLAYER_COLOR_FILL[i])
-#                self.color_outline[3] = int(255 - min(self.timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * 255)
-#                self.color_fill[3] = int(255 - min(self.timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * 255)
                 self.timer_invul -= dt
 
             if self.timer_invul <= 0:

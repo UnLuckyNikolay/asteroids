@@ -11,9 +11,6 @@ from circleshapes.explosion import Explosion
 # To fix:
 
 # --- Asteroids can be split multiple times
-# --- File "/home/niko/workspace/github.com/UnLuckyNikolay/asteroids/circleshapes/shot.py", line 12, in draw
-# pygame.gfxdraw.filled_circle(screen, int(self.position.x), int(self.position.y), self.radius, (150, 255, 150))
-# OverflowError: signed short integer is greater than maximum
 
 
 def main():
@@ -51,9 +48,13 @@ def main():
 
         for object in updatable:
             object.update(dt)
+        print(f"The amount of objects: {len(drawable)}")
 
         for object in drawable:
-            object.draw(screen)
+            if object.is_off_screen():
+                object.kill()
+            else:
+                object.draw(screen)
 
         for asteroid in asteroids:
             if asteroid.check_colision(player) and not player.is_invul:
