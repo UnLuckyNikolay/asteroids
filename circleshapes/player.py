@@ -15,10 +15,12 @@ class Player(CircleShape):
         self.color_fill = list(PLAYER_COLOR_FILL)
         self.color_glass = list(PLAYER_COLOR_GLASS)
         self.level_gun = 1
+        self.__speed = 0
         
-        # Each part is [[color_override],  [dots]]
+        # Each part is [[color_override],  [list of dots]]
         self.parts = [[[],  [[-25, 4], [25, 4], [22, -5], [0, -11], [-22, -5]]], # Wings
-                      [[],  [[20, 4], [20, 9]]],     [[],  [[-20, 4], [-20, 9]]], # Wing guns
+                      [[],  [[20, 4], [20, 9]]],   # Wing guns
+                      [[],  [[-20, 4], [-20, 9]]], # ^
                       [[],  [[7, 0], [-7, 0], [-4, 18], [4, 18]]], # Cockpit
                       [self.color_glass,  [[5, -3], [-5, -3], [-2, 15], [2, 15]]], # Cockpit window
                       [[],  [[15, 0], [-15, 0], [-10, -12], [10, -12]]], # Center part
@@ -28,6 +30,22 @@ class Player(CircleShape):
         
         self.rotated_sprite = self.rotate_sprite()
     
+
+    @property
+    def speed(self):
+        return self.__speed
+
+    @speed.setter
+    def speed(self, value):
+        if value < -PLAYER_SPEED_MAX:
+            self.__speed = -PLAYER_SPEED_MAX
+        elif value > PLAYER_SPEED_MAX:
+            self.__speed = PLAYER_SPEED_MAX
+        elif self.speed != 0 and abs(value) < PLAYER_ACCELERATION and abs(self.__speed) < PLAYER_ACCELERATION:
+            self.__speed = 0   # Stops the player the speed is very low during deseleration, might change later
+        else:
+            self.__speed = value 
+
 
     def draw(self, screen):
         if PLAYER_SHOW_HITBOX:   # Draws player hit box in dark gray.
@@ -64,7 +82,7 @@ class Player(CircleShape):
 
 
     def move(self, dt):
-        self.position += pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SPEED * dt
+        self.position += pygame.Vector2(0, 1).rotate(self.rotation) * self.speed * dt
 
 
     def shoot(self):
@@ -93,10 +111,23 @@ class Player(CircleShape):
             self.rotate(dt)
         if keys[pygame.K_a]:
             self.rotate(-dt)
-        if keys[pygame.K_w]:
+
+#        if keys[pygame.K_w]:   # Old movement system
+#            self.move(dt)
+#        if keys[pygame.K_s]:
+#            self.move(-dt)
+        if self.speed != 0:
             self.move(dt)
-        if keys[pygame.K_s]:
-            self.move(-dt)
+        if keys[pygame.K_w]:
+            self.speed += PLAYER_ACCELERATION
+        elif keys[pygame.K_s]:
+            self.speed -= PLAYER_ACCELERATION
+        else:
+            if self.speed > 0:
+                self.speed -= int(PLAYER_ACCELERATION / 2)
+            elif self.speed < 0:
+                self.speed += int(PLAYER_ACCELERATION / 2)
+
         if keys[pygame.K_SPACE] and self.timer_shot > SHOT_COOLDOWN:
             self.shoot()
 
