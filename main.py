@@ -20,7 +20,7 @@ def main():
     pygame.display.set_caption("Asteroids")
     clock = pygame.time.Clock()
     dt = 0
-    score = 0
+#    score = 0
     player_is_alive = True
 
     updatable = pygame.sprite.Group()

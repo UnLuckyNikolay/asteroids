@@ -8,6 +8,8 @@ class Player(CircleShape):
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 180
+        self.rotation_inertia = self.rotation
+        self.inertia = pygame.Vector2(0, 0)
         self.timer_shot = 0
         self.timer_invul = 0
         self.is_invul = False
@@ -41,8 +43,9 @@ class Player(CircleShape):
             self.__speed = -PLAYER_SPEED_MAX
         elif value > PLAYER_SPEED_MAX:
             self.__speed = PLAYER_SPEED_MAX
-        elif self.speed != 0 and abs(value) < PLAYER_ACCELERATION and abs(self.__speed) < PLAYER_ACCELERATION:
+        elif self.__speed != 0 and abs(value) < PLAYER_ACCELERATION and abs(self.__speed) < PLAYER_ACCELERATION:
             self.__speed = 0   # Stops the player the speed is very low during deseleration, might change later
+            self.inertia = pygame.Vector2(0, 0)
         else:
             self.__speed = value 
 
@@ -66,15 +69,15 @@ class Player(CircleShape):
 
 
     def rotate_sprite(self):
-        new_sprite = []
+        rotated_sprite = []
         for part in self.parts:
-            current_part = []
+            rotated_part = []
             for dot in part[1]:
                 dot_rotated = pygame.Vector2(dot).rotate(self.rotation)
-                current_part.append((int(self.position.x + dot_rotated.x), int(self.position.y + dot_rotated.y)))
-            new_sprite.append([part[0], current_part])
+                rotated_part.append((int(self.position.x + dot_rotated.x), int(self.position.y + dot_rotated.y)))
+            rotated_sprite.append([part[0], rotated_part])
             #print(f"{current_part}")
-        return new_sprite
+        return rotated_sprite
 
 
     def rotate(self, dt):
@@ -82,7 +85,9 @@ class Player(CircleShape):
 
 
     def move(self, dt):
-        self.position += pygame.Vector2(0, 1).rotate(self.rotation) * self.speed * dt
+#        self.position += pygame.Vector2(0, 1).rotate(self.rotation) * self.speed * dt
+        self.inertia = self.inertia * ((100 - PLAYER_ACCELERATION) / 100) + pygame.Vector2(0, 1).rotate(self.rotation_inertia) * (PLAYER_ACCELERATION / 100)
+        self.position += self.inertia * self.speed * dt
 
 
     def shoot(self):
@@ -119,10 +124,12 @@ class Player(CircleShape):
         if self.speed != 0:
             self.move(dt)
         if keys[pygame.K_w]:
+            self.rotation_inertia = self.rotation
             self.speed += PLAYER_ACCELERATION
         elif keys[pygame.K_s]:
+            self.rotation_inertia = self.rotation
             self.speed -= PLAYER_ACCELERATION
-        else:
+        else:   # Deceleration
             if self.speed > 0:
                 self.speed -= int(PLAYER_ACCELERATION / 2)
             elif self.speed < 0:
