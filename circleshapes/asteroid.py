@@ -7,6 +7,7 @@ class Asteroid(CircleShape):
     def __init__(self, x, y, radius):
         super().__init__(x, y, radius)
         self.points_for_drawing = self.get_points_for_drawing()
+        self.has_been_hit = False
         
 
     def get_points_for_drawing(self):
@@ -42,6 +43,7 @@ class Asteroid(CircleShape):
 
     def split(self):
         pygame.sprite.Sprite.kill(self)
+        self.has_been_hit = True
         if self.radius <= ASTEROID_MIN_RADIUS:
             return
         else:

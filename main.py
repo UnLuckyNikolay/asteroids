@@ -70,7 +70,7 @@ def main():
                     return
                 
             for shot in shots:
-                if shot.check_colision(asteroid):
+                if shot.check_colision(asteroid) and not asteroid.has_been_hit:
                     shot.kill()
                     asteroid.split()
                     explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
