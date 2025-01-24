@@ -89,6 +89,16 @@ class Player(CircleShape):
         self.inertia = self.inertia * ((100 - PLAYER_ACCELERATION) / 100) + pygame.Vector2(0, 1).rotate(self.rotation_inertia) * (PLAYER_ACCELERATION / 100)
         self.position += self.inertia * self.speed * dt
 
+        # Teleports player if off-screen
+        if self.position.x < -ASTEROID_MAX_RADIUS:
+            self.position.x = SCREEN_WIDTH + ASTEROID_MAX_RADIUS
+        elif self.position.x > SCREEN_WIDTH + ASTEROID_MAX_RADIUS:
+            self.position.x = -ASTEROID_MAX_RADIUS
+        if self.position.y < -ASTEROID_MAX_RADIUS:
+            self.position.y = SCREEN_HEIGHT + ASTEROID_MAX_RADIUS
+        elif self.position.y > SCREEN_HEIGHT + ASTEROID_MAX_RADIUS:
+            self.position.y = -ASTEROID_MAX_RADIUS
+
 
     def shoot(self):
         if self.level_gun == 1 or self.level_gun == 3:
