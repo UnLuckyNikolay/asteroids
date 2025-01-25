@@ -1,13 +1,12 @@
-import pygame, random, math, pygame.gfxdraw
+import pygame, random, pygame.gfxdraw
 from constants import *
-from circleshape import CircleShape
 from ..asteroid import Asteroid
 
 
 class AsteroidBasic(Asteroid):
     def __init__(self, x, y, radius):
         color = random.randint(30, 80)
-        super().__init__(x, y, radius, (color, color, color), 1)
+        super().__init__(x, y, radius, (color, color, color), (color + 50, color + 50, color + 50), 1)
 
 
     def split(self):

@@ -2,6 +2,7 @@ import pygame, random
 from constants import *
 #from circleshapes.asteroid import Asteroid
 from circleshapes.asteroids.asteroidbasic import AsteroidBasic
+from circleshapes.asteroids.asteroidgolden import AsteroidGolden
 
 
 class AsteroidField(pygame.sprite.Sprite):
@@ -31,8 +32,13 @@ class AsteroidField(pygame.sprite.Sprite):
 
 
     def spawn(self, radius, position, velocity):
-        asteroid = AsteroidBasic(position.x, position.y, radius)
-        asteroid.velocity = velocity
+        roll = random.randint(0, 100)
+        if roll < 5:
+            asteroid = AsteroidGolden(position.x, position.y, radius)
+            asteroid.velocity = velocity * 3
+        else:
+            asteroid = AsteroidBasic(position.x, position.y, radius)
+            asteroid.velocity = velocity
 
     
     def update(self, dt):

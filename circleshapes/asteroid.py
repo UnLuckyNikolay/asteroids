@@ -5,7 +5,7 @@ from circleshape import CircleShape
 
 
 class Asteroid(CircleShape):
-    def __init__(self, x, y, radius, color, reward):
+    def __init__(self, x, y, radius, color_fill, color_outline, reward):
         super().__init__(x, y, radius)
         self.size = int(self.radius / ASTEROID_MIN_RADIUS)
         self.has_been_hit = False
@@ -15,8 +15,8 @@ class Asteroid(CircleShape):
 #        self.color_fill = (self.__color_fill, self.__color_fill, self.__color_fill)
 #        self.__color_outline = self.__color_fill + 50
 #        self.color_outline = (self.__color_outline, self.__color_outline, self.__color_outline)
-        self.color_fill = color
-        self.color_outline = (color[0] + 50, color[1] + 50, color[2] + 50)
+        self.color_fill = color_fill
+        self.color_outline = color_outline
 
         self.default_points = self.get_points_for_drawing()
 
