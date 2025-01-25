@@ -1,12 +1,13 @@
 import pygame
 from constants import *
 from circleshapes.player import Player
-from circleshapes.asteroid import Asteroid
+#from circleshapes.asteroid import Asteroid
 from asteroidfield import AsteroidField
 from circleshapes.shot import Shot
 from gameinfo import GameInfo
 from circleshapes.explosion import Explosion
 from starfield import StarField
+from circleshapes.asteroids.asteroidbasic import AsteroidBasic
 
 
 def main():
@@ -25,7 +26,7 @@ def main():
 
     StarField.containers = (drawable)
     Player.containers = (updatable, drawable)
-    Asteroid.containers = (asteroids, updatable, drawable, projectile)
+    AsteroidBasic.containers = (asteroids, updatable, drawable, projectile)
     AsteroidField.containers = (updatable)
     Shot.containers = (shots, updatable, drawable, projectile)
     Explosion.containers = (updatable, drawable)
@@ -68,7 +69,7 @@ def main():
                     shot.kill()
                     asteroid.split()
                     explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
-                    gameinfo.score += 1
+                    gameinfo.score += asteroid.reward
 
 
         pygame.display.flip()

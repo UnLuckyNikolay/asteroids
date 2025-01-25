@@ -1,6 +1,7 @@
 import pygame, random
 from constants import *
-from circleshapes.asteroid import Asteroid
+#from circleshapes.asteroid import Asteroid
+from circleshapes.asteroids.asteroidbasic import AsteroidBasic
 
 
 class AsteroidField(pygame.sprite.Sprite):
@@ -30,7 +31,7 @@ class AsteroidField(pygame.sprite.Sprite):
 
 
     def spawn(self, radius, position, velocity):
-        asteroid = Asteroid(position.x, position.y, radius)
+        asteroid = AsteroidBasic(position.x, position.y, radius)
         asteroid.velocity = velocity
 
     

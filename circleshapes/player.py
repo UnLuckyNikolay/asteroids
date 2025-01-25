@@ -76,7 +76,6 @@ class Player(CircleShape):
                 dot_rotated = pygame.Vector2(dot).rotate(self.rotation)
                 rotated_part.append((int(self.position.x + dot_rotated.x), int(self.position.y + dot_rotated.y)))
             rotated_sprite.append([part[0], rotated_part])
-            #print(f"{current_part}")
         return rotated_sprite
 
 
