@@ -163,7 +163,9 @@ class Player(CircleShape):
 
 
     def got_shot(self, gameinfo):
-        if gameinfo.lives > 0:
+        if PLAYER_GOD_MODE:
+            return True
+        elif gameinfo.lives > 0:
             gameinfo.lives -= 1
             self.timer_invul = 2
             self.is_invul = True

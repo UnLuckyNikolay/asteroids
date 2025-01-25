@@ -9,6 +9,7 @@ from circleshapes.explosion import Explosion
 from starfield import StarField
 from circleshapes.asteroids.asteroidbasic import AsteroidBasic
 from circleshapes.asteroids.asteroidgolden import AsteroidGolden
+from circleshapes.asteroids.asteroidexplosive import AsteroidExplosive
 
 
 def main():
@@ -29,6 +30,7 @@ def main():
     Player.containers = (updatable, drawable)
     AsteroidBasic.containers = (asteroids, updatable, drawable, projectile)
     AsteroidGolden.containers = (asteroids, updatable, drawable, projectile)
+    AsteroidExplosive.containers = (asteroids, updatable, drawable, projectile)
     AsteroidField.containers = (updatable)
     Shot.containers = (shots, updatable, drawable, projectile)
     Explosion.containers = (updatable, drawable)
