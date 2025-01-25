@@ -9,18 +9,12 @@ from circleshapes.explosion import Explosion
 from starfield import StarField
 
 
-# To fix:
-
-# --- Asteroids can be split multiple times
-
-
 def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Asteroids")
     clock = pygame.time.Clock()
     dt = 0
-#    score = 0
     player_is_alive = True
 
     updatable = pygame.sprite.Group()
