@@ -1,7 +1,6 @@
 import pygame, pygame.gfxdraw, copy, math
 from constants import *
 from circleshape import CircleShape
-from circleshapes.shot import Shot
 from weapons.plasmagun import PlasmaGun
 
 
@@ -91,7 +90,6 @@ class Player(CircleShape):
 
 
     def move(self, dt):
-#        self.position += pygame.Vector2(0, 1).rotate(self.rotation) * self.speed * dt
         self.inertia = self.inertia * ((100 - PLAYER_ACCELERATION) / 100) + pygame.Vector2(0, 1).rotate(self.rotation_inertia) * (PLAYER_ACCELERATION / 100)
         self.position += self.inertia * self.speed * dt
 
@@ -120,10 +118,6 @@ class Player(CircleShape):
         if keys[pygame.K_a]:
             self.rotate(-dt)
 
-#        if keys[pygame.K_w]:   # Old movement system
-#            self.move(dt)
-#        if keys[pygame.K_s]:
-#            self.move(-dt)
         if self.speed != 0:
             self.move(dt)
         if keys[pygame.K_w]:

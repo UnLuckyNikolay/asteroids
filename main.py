@@ -1,10 +1,9 @@
 import pygame
 from constants import *
 from circleshapes.player import Player
-#from circleshapes.asteroid import Asteroid
 from asteroidfield import AsteroidField
-from circleshapes.shot import Shot
-from gameinfo import GameInfo
+from circleshapes.projectileplasma import ProjectilePlasma
+from gamestatemanager import GameStateManager
 from circleshapes.explosion import Explosion
 from starfield import StarField
 from circleshapes.asteroids.asteroidbasic import AsteroidBasic
@@ -23,21 +22,21 @@ def main():
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
-    shots = pygame.sprite.Group()
-    projectile = pygame.sprite.Group()
+    projectiles = pygame.sprite.Group()
+    moving_objects = pygame.sprite.Group()
 
     StarField.containers = (drawable)
     Player.containers = (updatable, drawable)
-    AsteroidBasic.containers = (asteroids, updatable, drawable, projectile)
-    AsteroidGolden.containers = (asteroids, updatable, drawable, projectile)
-    AsteroidExplosive.containers = (asteroids, updatable, drawable, projectile)
+    AsteroidBasic.containers = (asteroids, updatable, drawable, moving_objects)
+    AsteroidGolden.containers = (asteroids, updatable, drawable, moving_objects)
+    AsteroidExplosive.containers = (asteroids, updatable, drawable, moving_objects)
     AsteroidField.containers = (updatable)
-    Shot.containers = (shots, updatable, drawable, projectile)
+    ProjectilePlasma.containers = (projectiles, updatable, drawable, moving_objects)
     Explosion.containers = (updatable, drawable)
 
     starfield = StarField()
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-    gameinfo = GameInfo(player)
+    gameinfo = GameStateManager(player)
     asteroidfield = AsteroidField()
 
     while player_is_alive:
@@ -52,7 +51,7 @@ def main():
         for object in updatable:
             object.update(dt)
 
-        for object in projectile:
+        for object in moving_objects:
             if object.is_off_screen():
                 object.kill()
 
@@ -68,7 +67,7 @@ def main():
                 else:
                     return
                 
-            for shot in shots:
+            for shot in projectiles:
                 if shot.check_colision(asteroid) and not asteroid.has_been_hit:
                     shot.kill()
                     asteroid.split()

@@ -3,7 +3,7 @@ from constants import *
 from circleshape import CircleShape
 
 
-class Shot(CircleShape):
+class ProjectilePlasma(CircleShape):
     def __init__(self, x, y):
         super().__init__(x, y, 5)
 

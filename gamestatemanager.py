@@ -2,7 +2,7 @@ import pygame
 from constants import *
 
 
-class GameInfo():
+class GameStateManager():
     def __init__(self, player):
         self._score = 0
         self.lives = PLAYER_LIVES
