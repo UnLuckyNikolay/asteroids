@@ -2,6 +2,7 @@ import pygame, pygame.gfxdraw, copy, math
 from constants import *
 from circleshape import CircleShape
 from circleshapes.shot import Shot
+from weapons.plasmagun import PlasmaGun
 
 
 class Player(CircleShape):
@@ -10,14 +11,20 @@ class Player(CircleShape):
         self.rotation = 180
         self.rotation_inertia = self.rotation
         self.inertia = pygame.Vector2(0, 0)
-        self.timer_shot = 0
+        self.__speed = 0
+
         self.timer_invul = 0
         self.is_invul = False
+
         self.color_outline = list(PLAYER_COLOR_OUTLINE)
         self.color_fill = list(PLAYER_COLOR_FILL)
         self.color_glass = list(PLAYER_COLOR_GLASS)
-        self.level_gun = 1
-        self.__speed = 0
+
+        self.time_since_last_shot = 0
+        self.weapons_unlocked = []
+        self.weapon = PlasmaGun()
+        self.weapon.upgrade()
+        self.weapons_unlocked.append(self.weapon)
         
         # Each part is [[color_override],  [list of dots]]
         self.parts = [[[],  [[-25, 4], [25, 4], [22, -5], [0, -11], [-22, -5]]], # Wings
@@ -99,26 +106,13 @@ class Player(CircleShape):
             self.position.y = -ASTEROID_MAX_RADIUS
 
 
-    def shoot(self):
-        if self.level_gun == 1 or self.level_gun == 3:
-            self.spawn_bullet((0, 23))
-
-        if self.level_gun == 2 or self.level_gun == 3:
-            self.spawn_bullet((20, 9))
-            self.spawn_bullet((-20, 9))
-
-        self.timer_shot = 0
-
-    
-    def spawn_bullet(self, dot):
-        spawn = pygame.Vector2(dot).rotate(self.rotation)
-        shot = Shot(int(self.position.x + spawn.x), int(self.position.y + spawn.y))
-        shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * SHOT_SPEED
+    def attempt_shot(self, time_since_last_shot):
+        return self.weapon.attempt_shot(self.position, self.rotation, time_since_last_shot)
 
 
     def update(self, dt):
         keys = pygame.key.get_pressed()
-        self.timer_shot += dt
+        self.time_since_last_shot += dt
         self.rotated_sprite = self.rotate_sprite()
 
         if keys[pygame.K_d]:
@@ -144,8 +138,8 @@ class Player(CircleShape):
             elif self.speed < 0:
                 self.speed += int(PLAYER_ACCELERATION / 2)
 
-        if keys[pygame.K_SPACE] and self.timer_shot > SHOT_COOLDOWN:
-            self.shoot()
+        if keys[pygame.K_SPACE] and self.attempt_shot(self.time_since_last_shot):
+            self.time_since_last_shot = 0
 
         if self.is_invul:
             if self.timer_invul > 0:
