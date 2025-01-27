@@ -1,17 +1,17 @@
 import pygame
-from weapon import Weapon
-from circleshapes.projectileplasma import ProjectilePlasma
+from player.weapons.weapon import Weapon
+from player.weapons.projectiles.projectileplasma import ProjectilePlasma
 
 
 class PlasmaGun(Weapon):
     def __init__(self):
         super().__init__((0, 25, 100))
         self.__projectile_speed = 500
-        self.cooldown = 0.4
+        self.__cooldown = 0.4
 
 
     def attempt_shot(self, position, rotation, time_since_last_shot):
-        if time_since_last_shot >= self.cooldown:
+        if time_since_last_shot >= self.__cooldown:
             level = self.get_level()
 
             if level == 1 or level == 3:

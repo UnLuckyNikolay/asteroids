@@ -1,6 +1,6 @@
 import pygame, pygame.gfxdraw
 from constants import *
-from circleshape import CircleShape
+from shapes.circleshape import CircleShape
 
 
 class ProjectilePlasma(CircleShape):

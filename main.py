@@ -1,14 +1,14 @@
 import pygame
 from constants import *
-from circleshapes.player import Player
-from asteroidfield import AsteroidField
-from circleshapes.projectileplasma import ProjectilePlasma
+from player.player import Player
+from player.weapons.projectiles.projectileplasma import ProjectilePlasma
 from gamestatemanager import GameStateManager
-from circleshapes.explosion import Explosion
-from starfield import StarField
-from circleshapes.asteroids.asteroidbasic import AsteroidBasic
-from circleshapes.asteroids.asteroidgolden import AsteroidGolden
-from circleshapes.asteroids.asteroidexplosive import AsteroidExplosive
+from vfx.explosion import Explosion
+from world.starfield import StarField
+from world.asteroidfield import AsteroidField
+from asteroids.asteroidbasic import AsteroidBasic
+from asteroids.asteroidgolden import AsteroidGolden
+from asteroids.asteroidexplosive import AsteroidExplosive
 
 
 def main():
@@ -21,9 +21,9 @@ def main():
 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
-    asteroids = pygame.sprite.Group()
-    projectiles = pygame.sprite.Group()
-    moving_objects = pygame.sprite.Group()
+    asteroids = pygame.sprite.Group()        # Used for colision detection
+    projectiles = pygame.sprite.Group()      # ^
+    moving_objects = pygame.sprite.Group()   # Used to destroy objects that are off-screen
 
     StarField.containers = (drawable)
     Player.containers = (updatable, drawable)
@@ -36,7 +36,7 @@ def main():
 
     starfield = StarField()
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-    gameinfo = GameStateManager(player)
+    game = GameStateManager(player)
     asteroidfield = AsteroidField()
 
     while player_is_alive:
@@ -46,7 +46,7 @@ def main():
         
 
         screen.fill("black")
-        gameinfo.draw(screen)
+        game.draw(screen)
 
         for object in updatable:
             object.update(dt)
@@ -60,7 +60,7 @@ def main():
 
         for asteroid in asteroids:
             if asteroid.check_colision(player) and not player.is_invul:
-                player_is_alive = player.got_shot(gameinfo)
+                player_is_alive = player.take_damage_and_check_if_alive(game)
                 if player_is_alive:
                     asteroid.kill()
                     explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
@@ -72,7 +72,7 @@ def main():
                     shot.kill()
                     asteroid.split()
                     explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
-                    gameinfo.score += asteroid.reward
+                    game.score += asteroid.reward
 
 
         pygame.display.flip()

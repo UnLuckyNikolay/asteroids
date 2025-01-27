@@ -1,7 +1,7 @@
 import pygame, random, math, pygame.gfxdraw
 from abc import ABC, abstractmethod
 from constants import *
-from circleshape import CircleShape
+from shapes.circleshape import CircleShape
 
 
 class Asteroid(CircleShape):

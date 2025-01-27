@@ -1,7 +1,7 @@
 import pygame, random, pygame.gfxdraw
 from constants import *
-from ..asteroid import Asteroid
-from circleshapes.asteroids.asteroidbasic import AsteroidBasic
+from asteroids.asteroid import Asteroid
+from asteroids.asteroidbasic import AsteroidBasic
 
 
 class AsteroidExplosive(Asteroid):

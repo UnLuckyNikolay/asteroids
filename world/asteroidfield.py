@@ -1,9 +1,8 @@
 import pygame, random
 from constants import *
-#from circleshapes.asteroid import Asteroid
-from circleshapes.asteroids.asteroidbasic import AsteroidBasic
-from circleshapes.asteroids.asteroidgolden import AsteroidGolden
-from circleshapes.asteroids.asteroidexplosive import AsteroidExplosive
+from asteroids.asteroidbasic import AsteroidBasic
+from asteroids.asteroidgolden import AsteroidGolden
+from asteroids.asteroidexplosive import AsteroidExplosive
 
 
 class AsteroidField(pygame.sprite.Sprite):

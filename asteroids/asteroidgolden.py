@@ -1,6 +1,6 @@
 import pygame, random, pygame.gfxdraw
 from constants import *
-from ..asteroid import Asteroid
+from asteroids.asteroid import Asteroid
 
 
 class AsteroidGolden(Asteroid):

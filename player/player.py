@@ -1,7 +1,7 @@
 import pygame, pygame.gfxdraw, copy, math
 from constants import *
-from circleshape import CircleShape
-from weapons.plasmagun import PlasmaGun
+from shapes.circleshape import CircleShape
+from player.weapons.plasmagun import PlasmaGun
 
 
 class Player(CircleShape):
@@ -150,7 +150,7 @@ class Player(CircleShape):
                 self.color_fill = list(PLAYER_COLOR_FILL)
 
 
-    def got_shot(self, gameinfo):
+    def take_damage_and_check_if_alive(self, gameinfo):
         if PLAYER_GOD_MODE:
             return True
         elif gameinfo.lives > 0:
