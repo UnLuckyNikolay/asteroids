@@ -3,6 +3,7 @@ from constants import *
 
 
 class StarField(pygame.sprite.Sprite):
+    layer = 0
     def __init__(self):
         if hasattr(self, "containers"):
             super().__init__(self.containers)

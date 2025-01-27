@@ -5,6 +5,7 @@ from vfx.explosion import Explosion
 
 
 class Bomb(CircleShape):
+    layer = 20
     def __init__(self, x, y):
         super().__init__(x, y, 15)
         self.time = 0

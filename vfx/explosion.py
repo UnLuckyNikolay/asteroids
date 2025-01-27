@@ -4,6 +4,7 @@ from shapes.circleshape import CircleShape
 
 
 class Explosion(CircleShape):
+    layer = 20
     def __init__(self, x, y, radius):
         super().__init__(x, y, radius)
         self.timer = 0

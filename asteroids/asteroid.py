@@ -5,6 +5,7 @@ from shapes.circleshape import CircleShape
 
 
 class Asteroid(CircleShape):
+    layer = 30
     def __init__(self, x, y, radius, color_fill, color_outline, reward):
         super().__init__(x, y, radius)
         self.size = int(self.radius / ASTEROID_MIN_RADIUS)

@@ -14,7 +14,6 @@ from asteroids.asteroidgolden import AsteroidGolden
 from asteroids.asteroidexplosive import AsteroidExplosive
 
 
-# Make ship be drawn over the bomb explosion (for start compare to plasma)
 # Move player_is_alive to player.is_alive
 
 
@@ -33,24 +32,27 @@ def main():
     explosion_hitboxes = pygame.sprite.Group()    # ^
     moving_objects = pygame.sprite.Group()        # Used to destroy objects that are off-screen
 
-#    StarField.layer = 0
+
     StarField.containers = (drawable)
-#    Explosion.layer = 50
     Explosion.containers = (updatable, drawable)
 
-#    Player.layer = 30
     Player.containers = (updatable, drawable)
-#    ProjectilePlasma.layer = 40
     ProjectilePlasma.containers = (projectiles, updatable, drawable, moving_objects)
-#    Bomb.layer = 20
     Bomb.containers = (drawable, updatable)
     BombExplosion.containers = (explosion_hitboxes)
 
-#    Asteroid.layer = 10
     AsteroidField.containers = (updatable)
     AsteroidBasic.containers = (asteroids, updatable, drawable, moving_objects)
     AsteroidGolden.containers = (asteroids, updatable, drawable, moving_objects)
     AsteroidExplosive.containers = (asteroids, updatable, drawable, moving_objects)
+
+    # Layers for drawable
+    # 0 - StarField
+    # 20 - Bomb, Explosion
+    # 30 - Asteroid(and children)
+    # 50 - Player
+    # 60 - ProjectilePlasma
+
 
     starfield = StarField()
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
@@ -73,8 +75,7 @@ def main():
             if object.is_off_screen():
                 object.kill()
 
-#        drawable = sorted(drawable, key = lambda object: object.layer)
-        for object in drawable:
+        for object in sorted(list(drawable), key = lambda object: object.layer):
             object.draw(screen)
 
         for asteroid in asteroids:
@@ -93,7 +94,7 @@ def main():
                     explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
                     game.score += asteroid.reward
             
-        for hitbox in explosion_hitboxes:  # RENAME ONE OF THE EXPLOSIONS
+        for hitbox in explosion_hitboxes:
             for asteroid in asteroids:
                 if hitbox.check_colision(asteroid) and not asteroid.has_been_hit:
                     asteroid.split()
