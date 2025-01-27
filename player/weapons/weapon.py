@@ -21,7 +21,7 @@ class Weapon(pygame.sprite.Sprite):
         if self.__level < len(self.__upgrade_costs):
             return self.__upgrade_costs[self.__level]
         else:
-            return None
+            return float('inf')
         
 
     def get_level(self):

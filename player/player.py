@@ -22,8 +22,8 @@ class Player(CircleShape):
 
         self.time_since_last_shot = 0
         self.weapons_unlocked = []
-        self.weapon = BombLauncher()
-        #self.weapon = PlasmaGun()
+        #self.weapon = BombLauncher()
+        self.weapon = PlasmaGun()
         self.weapon.upgrade()
         self.weapons_unlocked.append(self.weapon)
         

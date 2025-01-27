@@ -8,6 +8,7 @@ from gamestatemanager import GameStateManager
 from vfx.explosion import Explosion
 from world.starfield import StarField
 from world.asteroidfield import AsteroidField
+from asteroids.asteroid import Asteroid
 from asteroids.asteroidbasic import AsteroidBasic
 from asteroids.asteroidgolden import AsteroidGolden
 from asteroids.asteroidexplosive import AsteroidExplosive
@@ -32,14 +33,20 @@ def main():
     explosion_hitboxes = pygame.sprite.Group()    # ^
     moving_objects = pygame.sprite.Group()        # Used to destroy objects that are off-screen
 
+#    StarField.layer = 0
     StarField.containers = (drawable)
+#    Explosion.layer = 50
     Explosion.containers = (updatable, drawable)
 
+#    Player.layer = 30
     Player.containers = (updatable, drawable)
+#    ProjectilePlasma.layer = 40
     ProjectilePlasma.containers = (projectiles, updatable, drawable, moving_objects)
+#    Bomb.layer = 20
     Bomb.containers = (drawable, updatable)
     BombExplosion.containers = (explosion_hitboxes)
 
+#    Asteroid.layer = 10
     AsteroidField.containers = (updatable)
     AsteroidBasic.containers = (asteroids, updatable, drawable, moving_objects)
     AsteroidGolden.containers = (asteroids, updatable, drawable, moving_objects)
@@ -66,6 +73,7 @@ def main():
             if object.is_off_screen():
                 object.kill()
 
+#        drawable = sorted(drawable, key = lambda object: object.layer)
         for object in drawable:
             object.draw(screen)
 

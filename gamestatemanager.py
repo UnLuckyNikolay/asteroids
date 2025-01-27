@@ -21,10 +21,8 @@ class GameStateManager():
     @score.setter
     def score(self, value):
         self._score = value
-        if self._score > 50:
-            self.player.level_gun = 3
-        elif self._score > 25:
-            self.player.level_gun = 2
+        if self._score >= self.player.weapon.get_upgrade_cost():
+            self.player.weapon.upgrade()
 
 
     def draw(self, screen):
