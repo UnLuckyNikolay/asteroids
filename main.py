@@ -2,6 +2,8 @@ import pygame
 from constants import *
 from player.player import Player
 from player.weapons.projectiles.projectileplasma import ProjectilePlasma
+from player.weapons.projectiles.bomb import Bomb
+from player.weapons.projectiles.bombexplosion import BombExplosion
 from gamestatemanager import GameStateManager
 from vfx.explosion import Explosion
 from world.starfield import StarField
@@ -9,6 +11,10 @@ from world.asteroidfield import AsteroidField
 from asteroids.asteroidbasic import AsteroidBasic
 from asteroids.asteroidgolden import AsteroidGolden
 from asteroids.asteroidexplosive import AsteroidExplosive
+
+
+# Make ship be drawn over the bomb explosion (for start compare to plasma)
+# Move player_is_alive to player.is_alive
 
 
 def main():
@@ -21,18 +27,23 @@ def main():
 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
-    asteroids = pygame.sprite.Group()        # Used for colision detection
-    projectiles = pygame.sprite.Group()      # ^
-    moving_objects = pygame.sprite.Group()   # Used to destroy objects that are off-screen
+    asteroids = pygame.sprite.Group()             # Used for colision detection
+    projectiles = pygame.sprite.Group()           # ^
+    explosion_hitboxes = pygame.sprite.Group()    # ^
+    moving_objects = pygame.sprite.Group()        # Used to destroy objects that are off-screen
 
     StarField.containers = (drawable)
+    Explosion.containers = (updatable, drawable)
+
     Player.containers = (updatable, drawable)
+    ProjectilePlasma.containers = (projectiles, updatable, drawable, moving_objects)
+    Bomb.containers = (drawable, updatable)
+    BombExplosion.containers = (explosion_hitboxes)
+
+    AsteroidField.containers = (updatable)
     AsteroidBasic.containers = (asteroids, updatable, drawable, moving_objects)
     AsteroidGolden.containers = (asteroids, updatable, drawable, moving_objects)
     AsteroidExplosive.containers = (asteroids, updatable, drawable, moving_objects)
-    AsteroidField.containers = (updatable)
-    ProjectilePlasma.containers = (projectiles, updatable, drawable, moving_objects)
-    Explosion.containers = (updatable, drawable)
 
     starfield = StarField()
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
@@ -67,12 +78,20 @@ def main():
                 else:
                     return
                 
-            for shot in projectiles:
-                if shot.check_colision(asteroid) and not asteroid.has_been_hit:
-                    shot.kill()
+            for projectile in projectiles:
+                if projectile.check_colision(asteroid) and not asteroid.has_been_hit:
+                    projectile.kill()
                     asteroid.split()
                     explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
                     game.score += asteroid.reward
+            
+        for hitbox in explosion_hitboxes:  # RENAME ONE OF THE EXPLOSIONS
+            for asteroid in asteroids:
+                if hitbox.check_colision(asteroid) and not asteroid.has_been_hit:
+                    asteroid.split()
+                    #explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
+                    game.score += asteroid.reward
+            hitbox.kill()
 
 
         pygame.display.flip()

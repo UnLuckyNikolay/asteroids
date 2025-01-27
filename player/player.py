@@ -2,6 +2,7 @@ import pygame, pygame.gfxdraw, copy, math
 from constants import *
 from shapes.circleshape import CircleShape
 from player.weapons.plasmagun import PlasmaGun
+from player.weapons.bomblauncher import BombLauncher
 
 
 class Player(CircleShape):
@@ -21,7 +22,8 @@ class Player(CircleShape):
 
         self.time_since_last_shot = 0
         self.weapons_unlocked = []
-        self.weapon = PlasmaGun()
+        self.weapon = BombLauncher()
+        #self.weapon = PlasmaGun()
         self.weapon.upgrade()
         self.weapons_unlocked.append(self.weapon)
         
