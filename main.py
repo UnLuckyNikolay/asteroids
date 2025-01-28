@@ -48,7 +48,8 @@ def main():
 
     # Layers for drawable
     # 0 - StarField
-    # 20 - Bomb, Explosion
+    # 10 - Explosion
+    # 20 - Bomb
     # 30 - Asteroid(and children)
     # 50 - Player
     # 60 - ProjectilePlasma

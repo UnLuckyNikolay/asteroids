@@ -13,6 +13,8 @@ class Player(CircleShape):
         self.rotation_inertia = self.rotation
         self.inertia = pygame.Vector2(0, 0)
         self.__speed = 0
+        self.__turning_speed = 0
+        self.last_dt = 0
 
         self.timer_invul = 0
         self.is_invul = False
@@ -41,6 +43,22 @@ class Player(CircleShape):
         
         self.rotated_sprite = self.rotate_sprite()
     
+
+    @property
+    def turning_speed(self):
+        return self.__turning_speed
+    
+    @turning_speed.setter
+    def turning_speed(self, value):
+        if value < -PLAYER_TURNING_MAX:
+            self.__turning_speed = -PLAYER_TURNING_MAX
+        elif value > PLAYER_TURNING_MAX:
+            self.__turning_speed = PLAYER_TURNING_MAX
+        elif self.__turning_speed != 0 and abs(value) < PLAYER_TURNING_ACCELERATION and abs(self.__turning_speed) < PLAYER_TURNING_ACCELERATION:
+            self.__turning_speed = 0
+        else:
+            self.__turning_speed = value
+
 
     @property
     def speed(self):
@@ -89,7 +107,7 @@ class Player(CircleShape):
 
 
     def rotate(self, dt):
-        self.rotation += PLAYER_TURN_SPEED * dt
+        self.rotation += self.turning_speed * dt
 
 
     def move(self, dt):
@@ -112,21 +130,29 @@ class Player(CircleShape):
 
 
     def update(self, dt):
+        self.last_dt = dt
         keys = pygame.key.get_pressed()
         self.time_since_last_shot += dt
         self.rotated_sprite = self.rotate_sprite()
 
-        if keys[pygame.K_d]:
+        if self.turning_speed != 0:
             self.rotate(dt)
-        if keys[pygame.K_a]:
-            self.rotate(-dt)
+        if keys[pygame.K_d] and not keys[pygame.K_a]:
+            self.turning_speed += PLAYER_TURNING_ACCELERATION
+        elif keys[pygame.K_a] and not keys[pygame.K_d]:
+            self.turning_speed -= PLAYER_TURNING_ACCELERATION
+        else:
+            if self.turning_speed > 0:
+                self.turning_speed -= int(PLAYER_TURNING_ACCELERATION / 2)
+            elif self.turning_speed < 0:
+                self.turning_speed += int(PLAYER_TURNING_ACCELERATION / 2)
 
         if self.speed != 0:
             self.move(dt)
-        if keys[pygame.K_w]:
+        if keys[pygame.K_w] and not keys[pygame.K_s]:
             self.rotation_inertia = self.rotation
             self.speed += PLAYER_ACCELERATION
-        elif keys[pygame.K_s]:
+        elif keys[pygame.K_s] and not keys[pygame.K_w]:
             self.rotation_inertia = self.rotation
             self.speed -= PLAYER_ACCELERATION
         else:   # Deceleration
