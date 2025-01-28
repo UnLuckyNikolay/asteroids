@@ -5,7 +5,7 @@ from player.weapons.projectiles.projectileplasma import ProjectilePlasma
 
 class PlasmaGun(Weapon):
     def __init__(self):
-        super().__init__((0, 25, 100))
+        super().__init__((0, 25, 100), "Plasma Gun")
         self.__projectile_speed = 500
         self.__cooldown = 0.4
 

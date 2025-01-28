@@ -3,13 +3,18 @@ from abc import ABC, abstractmethod
 
 
 class Weapon(pygame.sprite.Sprite):
-    def __init__(self, upgrade_costs):
+    def __init__(self, upgrade_costs, name):
         if hasattr(self, "containers"):
             super().__init__(self.containers)
         else:
             super().__init__()
-        self.__level = 0
+        self.__level = 1
         self.__upgrade_costs = upgrade_costs
+        self.__name = name
+
+
+    def get_name(self):
+        return self.__name
 
         
     @abstractmethod

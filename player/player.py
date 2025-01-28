@@ -24,11 +24,13 @@ class Player(CircleShape):
         self.color_glass = list(PLAYER_COLOR_GLASS)
 
         self.time_since_last_shot = 0
-        self.weapons_unlocked = []
-        self.weapon = BombLauncher()
+        self.weapons = []
+        #self.weapon = BombLauncher()
         #self.weapon = PlasmaGun()
-        self.weapon.upgrade()
-        self.weapons_unlocked.append(self.weapon)
+        #self.weapon.upgrade()
+        self.weapons.append(PlasmaGun())
+        self.weapons.append(BombLauncher())
+        self.weapon = self.weapons[0]
         
         # Each part is [[color_override],  [list of dots]]
         self.parts = [[[],  [[-25, 4], [25, 4], [22, -5], [0, -11], [-22, -5]]], # Wings
@@ -135,18 +137,20 @@ class Player(CircleShape):
         self.time_since_last_shot += dt
         self.rotated_sprite = self.rotate_sprite()
 
+        # Turning
         if self.turning_speed != 0:
             self.rotate(dt)
         if keys[pygame.K_d] and not keys[pygame.K_a]:
             self.turning_speed += PLAYER_TURNING_ACCELERATION
         elif keys[pygame.K_a] and not keys[pygame.K_d]:
             self.turning_speed -= PLAYER_TURNING_ACCELERATION
-        else:
+        else:   # Deceleration
             if self.turning_speed > 0:
                 self.turning_speed -= int(PLAYER_TURNING_ACCELERATION / 2)
             elif self.turning_speed < 0:
                 self.turning_speed += int(PLAYER_TURNING_ACCELERATION / 2)
 
+        # Movement
         if self.speed != 0:
             self.move(dt)
         if keys[pygame.K_w] and not keys[pygame.K_s]:
@@ -160,6 +164,12 @@ class Player(CircleShape):
                 self.speed -= int(PLAYER_ACCELERATION / 2)
             elif self.speed < 0:
                 self.speed += int(PLAYER_ACCELERATION / 2)
+
+        # Weapon change
+        if keys[pygame.K_1] and self.weapon.get_name() != self.weapons[0].get_name():
+            self.weapon = self.weapons[0]
+        elif keys[pygame.K_2] and self.weapon.get_name() != self.weapons[1].get_name():
+            self.weapon = self.weapons[1]
 
         if keys[pygame.K_SPACE] and self.attempt_shot(self.time_since_last_shot):
             self.time_since_last_shot = 0
