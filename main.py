@@ -12,6 +12,7 @@ from asteroids.asteroid import Asteroid
 from asteroids.asteroidbasic import AsteroidBasic
 from asteroids.asteroidgolden import AsteroidGolden
 from asteroids.asteroidexplosive import AsteroidExplosive
+from userinterface import UserInterface
 
 
 # Move player_is_alive to player.is_alive
@@ -27,11 +28,12 @@ def main():
 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
-    asteroids = pygame.sprite.Group()             # Used for colision detection
-    projectiles = pygame.sprite.Group()           # ^
-    explosion_hitboxes = pygame.sprite.Group()    # ^
+    asteroids = pygame.sprite.Group()            # Used for colision detection
+    projectiles = pygame.sprite.Group()          # ^
+    explosion_hitboxes = pygame.sprite.Group()   # ^
     moving_objects = pygame.sprite.Group()        # Used to destroy objects that are off-screen
 
+    UserInterface.containers = (drawable)
 
     StarField.containers = (drawable)
     Explosion.containers = (updatable, drawable)
@@ -53,11 +55,13 @@ def main():
     # 30 - Asteroid(and children)
     # 50 - Player
     # 60 - ProjectilePlasma
+    # 100 - UserInterface
 
 
-    starfield = StarField()
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     game = GameStateManager(player)
+    ui = UserInterface(game, player)
+    starfield = StarField()
     asteroidfield = AsteroidField()
 
     while player_is_alive:
@@ -67,7 +71,6 @@ def main():
         
 
         screen.fill("black")
-        game.draw(screen)
 
         for object in updatable:
             object.update(dt)

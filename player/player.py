@@ -25,9 +25,6 @@ class Player(CircleShape):
 
         self.time_since_last_shot = 0
         self.weapons = []
-        #self.weapon = BombLauncher()
-        #self.weapon = PlasmaGun()
-        #self.weapon.upgrade()
         self.weapons.append(PlasmaGun())
         self.weapons.append(BombLauncher())
         self.weapon = self.weapons[0]
@@ -192,7 +189,7 @@ class Player(CircleShape):
     def take_damage_and_check_if_alive(self, gameinfo):
         if PLAYER_GOD_MODE:
             return True
-        elif gameinfo.lives > 0:
+        elif gameinfo.lives > 1:
             gameinfo.lives -= 1
             self.timer_invul = 2
             self.is_invul = True
