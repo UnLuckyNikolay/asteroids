@@ -44,9 +44,10 @@ def main():
     BombExplosion.containers = (explosion_hitboxes)
 
     AsteroidField.containers = (updatable)
-    AsteroidBasic.containers = (asteroids, updatable, drawable, moving_objects)
-    AsteroidGolden.containers = (asteroids, updatable, drawable, moving_objects)
-    AsteroidExplosive.containers = (asteroids, updatable, drawable, moving_objects)
+    Asteroid.containers = (asteroids, updatable, drawable, moving_objects)
+#    AsteroidBasic.containers = (asteroids, updatable, drawable, moving_objects)
+#    AsteroidGolden.containers = (asteroids, updatable, drawable, moving_objects)
+#    AsteroidExplosive.containers = (asteroids, updatable, drawable, moving_objects)
 
     # Layers for drawable
     # 0 - StarField
@@ -62,7 +63,7 @@ def main():
     game = GameStateManager(player)
     ui = UserInterface(game, player)
     starfield = StarField()
-    asteroidfield = AsteroidField()
+    asteroidfield = AsteroidField(player)
 
     while player_is_alive:
         for event in pygame.event.get():

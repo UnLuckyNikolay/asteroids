@@ -3,6 +3,7 @@ from constants import *
 from asteroids.asteroidbasic import AsteroidBasic
 from asteroids.asteroidgolden import AsteroidGolden
 from asteroids.asteroidexplosive import AsteroidExplosive
+from asteroids.asteroidhoming import AsteroidHoming
 
 
 class AsteroidField(pygame.sprite.Sprite):
@@ -26,17 +27,21 @@ class AsteroidField(pygame.sprite.Sprite):
     ]
 
 
-    def __init__(self):
+    def __init__(self, player):
         pygame.sprite.Sprite.__init__(self, self.containers)
         self.spawn_timer = 0.0
+        self.player = player
 
 
     def spawn(self, radius, position, velocity):
-        roll = random.randint(0, 100)
-        if roll < 5:
+        roll = random.randint(1, 100)
+        if roll <= 5:
             asteroid = AsteroidGolden(position.x, position.y)
             asteroid.velocity = velocity * 3
-        elif roll < 15:
+        elif roll <= 12:
+            asteroid = AsteroidHoming(position.x, position.y, self.player)
+            asteroid.velocity = velocity * 2
+        elif roll <= 22:
             asteroid = AsteroidExplosive(position.x, position.y)
             asteroid.velocity = velocity
         else:
