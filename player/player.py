@@ -1,4 +1,4 @@
-import pygame, pygame.gfxdraw, copy, math
+import pygame, pygame.gfxdraw
 from constants import *
 from shapes.circleshape import CircleShape
 from player.weapons.plasmagun import PlasmaGun
@@ -83,12 +83,10 @@ class Player(CircleShape):
 
         for part in self.rotated_sprite:
             if len(part[1]) == 2:
-                #pygame.gfxdraw.line(screen, part[0][0], part[0][1], part[1][0], part[1][1], self.color_outline)
                 pygame.draw.line(screen, self.color_outline, part[1][0], part[1][1], 2)
             elif len(part[1]) > 2:
                 if len(part[0]) == 0:
                     pygame.gfxdraw.filled_polygon(screen, part[1], self.color_fill)
-                    #pygame.gfxdraw.aapolygon(screen, part, self.color_outline)
                     pygame.draw.polygon(screen, self.color_outline, part[1], 2)
                 else: 
                     pygame.gfxdraw.filled_polygon(screen, part[1], part[0])

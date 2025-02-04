@@ -12,10 +12,6 @@ class Asteroid(CircleShape):
         self.has_been_hit = False
         self.reward = reward
 
-#        self.__color_fill = random.randint(30, 80)
-#        self.color_fill = (self.__color_fill, self.__color_fill, self.__color_fill)
-#        self.__color_outline = self.__color_fill + 50
-#        self.color_outline = (self.__color_outline, self.__color_outline, self.__color_outline)
         self.color_fill = color_fill
         self.color_outline = color_outline
 
@@ -47,7 +43,6 @@ class Asteroid(CircleShape):
         new_points = self.recalculate_points_for_drawing()
         pygame.gfxdraw.filled_polygon(screen, new_points, self.color_fill)
         pygame.draw.polygon(screen, self.color_outline, new_points, self.size + 2)
-#        pygame.gfxdraw.aapolygon(screen, points, (255, 255, 255))
 
     
     def update(self, dt):

@@ -9,9 +9,6 @@ from vfx.explosion import Explosion
 from world.starfield import StarField
 from world.asteroidfield import AsteroidField
 from asteroids.asteroid import Asteroid
-from asteroids.asteroidbasic import AsteroidBasic
-from asteroids.asteroidgolden import AsteroidGolden
-from asteroids.asteroidexplosive import AsteroidExplosive
 from userinterface import UserInterface
 
 
@@ -45,9 +42,6 @@ def main():
 
     AsteroidField.containers = (updatable)
     Asteroid.containers = (asteroids, updatable, drawable, moving_objects)
-#    AsteroidBasic.containers = (asteroids, updatable, drawable, moving_objects)
-#    AsteroidGolden.containers = (asteroids, updatable, drawable, moving_objects)
-#    AsteroidExplosive.containers = (asteroids, updatable, drawable, moving_objects)
 
     # Layers for drawable
     # 0 - StarField
@@ -103,7 +97,6 @@ def main():
             for asteroid in asteroids:
                 if hitbox.check_colision(asteroid) and not asteroid.has_been_hit:
                     asteroid.split()
-                    #explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
                     game.score += asteroid.reward
             hitbox.kill()
 
