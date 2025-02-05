@@ -1,20 +1,46 @@
 import pygame, pygame.gfxdraw
+from constants import *
 
 
 class UserInterface(pygame.sprite.Sprite):
     layer = 100
-    def __init__(self, game, player):
+    def __init__(self):
         if hasattr(self, "containers"):
             super().__init__(self.containers)
         else:
             super().__init__()
-        self.game = game
-        self.player = player
+        self.game = None
+        self.player = None
 
         self.alpha = 100
         self.font = pygame.font.Font(None, 36)
+        self.font_big = pygame.font.Font(None, 72)
+
+        self.button_big_height = 72
+        self.button_big_width = 240
+        self.button_coordinates = (
+            (((SCREEN_WIDTH / 2 - 120), 200), ((SCREEN_WIDTH / 2 - 120 + self.button_big_width), (200 + self.button_big_height))),   # Main menu - Start
+        )
         
 
+    def draw_main_menu(self, screen):
+        button_start_text = self.font_big.render("Start", True, (200, 200, 200, self.alpha))
+        self.draw_container(screen, SCREEN_WIDTH / 2 - 120, 200, self.button_big_height, self.button_big_width, 15, 8, 15, 8)
+        screen.blit(button_start_text, (SCREEN_WIDTH / 2 - 55, 215))
+
+
+    def check_click(self, position):
+        for i in range(0, len(self.button_coordinates)):
+            if (position[0] > self.button_coordinates[i][0][0] and
+                position[0] < self.button_coordinates[i][1][0] and
+                position[1] > self.button_coordinates[i][0][1] and
+                position[1] < self.button_coordinates[i][1][1]):
+                return i + 1
+            else:
+                return 0
+            
+
+    # In-game UI
     def draw(self, screen):
         info_weapon = self.font.render(f"Weapon: {self.player.weapon.get_name()}", True, (200, 200, 200, self.alpha))
         self.draw_container(screen, 25, 25, 36, 320, 10, 10, 5, 5)
@@ -48,10 +74,6 @@ class UserInterface(pygame.sprite.Sprite):
     def draw_polygon(self, screen, x, y, height, width, corner_topleft, corner_topright, corner_bottomright, corner_bottomleft, color):
         points = self.get_points(x, y, height, width, corner_topleft, corner_topright, corner_bottomright, corner_bottomleft)
         pygame.gfxdraw.filled_polygon(screen, points, (color[0], color[1], color[2], self.alpha))
-
-
-    def draw_health(self):
-        pass
 
 
     def get_points(self, x, y, height, width, corner_topleft, corner_topright, corner_bottomright, corner_bottomleft):

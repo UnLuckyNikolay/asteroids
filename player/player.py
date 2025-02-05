@@ -187,13 +187,15 @@ class Player(CircleShape):
 
     def take_damage_and_check_if_alive(self, gameinfo):
         if PLAYER_GOD_MODE:
-            return True
+            return self.is_alive
         elif gameinfo.lives > 1:
             gameinfo.lives -= 1
             self.timer_invul = 2
             self.is_invul = True
-            return True
+            return self.is_alive
         else:
+            gameinfo.lives -= 1
+            self.is_alive = False
             print(f"Game over! Final score: {gameinfo.score}")
-            return False
+            return self.is_alive
         
