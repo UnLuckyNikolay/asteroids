@@ -12,16 +12,12 @@ from asteroids.asteroid import Asteroid
 from userinterface import UserInterface
 
 
-# Move player_is_alive to player.is_alive
-
-
 def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Asteroids")
     clock = pygame.time.Clock()
     dt = 0
-    player_is_alive = True
 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
@@ -54,12 +50,12 @@ def main():
 
 
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-    game = GameStateManager(player)
-    ui = UserInterface(game, player)
-    starfield = StarField()
-    asteroidfield = AsteroidField(player)
+    game_state = GameStateManager(player)
+    ui = UserInterface(game_state, player)
+    star_field = StarField()
+    asteroid_field = AsteroidField(player)
 
-    while player_is_alive:
+    while player.is_alive:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
@@ -79,7 +75,7 @@ def main():
 
         for asteroid in asteroids:
             if asteroid.check_colision(player) and not player.is_invul:
-                player_is_alive = player.take_damage_and_check_if_alive(game)
+                player_is_alive = player.take_damage_and_check_if_alive(game_state)
                 if player_is_alive:
                     asteroid.kill()
                     explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
@@ -91,13 +87,13 @@ def main():
                     projectile.kill()
                     asteroid.split()
                     explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
-                    game.score += asteroid.reward
+                    game_state.score += asteroid.reward
             
         for hitbox in explosion_hitboxes:
             for asteroid in asteroids:
                 if hitbox.check_colision(asteroid) and not asteroid.has_been_hit:
                     asteroid.split()
-                    game.score += asteroid.reward
+                    game_state.score += asteroid.reward
             hitbox.kill()
 
 

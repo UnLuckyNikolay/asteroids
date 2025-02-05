@@ -18,6 +18,7 @@ class Player(CircleShape):
 
         self.timer_invul = 0
         self.is_invul = False
+        self.is_alive = True
 
         self.color_outline = list(PLAYER_COLOR_OUTLINE)
         self.color_fill = list(PLAYER_COLOR_FILL)
