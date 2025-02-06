@@ -1,4 +1,5 @@
-import pygame
+import pygame, json
+from tkinter import Tk, simpledialog
 from constants import *
 from player.player import Player
 from player.weapons.projectiles.projectileplasma import ProjectilePlasma
@@ -125,14 +126,43 @@ class Game():
             pygame.display.flip()
             self.dt = self.clock.tick(60) / 1000
 
-        
+        self.check_score(self.game_state.score)
+
         self.player = None
         self.game_state = None
         self.asteroid_field = None
         self.ui.player = None
         self.ui.game = None
 
-        print(f"Number of sprites before cleanup: {len(self.updatable)}")
         for object in self.updatable:
             object.kill()
-        print(f"Number of sprites after cleanup: {len(self.updatable)}")
+
+
+    def check_score(self, score):
+        try:
+            with open("leaderboard.json", "r") as file:
+                scores = json.load(file)
+        except FileNotFoundError:
+            scores = []
+
+        if len(scores) == 10 and score > scores[9]["score"]:
+            scores.pop()
+        if len(scores) != 10:
+            name = self.get_player_name()
+            scores.append({"name": name, "score": score})
+            scores.sort(key=lambda x: x["score"], reverse=True)
+
+        with open("leaderboard.json", "w") as file:
+            json.dump(scores, file)
+
+
+    def get_player_name(self):
+        root = Tk()
+        root.withdraw()
+
+        name = simpledialog.askstring("New record!", "Please enter your name: ")
+
+        root.destroy()
+
+        return name if name else "Player"
+    
