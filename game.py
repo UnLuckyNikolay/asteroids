@@ -17,7 +17,7 @@ class Game():
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        pygame.display.set_caption("Asteroids")
+        pygame.display.set_caption("Asteroids from Outer Space")
         self.clock = pygame.time.Clock()
         self.dt = 0
         self.is_running = True
@@ -66,15 +66,38 @@ class Game():
             self.ui.draw_main_menu(self.screen)
 
             if pygame.mouse.get_pressed()[0]:
-                next = self.ui.check_click(pygame.mouse.get_pos())
+                next = self.ui.check_click(pygame.mouse.get_pos(), self.ui.buttons_main_menu)
                 if next == 0:
                     pass
                 if next == 1:
                     self.game_loop()
+                if next == 2:
+                    self.leaderboard()
 
             pygame.display.flip()
             self.clock.tick(60)
 
+
+    def leaderboard(self):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.is_running = False
+                    return
+        
+            self.screen.fill("black")
+            self.star_field.draw(self.screen)
+            self.ui.draw_leaderboard(self.screen)
+
+            if pygame.mouse.get_pressed()[0]:
+                next = self.ui.check_click(pygame.mouse.get_pos(), self.ui.buttons_leaderboard)
+                if next == 0:
+                    pass
+                if next == 1:
+                    return
+
+            pygame.display.flip()
+            self.clock.tick(60)
 
     def game_loop(self):
         self.player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
@@ -145,10 +168,12 @@ class Game():
         except FileNotFoundError:
             scores = []
 
-        if len(scores) == 10 and score > scores[9]["score"]:
+        while len(scores) > LEADERBOARD_LENGTH:   # Shortens leaderboard if max length was reduced
             scores.pop()
-        if len(scores) != 10:
-            name = self.get_player_name()
+        if len(scores) == LEADERBOARD_LENGTH and score > scores[LEADERBOARD_LENGTH - 1]["score"]:
+            scores.pop()
+        if len(scores) != LEADERBOARD_LENGTH:
+            name = self.ask_player_name()
             scores.append({"name": name, "score": score})
             scores.sort(key=lambda x: x["score"], reverse=True)
 
@@ -156,7 +181,7 @@ class Game():
             json.dump(scores, file)
 
 
-    def get_player_name(self):
+    def ask_player_name(self):
         root = Tk()
         root.withdraw()
 
