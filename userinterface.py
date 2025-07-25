@@ -52,9 +52,9 @@ class UserInterface(pygame.sprite.Sprite):
                 scores = json.load(file)
         except FileNotFoundError:
             scores = []
-
+        
         for i in range(0, min(len(scores), LEADERBOARD_LENGTH)):
-            text = self.font_medium.render(f"{scores[i]["score"]} - {scores[i]["name"]}", True, (200, 200, 200, self.alpha))
+            text = self.font_medium.render(f"{scores[i]['score']} - {scores[i]['name']}", True, (200, 200, 200, self.alpha))
             self.draw_container(screen, 100, (145 + 65 * i), 48, 1080, 15, 8, 15, 8)
             screen.blit(text, (115, (157 + 65 * i)))
 
