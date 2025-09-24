@@ -34,13 +34,19 @@ class UserInterface(pygame.sprite.Sprite):
         # Buttons
         self.button_big_height = 72 # REMOVE
         self.button_big_width = 340 # REMOVE
+
         self.buttons_main_menu = (
             Button(SCREEN_WIDTH / 2 - 170, 200, 340, 72, 8, 8, 20, 20, self.font_big, "Start", 114, lambda: self.game.game_loop()),
             Button(SCREEN_WIDTH / 2 - 170, 300, 340, 72, 8, 8, 20, 20, self.font_big, "Leaderboard", 16, lambda: self.switch_menu(Menu.LEADERBOARDS)),
             Button(SCREEN_WIDTH / 2 - 170, 400, 340, 72, 8, 8, 20, 20, self.font_big, "Exit", 120, lambda: self.game.handler_turn_off()),
         )
+
         self.buttons_leaderboard = (
             Button(100, 68, 100, 36, 15, 3, 3, 15, self.font_small, "Back", 15, lambda: self.switch_menu(Menu.MAIN_MENU)),
+        )
+
+        self.buttons_pause_menu = (
+            Button(SCREEN_WIDTH - 390, SCREEN_HEIGHT - 122, 340, 72, 8, 8, 20, 20, self.font_big, "End Run", 65, lambda: self.game.handler_finish_round(), color=(255, 0, 0, 100)), 
         )
 
     def switch_menu(self, menu : Menu):
@@ -62,6 +68,12 @@ class UserInterface(pygame.sprite.Sprite):
                         return
             
             #case Menu.HUD:
+            
+            case Menu.PAUSE_MENU:
+                for button in self.buttons_pause_menu:
+                    if button.check_click(position):
+                        button.run_if_possible()
+                        return
 
             case _:
                 print("How are you here? This menu shouldn't have BUTTONS!")
@@ -77,7 +89,7 @@ class UserInterface(pygame.sprite.Sprite):
             case Menu.HUD:
                 self.draw_hud(screen)
             case Menu.PAUSE_MENU:
-                pass
+                self.draw_pause_menu(screen)
             case _:
                 print("Menu not implemented yet!")        
 
@@ -126,6 +138,10 @@ class UserInterface(pygame.sprite.Sprite):
             self.draw_polygon(screen, 296, 76, 26, 20, 0, 2, 2, 0, (255, 255, 0))
         elif self.gsm.lives == 1:
             self.draw_polygon(screen, 272, 76, 26, 20, 2, 2, 2, 2, (255, 0, 0))
+
+    def draw_pause_menu(self, screen):
+        for button in self.buttons_pause_menu:
+            button.draw(screen)
 
     ### Polygons
 

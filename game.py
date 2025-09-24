@@ -62,7 +62,7 @@ class Game():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == pygame.BUTTON_LEFT:
                         self.ui.check_click(pygame.mouse.get_pos())
                 
@@ -78,6 +78,7 @@ class Game():
         self.ui.switch_menu(Menu.HUD)
         self.ui.player = self.player
         self.ui.gsm = self.gsm
+        self.is_paused = False
 
 
         while self.player.is_alive:
@@ -85,15 +86,17 @@ class Game():
                 if event.type == pygame.QUIT:
                     self.is_running = False
                     return
-                if event.type == pygame.KEYDOWN:
+                elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        #self.is_paused = False if self.is_paused else True
                         if not self.is_paused:
                             self.is_paused = True
                             self.ui.switch_menu(Menu.PAUSE_MENU)
                         else:
                             self.is_paused = False
                             self.ui.switch_menu(Menu.HUD)
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == pygame.BUTTON_LEFT:
+                        self.ui.check_click(pygame.mouse.get_pos())
 
             if not self.is_paused:
                 for object in self.updatable:
@@ -130,7 +133,8 @@ class Game():
             pygame.display.flip()
             self.dt = self.clock.tick(60) / 1000
 
-        self.check_score(self.gsm.score)
+        if not self.player.is_invul:
+            self.check_score(self.gsm.score)
         self.ui.switch_menu(Menu.MAIN_MENU)
 
         self.player = None
@@ -183,3 +187,7 @@ class Game():
     
     def handler_turn_off(self):
         self.is_running = False
+
+    def handler_finish_round(self):
+        if self.player != None and self.player.is_alive:
+            self.player.is_alive = False

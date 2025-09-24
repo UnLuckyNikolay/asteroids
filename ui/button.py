@@ -9,7 +9,9 @@ class Button(pygame.sprite.Sprite):
                  corner_topleft, corner_topright, corner_bottomright, corner_bottomleft, 
                  font, text, text_shift : int,
                  key_func : Callable, 
-                 condition_func : Callable = lambda: True):
+                 condition_func : Callable = lambda: True,
+                 color = (100, 200, 255, 100),
+                 ):
         self.x = x
         self.y = y
         self.width = width
@@ -23,15 +25,16 @@ class Button(pygame.sprite.Sprite):
         self.text_shift = text_shift
         self.key_func = key_func
         self.condition_func = condition_func
+        self.color = color
 
     def draw(self, screen):
         points = self._get_points(self.x, self.y, 
                                  self.height, self.width, 
                                  self.corner_topleft, self.corner_topright, self.corner_bottomright, self.corner_bottomleft)
         pygame.gfxdraw.filled_polygon(screen, points, (75, 75, 75, 100))
-        pygame.draw.polygon(screen, (100, 200, 255, 100), points, 3)
+        pygame.draw.polygon(screen, self.color, points, 3)
         
-        button_text = self.font.render(self.text, True, (80, 180, 220, 100))
+        button_text = self.font.render(self.text, True, self.color)
         screen.blit(button_text, (self.x + self.text_shift, self.y + int(self.height / 5)))
 
     def _get_points(self, x, y, height, width, corner_topleft, corner_topright, corner_bottomright, corner_bottomleft):
