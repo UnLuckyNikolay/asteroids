@@ -1,9 +1,19 @@
+# pyright: reportAttributeAccessIssue=false
+
 import pygame, pygame.gfxdraw, json
+from enum import Enum
+
 from constants import *
 
 
+class Menu(Enum):
+    MAIN_MENU = 1
+    GAME_UI = 2
+    PAUSE_MENU = 3
+    LEADERBOARDS = 4
+
 class UserInterface(pygame.sprite.Sprite):
-    layer = 100
+    layer = 100 # pyright: ignore
     def __init__(self):
         if hasattr(self, "containers"):
             super().__init__(self.containers)
@@ -11,6 +21,7 @@ class UserInterface(pygame.sprite.Sprite):
             super().__init__()
         self.game = None
         self.player = None
+        self.__current_menu : Menu = Menu.MAIN_MENU
 
         self.alpha = 100
         self.font_small = pygame.font.Font(None, 36)
@@ -26,7 +37,21 @@ class UserInterface(pygame.sprite.Sprite):
         self.buttons_leaderboard =(
             ((50, 50), (150, 86)),  # Back
         )
-        
+
+    def switch_menu(self, menu : Menu):
+        self.__current_menu = menu
+
+
+    def draw(self, screen):
+        match self.__current_menu:
+            case Menu.MAIN_MENU:
+                self.draw_main_menu(screen)
+            case Menu.LEADERBOARDS:
+                self.draw_leaderboards(screen)
+            case Menu.GAME_UI:
+                self.draw_game_ui(screen)
+            case _:
+                print("Menu not implemented yet!")        
 
     def draw_main_menu(self, screen):
         button_text = self.font_big.render("Start", True, (80, 180, 220, self.alpha))
@@ -37,8 +62,7 @@ class UserInterface(pygame.sprite.Sprite):
         self.draw_button(screen, SCREEN_WIDTH / 2 - 170, 300, self.button_big_height, self.button_big_width, 8, 8, 20, 20)
         screen.blit(button_text, (SCREEN_WIDTH / 2 - 153, 315))
 
-
-    def draw_leaderboard(self, screen):
+    def draw_leaderboards(self, screen):
         name_text = self.font_big.render("Leaderboard", True, (200, 200, 200, self.alpha))
         self.draw_container(screen, SCREEN_WIDTH / 2 - 170, 35, self.button_big_height, self.button_big_width, 8, 8, 20, 20)
         screen.blit(name_text, (SCREEN_WIDTH / 2 - 153, 50))
@@ -57,21 +81,8 @@ class UserInterface(pygame.sprite.Sprite):
             text = self.font_medium.render(f"{scores[i]['score']} - {scores[i]['name']}", True, (200, 200, 200, self.alpha))
             self.draw_container(screen, 100, (145 + 65 * i), 48, 1080, 15, 8, 15, 8)
             screen.blit(text, (115, (157 + 65 * i)))
-
-
-    def check_click(self, position, list):
-        for i in range(0, len(list)):
-            if (position[0] > list[i][0][0] and
-                position[0] < list[i][1][0] and
-                position[1] > list[i][0][1] and
-                position[1] < list[i][1][1]):
-                return i + 1
-        else:
-            return 0
             
-
-    # In-game UI
-    def draw(self, screen):
+    def draw_game_ui(self, screen):
         info_weapon = self.font_small.render(f"Weapon: {self.player.weapon.get_name()}", True, (200, 200, 200, self.alpha))
         self.draw_container(screen, 25, 25, 36, 320, 10, 10, 5, 5)
         screen.blit(info_weapon, (34, 32))
@@ -94,6 +105,19 @@ class UserInterface(pygame.sprite.Sprite):
         elif self.game.lives == 1:
             self.draw_polygon(screen, 272, 76, 26, 20, 2, 2, 2, 2, (255, 0, 0))
 
+    ### Helpers
+    
+    def check_click(self, position, list):
+        for i in range(0, len(list)):
+            if (position[0] > list[i][0][0] and
+                position[0] < list[i][1][0] and
+                position[1] > list[i][0][1] and
+                position[1] < list[i][1][1]):
+                return i + 1
+        else:
+            return 0
+
+    ### Polygons
 
     def draw_container(self, screen, x, y, height, width, corner_topleft, corner_topright, corner_bottomright, corner_bottomleft):
         points = self.get_points(x, y, height, width, corner_topleft, corner_topright, corner_bottomright, corner_bottomleft)

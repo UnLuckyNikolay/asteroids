@@ -12,7 +12,7 @@ from vfx.explosion import Explosion
 from world.starfield import StarField
 from world.asteroidfield import AsteroidField
 from asteroids.asteroid import Asteroid
-from userinterface import UserInterface
+from userinterface import UserInterface, Menu
 
 
 class Game():
@@ -57,6 +57,7 @@ class Game():
         self.star_field = StarField()
         self.ui = UserInterface()
 
+    ### Menus
 
     def main_menu(self):
         while self.is_running:
@@ -64,22 +65,21 @@ class Game():
                 if event.type == pygame.QUIT:
                     return
                 
-            self.screen.fill("black")
-            self.star_field.draw(self.screen)
-            self.ui.draw_main_menu(self.screen)
+            self.redraw_objects_and_ui()
 
             if pygame.mouse.get_pressed()[0]:
                 next = self.ui.check_click(pygame.mouse.get_pos(), self.ui.buttons_main_menu)
                 if next == 0:
                     pass
                 if next == 1:
+                    self.ui.switch_menu(Menu.GAME_UI)
                     self.game_loop()
                 if next == 2:
+                    self.ui.switch_menu(Menu.LEADERBOARDS)
                     self.leaderboard()
 
             pygame.display.flip()
             self.clock.tick(60)
-
 
     def leaderboard(self):
         while True:
@@ -88,15 +88,14 @@ class Game():
                     self.is_running = False
                     return
         
-            self.screen.fill("black")
-            self.star_field.draw(self.screen)
-            self.ui.draw_leaderboard(self.screen)
+            self.redraw_objects_and_ui()
 
             if pygame.mouse.get_pressed()[0]:
                 next = self.ui.check_click(pygame.mouse.get_pos(), self.ui.buttons_leaderboard)
                 if next == 0:
                     pass
                 if next == 1:
+                    self.ui.switch_menu(Menu.MAIN_MENU)
                     return
 
             pygame.display.flip()
@@ -120,8 +119,6 @@ class Game():
                         self.is_paused = False if self.is_paused else True
 
             if not self.is_paused:
-                self.screen.fill("black")
-
                 for object in self.updatable:
                     object.update(self.dt)
 
@@ -129,8 +126,7 @@ class Game():
                     if object.is_off_screen():
                         object.kill()
 
-                for object in sorted(list(self.drawable), key = lambda object: object.layer):
-                    object.draw(self.screen)
+                self.redraw_objects_and_ui()
 
                 for asteroid in self.asteroids:
                     if asteroid.check_colision(self.player) and not self.player.is_invul:
@@ -156,6 +152,7 @@ class Game():
             self.dt = self.clock.tick(60) / 1000
 
         self.check_score(self.game_state.score)
+        self.ui.switch_menu(Menu.MAIN_MENU)
 
         self.player = None
         self.game_state = None
@@ -166,6 +163,13 @@ class Game():
         for object in self.updatable:
             object.kill()
 
+    ### Helpers
+    
+    def redraw_objects_and_ui(self):
+        self.screen.fill("black")
+
+        for object in sorted(list(self.drawable), key = lambda object: object.layer):
+            object.draw(self.screen)
 
     def check_score(self, score):
         try:
@@ -185,7 +189,6 @@ class Game():
 
         with open("leaderboard.json", "w") as file:
             json.dump(scores, file)
-
 
     def ask_player_name(self):
         root = Tk()
