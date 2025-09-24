@@ -1,3 +1,5 @@
+# pyright: reportAttributeAccessIssue=false
+
 import pygame, json
 from tkinter import Tk, simpledialog
 from constants import *
@@ -21,6 +23,7 @@ class Game():
         self.clock = pygame.time.Clock()
         self.dt = 0
         self.is_running = True
+        self.is_paused = False
             
         self.updatable = pygame.sprite.Group()   # This group is cleaned (object.kill()) after each round
         self.drawable = pygame.sprite.Group()
@@ -112,40 +115,43 @@ class Game():
                 if event.type == pygame.QUIT:
                     self.is_running = False
                     return
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.is_paused = False if self.is_paused else True
 
-            self.screen.fill("black")
+            if not self.is_paused:
+                self.screen.fill("black")
 
-            for object in self.updatable:
-                object.update(self.dt)
+                for object in self.updatable:
+                    object.update(self.dt)
 
-            for object in self.moving_objects:
-                if object.is_off_screen():
-                    object.kill()
+                for object in self.moving_objects:
+                    if object.is_off_screen():
+                        object.kill()
 
-            for object in sorted(list(self.drawable), key = lambda object: object.layer):
-                object.draw(self.screen)
+                for object in sorted(list(self.drawable), key = lambda object: object.layer):
+                    object.draw(self.screen)
 
-            for asteroid in self.asteroids:
-                if asteroid.check_colision(self.player) and not self.player.is_invul:
-                    if self.player.take_damage_and_check_if_alive(self.game_state):
-                        asteroid.kill()
-                        explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
-                    
-                for projectile in self.projectiles:
-                    if projectile.check_colision(asteroid) and not asteroid.has_been_hit:
-                        projectile.kill()
-                        asteroid.split()
-                        explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
-                        self.game_state.score += asteroid.reward
-                
-            for hitbox in self.explosion_hitboxes:
                 for asteroid in self.asteroids:
-                    if hitbox.check_colision(asteroid) and not asteroid.has_been_hit:
-                        asteroid.split()
-                        self.game_state.score += asteroid.reward
-                hitbox.kill()
-
-
+                    if asteroid.check_colision(self.player) and not self.player.is_invul:
+                        if self.player.take_damage_and_check_if_alive(self.game_state):
+                            asteroid.kill()
+                            explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
+                        
+                    for projectile in self.projectiles:
+                        if projectile.check_colision(asteroid) and not asteroid.has_been_hit:
+                            projectile.kill()
+                            asteroid.split()
+                            explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
+                            self.game_state.score += asteroid.reward
+                    
+                for hitbox in self.explosion_hitboxes:
+                    for asteroid in self.asteroids:
+                        if hitbox.check_colision(asteroid) and not asteroid.has_been_hit:
+                            asteroid.split()
+                            self.game_state.score += asteroid.reward
+                    hitbox.kill()
+                    
             pygame.display.flip()
             self.dt = self.clock.tick(60) / 1000
 
