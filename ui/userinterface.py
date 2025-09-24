@@ -8,10 +8,10 @@ from ui.button import Button
 
 
 class Menu(Enum):
-    MAIN_MENU = 1
-    GAME_UI = 2
-    PAUSE_MENU = 3
-    LEADERBOARDS = 4
+    MAIN_MENU = "Main Menu"
+    HUD = "HUD"
+    PAUSE_MENU = "Pause"
+    LEADERBOARDS = "Leaderboards"
 
 class UserInterface(pygame.sprite.Sprite):
     layer = 100 # pyright: ignore
@@ -45,14 +45,12 @@ class UserInterface(pygame.sprite.Sprite):
 
     def switch_menu(self, menu : Menu):
         self.__current_menu = menu
+        print(f"Switching to {self.__current_menu.value}")
     
     def check_click(self, position, list = None):
-        print(" >>> Checking click")
         match self.__current_menu:
             case Menu.MAIN_MENU:
-                print("in main menu")
                 for button in self.buttons_main_menu:
-                    print(f"checking {button.text}")
                     if button.check_click(position):
                         button.run_if_possible()
                         return
@@ -63,7 +61,7 @@ class UserInterface(pygame.sprite.Sprite):
                         button.run_if_possible()
                         return
             
-            #case Menu.GAME_UI:
+            #case Menu.HUD:
 
             case _:
                 print("How are you here? This menu shouldn't have BUTTONS!")
@@ -76,8 +74,10 @@ class UserInterface(pygame.sprite.Sprite):
                 self.draw_main_menu(screen)
             case Menu.LEADERBOARDS:
                 self.draw_leaderboards(screen)
-            case Menu.GAME_UI:
-                self.draw_game_ui(screen)
+            case Menu.HUD:
+                self.draw_hud(screen)
+            case Menu.PAUSE_MENU:
+                pass
             case _:
                 print("Menu not implemented yet!")        
 
@@ -104,7 +104,7 @@ class UserInterface(pygame.sprite.Sprite):
             self.draw_container(screen, 100, (145 + 65 * i), 48, 1080, 15, 8, 15, 8)
             screen.blit(text, (115, (157 + 65 * i)))
             
-    def draw_game_ui(self, screen):
+    def draw_hud(self, screen):
         info_weapon = self.font_small.render(f"Weapon: {self.player.weapon.get_name()}", True, (200, 200, 200, self.alpha))
         self.draw_container(screen, 25, 25, 36, 320, 10, 10, 5, 5)
         screen.blit(info_weapon, (34, 32))

@@ -75,7 +75,7 @@ class Game():
         self.player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
         self.gsm = GameStateManager(self.player)
         self.asteroid_field = AsteroidField(self.player)
-        self.ui.switch_menu(Menu.GAME_UI)
+        self.ui.switch_menu(Menu.HUD)
         self.ui.player = self.player
         self.ui.gsm = self.gsm
 
@@ -87,7 +87,13 @@ class Game():
                     return
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        self.is_paused = False if self.is_paused else True
+                        #self.is_paused = False if self.is_paused else True
+                        if not self.is_paused:
+                            self.is_paused = True
+                            self.ui.switch_menu(Menu.PAUSE_MENU)
+                        else:
+                            self.is_paused = False
+                            self.ui.switch_menu(Menu.HUD)
 
             if not self.is_paused:
                 for object in self.updatable:
@@ -118,6 +124,8 @@ class Game():
                             asteroid.split()
                             self.gsm.score += asteroid.reward
                     hitbox.kill()
+            else:
+                self.redraw_objects_and_ui()
                     
             pygame.display.flip()
             self.dt = self.clock.tick(60) / 1000
@@ -170,6 +178,8 @@ class Game():
         root.destroy()
 
         return name if name else "Player"
+    
+    ### Handlers
     
     def handler_turn_off(self):
         self.is_running = False
