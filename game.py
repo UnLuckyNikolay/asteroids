@@ -12,7 +12,7 @@ from vfx.explosion import Explosion
 from world.starfield import StarField
 from world.asteroidfield import AsteroidField
 from asteroids.asteroid import Asteroid
-from userinterface import UserInterface, Menu
+from ui.userinterface import UserInterface, Menu
 
 
 class Game():
@@ -55,58 +55,29 @@ class Game():
         # 100 - UserInterface
 
         self.star_field = StarField()
-        self.ui = UserInterface()
+        self.ui = UserInterface(self)
 
-    ### Menus
-
-    def main_menu(self):
+    def run(self):
         while self.is_running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == pygame.BUTTON_LEFT:
+                        self.ui.check_click(pygame.mouse.get_pos())
                 
             self.redraw_objects_and_ui()
-
-            if pygame.mouse.get_pressed()[0]:
-                next = self.ui.check_click(pygame.mouse.get_pos(), self.ui.buttons_main_menu)
-                if next == 0:
-                    pass
-                if next == 1:
-                    self.ui.switch_menu(Menu.GAME_UI)
-                    self.game_loop()
-                if next == 2:
-                    self.ui.switch_menu(Menu.LEADERBOARDS)
-                    self.leaderboard()
-
-            pygame.display.flip()
-            self.clock.tick(60)
-
-    def leaderboard(self):
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.is_running = False
-                    return
-        
-            self.redraw_objects_and_ui()
-
-            if pygame.mouse.get_pressed()[0]:
-                next = self.ui.check_click(pygame.mouse.get_pos(), self.ui.buttons_leaderboard)
-                if next == 0:
-                    pass
-                if next == 1:
-                    self.ui.switch_menu(Menu.MAIN_MENU)
-                    return
 
             pygame.display.flip()
             self.clock.tick(60)
 
     def game_loop(self):
         self.player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-        self.game_state = GameStateManager(self.player)
+        self.gsm = GameStateManager(self.player)
         self.asteroid_field = AsteroidField(self.player)
+        self.ui.switch_menu(Menu.GAME_UI)
         self.ui.player = self.player
-        self.ui.game = self.game_state
+        self.ui.gsm = self.gsm
 
 
         while self.player.is_alive:
@@ -130,7 +101,7 @@ class Game():
 
                 for asteroid in self.asteroids:
                     if asteroid.check_colision(self.player) and not self.player.is_invul:
-                        if self.player.take_damage_and_check_if_alive(self.game_state):
+                        if self.player.take_damage_and_check_if_alive(self.gsm):
                             asteroid.kill()
                             explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
                         
@@ -139,26 +110,26 @@ class Game():
                             projectile.kill()
                             asteroid.split()
                             explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
-                            self.game_state.score += asteroid.reward
+                            self.gsm.score += asteroid.reward
                     
                 for hitbox in self.explosion_hitboxes:
                     for asteroid in self.asteroids:
                         if hitbox.check_colision(asteroid) and not asteroid.has_been_hit:
                             asteroid.split()
-                            self.game_state.score += asteroid.reward
+                            self.gsm.score += asteroid.reward
                     hitbox.kill()
                     
             pygame.display.flip()
             self.dt = self.clock.tick(60) / 1000
 
-        self.check_score(self.game_state.score)
+        self.check_score(self.gsm.score)
         self.ui.switch_menu(Menu.MAIN_MENU)
 
         self.player = None
-        self.game_state = None
+        self.gsm = None
         self.asteroid_field = None
         self.ui.player = None
-        self.ui.game = None
+        self.ui.gsm = None
 
         for object in self.updatable:
             object.kill()
