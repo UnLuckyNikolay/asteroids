@@ -37,6 +37,7 @@ class UserInterface(pygame.sprite.Sprite):
         self.buttons_main_menu = (
             Button(SCREEN_WIDTH / 2 - 170, 200, 340, 72, 8, 8, 20, 20, self.font_big, "Start", 114, lambda: self.game.game_loop()),
             Button(SCREEN_WIDTH / 2 - 170, 300, 340, 72, 8, 8, 20, 20, self.font_big, "Leaderboard", 16, lambda: self.switch_menu(Menu.LEADERBOARDS)),
+            Button(SCREEN_WIDTH / 2 - 170, 400, 340, 72, 8, 8, 20, 20, self.font_big, "Exit", 120, lambda: self.game.handler_turn_off()),
         )
         self.buttons_leaderboard = (
             Button(100, 68, 100, 36, 15, 3, 3, 15, self.font_small, "Back", 15, lambda: self.switch_menu(Menu.MAIN_MENU)),
@@ -46,9 +47,12 @@ class UserInterface(pygame.sprite.Sprite):
         self.__current_menu = menu
     
     def check_click(self, position, list = None):
+        print(" >>> Checking click")
         match self.__current_menu:
             case Menu.MAIN_MENU:
+                print("in main menu")
                 for button in self.buttons_main_menu:
+                    print(f"checking {button.text}")
                     if button.check_click(position):
                         button.run_if_possible()
                         return

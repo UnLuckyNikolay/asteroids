@@ -171,3 +171,5 @@ class Game():
 
         return name if name else "Player"
     
+    def handler_turn_off(self):
+        self.is_running = False
