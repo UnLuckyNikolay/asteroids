@@ -5,6 +5,8 @@ from enum import Enum
 
 from constants import *
 from ui.button import Button
+from ui.container import Container
+from ui.text import Text
 
 
 class Menu(Enum):
@@ -31,29 +33,53 @@ class UserInterface(pygame.sprite.Sprite):
         self.font_medium = pygame.font.Font(None, 48)
         self.font_big = pygame.font.Font(None, 72)
 
-        # Buttons
+        # Buttons and containers
         self.button_big_height = 72 # REMOVE
         self.button_big_width = 340 # REMOVE
 
         self.buttons_main_menu = (
-            Button(SCREEN_WIDTH / 2 - 170, 200, 340, 72, 8, 8, 20, 20, self.font_big, "Start", 114, lambda: self.game.game_loop()),
-            Button(SCREEN_WIDTH / 2 - 170, 300, 340, 72, 8, 8, 20, 20, self.font_big, "Leaderboard", 16, lambda: self.switch_menu(Menu.LEADERBOARDS)),
-            Button(SCREEN_WIDTH / 2 - 170, 400, 340, 72, 8, 8, 20, 20, self.font_big, "Exit", 120, lambda: self.game.handler_turn_off()),
+            Button(SCREEN_WIDTH / 2 - 170, 200, 340, 72, 8, 8, 20, 20, 
+                   lambda: self.game.game_loop(),
+                   lambda: True,
+                   (100, 200, 255, 100),
+                   Text("Start", 114, 14, self.font_big, (100, 200, 255, 100))),
+            Button(SCREEN_WIDTH / 2 - 170, 300, 340, 72, 8, 8, 20, 20, 
+                   lambda: self.switch_menu(Menu.LEADERBOARDS),
+                   lambda: True,
+                   (100, 200, 255, 100),
+                   Text("Leaderboard", 16, 14, self.font_big, (100, 200, 255, 100))),
+            Button(SCREEN_WIDTH / 2 - 170, 400, 340, 72, 8, 8, 20, 20, 
+                   lambda: self.game.handler_turn_off(),
+                   lambda: True,
+                   (100, 200, 255, 100),
+                   Text("Exit", 120, 14, self.font_big, (100, 200, 255, 100))),
         )
 
         self.buttons_leaderboard = (
-            Button(100, 68, 100, 36, 15, 3, 3, 15, self.font_small, "Back", 15, lambda: self.switch_menu(Menu.MAIN_MENU)),
+            Button(100, 68, 100, 36, 15, 3, 3, 15, 
+                   lambda: self.switch_menu(Menu.MAIN_MENU),
+                   lambda: True,
+                   (100, 200, 255, 100),
+                   Text("Back", 15, 7, self.font_small, (100, 200, 255, 100))),
+        )
+
+        self.containers_hud = (
+            Container
         )
 
         self.buttons_pause_menu = (
-            Button(SCREEN_WIDTH - 390, SCREEN_HEIGHT - 122, 340, 72, 8, 8, 20, 20, self.font_big, "End Run", 65, lambda: self.game.handler_finish_round(), color=(255, 0, 0, 100)), 
+            Button(SCREEN_WIDTH - 390, SCREEN_HEIGHT - 122, 340, 72, 8, 8, 20, 20,
+                   lambda: self.game.handler_finish_round(),
+                   lambda: True,
+                   (255, 0, 0, 100),
+                   Text("End Run", 65, 14, self.font_big, (255, 0, 0, 100))),
         )
 
     def switch_menu(self, menu : Menu):
         self.__current_menu = menu
         print(f"Switching to {self.__current_menu.value}")
     
-    def check_click(self, position, list = None):
+    def check_click(self, position):
         match self.__current_menu:
             case Menu.MAIN_MENU:
                 for button in self.buttons_main_menu:
@@ -67,7 +93,8 @@ class UserInterface(pygame.sprite.Sprite):
                         button.run_if_possible()
                         return
             
-            #case Menu.HUD:
+            case Menu.HUD:
+                pass # No buttons planned for HUD
             
             case Menu.PAUSE_MENU:
                 for button in self.buttons_pause_menu:
