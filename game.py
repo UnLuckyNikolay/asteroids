@@ -2,6 +2,8 @@
 
 import pygame, json
 from tkinter import Tk, simpledialog
+from random import randint
+
 from constants import *
 from player.player import Player
 from player.weapons.projectiles.projectileplasma import ProjectilePlasma
@@ -24,7 +26,8 @@ class Game():
         self.dt = 0
         self.is_running = True
         self.is_paused = False
-            
+        self.space_color = SPACE_COLOR_LIST[randint(0, len(SPACE_COLOR_LIST)-1)]
+
         self.updatable = pygame.sprite.Group()   # This group is cleaned (object.kill()) after each round
         self.drawable = pygame.sprite.Group()
         self.asteroids = pygame.sprite.Group()            # Used for colision detection
@@ -149,7 +152,7 @@ class Game():
     ### Helpers
     
     def redraw_objects_and_ui(self):
-        self.screen.fill("black")
+        self.screen.fill(self.space_color)
 
         for object in sorted(list(self.drawable), key = lambda object: object.layer):
             object.draw(self.screen)
