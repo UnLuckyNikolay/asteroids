@@ -1,6 +1,6 @@
 # pyright: reportAttributeAccessIssue=false
 
-import pygame, pygame.gfxdraw, json
+import pygame, json
 from enum import Enum
 
 from constants import *
@@ -28,6 +28,14 @@ class UserInterface(pygame.sprite.Sprite):
         self.gsm = None
         self.player = None
         self.__current_menu : Menu = Menu.MAIN_MENU
+        
+        # Checking scores
+        try:
+            print("Trying to access file `./leaderboard.json`")
+            with open("leaderboard.json", "r") as file:
+                self.scores = json.load(file)
+        except FileNotFoundError:
+            self.scores = []
 
         # Fonts
         self.font_small = pygame.font.Font(None, 36)
@@ -64,7 +72,7 @@ class UserInterface(pygame.sprite.Sprite):
             Container(SCREEN_WIDTH / 2 - 170, 35, 340, 72, 8, 8, 20, 20,
                       (200, 200, 200, 100),
                       TextH("Leaderboard", 17, 15, self.font_big, (200, 200, 200, 100))),
-            Leaderboards(100, 145, self.font_medium)
+            Leaderboards(100, 145, self.font_medium, self.scores)
         )
 
         self.containers_hud = (
