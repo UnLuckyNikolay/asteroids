@@ -1,4 +1,3 @@
-import pygame, pygame.gfxdraw
 from typing import Callable
 from ui.container import Container
 
@@ -22,6 +21,15 @@ class Button(Container):
         )
         self.key_func = key_func
         self.condition_func = condition_func
+    
+    def check_click(self, position):
+        if (position[0] > self.x and
+            position[0] < self.x + self.width and
+            position[1] > self.y and
+            position[1] < self.y + self.height):
+            return True
+        else:
+            return False
 
     def run_if_possible(self):
         if self.condition_func():

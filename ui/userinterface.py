@@ -7,6 +7,7 @@ from constants import *
 from ui.button import Button
 from ui.container import Container
 from ui.text import Text
+from ui.sprites.healthbar import HealthBar
 
 
 class Menu(Enum):
@@ -64,7 +65,19 @@ class UserInterface(pygame.sprite.Sprite):
         )
 
         self.containers_hud = (
-            Container
+            Container(25, 25, 320, 36, 10, 10, 5, 5, 
+                      (200, 200, 200, 100),
+                      Text("Weapon: {}", 9, 7, self.font_small, (200, 200, 200, 100), 
+                           self.game.get_current_weapon_name)),
+            Container(25, 71, 155, 36, 5, 3, 5, 10, 
+                      (200, 200, 200, 100),
+                      Text("Score: {}", 9, 7, self.font_small, (200, 200, 200, 100), 
+                           self.game.get_current_score)),
+            Container(190, 71, 155, 36, 3, 5, 10, 5, 
+                      (200, 200, 200, 100),
+                      Text("Lives", 9, 7, self.font_small, (200, 200, 200, 100)),
+                      HealthBar(82, 5, 
+                                self.game.get_current_lives)),
         )
 
         self.buttons_pause_menu = (
@@ -144,27 +157,8 @@ class UserInterface(pygame.sprite.Sprite):
             screen.blit(text, (115, (157 + 65 * i)))
             
     def draw_hud(self, screen):
-        info_weapon = self.font_small.render(f"Weapon: {self.player.weapon.get_name()}", True, (200, 200, 200, self.alpha))
-        self.draw_container(screen, 25, 25, 36, 320, 10, 10, 5, 5)
-        screen.blit(info_weapon, (34, 32))
-
-        info_score = self.font_small.render(f"Score: {self.gsm.score}", False, (200, 200, 200, self.alpha))
-        self.draw_container(screen, 25, 71, 36, 155, 5, 3, 5, 10)
-        screen.blit(info_score, (34, 78))
-
-        info_lives = self.font_small.render(f"Lives", False, (200, 200, 200, self.alpha))
-        self.draw_container(screen, 190, 71, 36, 155, 3, 5, 10, 5)
-        screen.blit(info_lives, (199, 78))
-
-        if self.gsm.lives == 3:
-            self.draw_polygon(screen, 272, 76, 26, 20, 2, 0, 0, 2, (0, 255, 0))
-            self.draw_polygon(screen, 296, 76, 26, 20, 0, 0, 0, 0, (0, 255, 0))
-            self.draw_polygon(screen, 320, 76, 26, 20, 0, 2, 6, 0, (0, 255, 0))
-        elif self.gsm.lives == 2:
-            self.draw_polygon(screen, 272, 76, 26, 20, 2, 0, 0, 2, (255, 255, 0))
-            self.draw_polygon(screen, 296, 76, 26, 20, 0, 2, 2, 0, (255, 255, 0))
-        elif self.gsm.lives == 1:
-            self.draw_polygon(screen, 272, 76, 26, 20, 2, 2, 2, 2, (255, 0, 0))
+        for container in self.containers_hud:
+            container.draw(screen)
 
     def draw_pause_menu(self, screen):
         for button in self.buttons_pause_menu:

@@ -191,3 +191,18 @@ class Game():
     def handler_finish_round(self):
         if self.player != None and self.player.is_alive:
             self.player.is_alive = False
+
+    def get_current_weapon_name(self) -> str:
+        if self.player == None:
+            return "Missing"
+        return self.player.weapon.get_name()
+
+    def get_current_lives(self) -> int:
+        if self.gsm == None:
+            return 0
+        return self.gsm.lives
+    
+    def get_current_score(self) -> int:
+        if self.gsm == None:
+            return 0
+        return self.gsm.score
