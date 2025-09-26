@@ -82,36 +82,14 @@ class Player(CircleShape):
 
 
     def draw(self, screen):
-        self.ship.draw_rotated(screen, self.position.x, self.position.y, self.rotation+180)
-        #if PLAYER_SHOW_HITBOX:   # Draws player hit box in dark gray.
-        #    pygame.draw.circle(screen, (50, 50, 50), self.position, 1, 2)
-        #    pygame.draw.circle(screen, (50, 50, 50), self.position, self.radius, 2)
-
-        #for part in self.rotated_sprite:
-        #    if len(part[1]) == 2:
-        #        pygame.draw.line(screen, self.color_outline, part[1][0], part[1][1], 2)
-        #    elif len(part[1]) > 2:
-        #        if len(part[0]) == 0:
-        #            pygame.gfxdraw.filled_polygon(screen, part[1], self.color_fill)
-        #           pygame.draw.polygon(screen, self.color_outline, part[1], 2)
-        #       else: 
-        #            pygame.gfxdraw.filled_polygon(screen, part[1], part[0])
-
-
-    #def rotate_sprite(self):
-    #    rotated_sprite = []
-    #    for part in self.parts:
-    #        rotated_part = []
-    #        for dot in part[1]:
-    #            dot_rotated = pygame.Vector2(dot).rotate(self.rotation)
-    #            rotated_part.append((int(self.position.x + dot_rotated.x), int(self.position.y + dot_rotated.y)))
-    #       rotated_sprite.append([part[0], rotated_part])
-    #    return rotated_sprite
-
+        self.ship.draw_rotated(
+            screen, 
+            self.position.x, self.position.y, 
+            self.rotation+180, self.timer_invul
+        )
 
     def rotate(self, dt):
         self.rotation += self.turning_speed * dt
-
 
     def move(self, dt):
         self.inertia = self.inertia * ((100 - PLAYER_ACCELERATION) / 100) + pygame.Vector2(0, 1).rotate(self.rotation_inertia) * (PLAYER_ACCELERATION / 100)
@@ -127,16 +105,13 @@ class Player(CircleShape):
         elif self.position.y > SCREEN_HEIGHT + ASTEROID_MAX_RADIUS:
             self.position.y = -ASTEROID_MAX_RADIUS
 
-
     def attempt_shot(self, time_since_last_shot):
         return self.weapon.attempt_shot(self.position, self.rotation, time_since_last_shot)
-
 
     def update(self, dt):
         self.last_dt = dt
         keys = pygame.key.get_pressed()
         self.time_since_last_shot += dt
-        #self.rotated_sprite = self.rotate_sprite()
 
         # Turning
         if self.turning_speed != 0:
@@ -177,10 +152,6 @@ class Player(CircleShape):
 
         if self.is_invul:
             if self.timer_invul > 0:
-                for i in range(0, 4):
-                    self.color_outline[i] = int(PLAYER_COLOR_OUTLINE[i] - min(self.timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * PLAYER_COLOR_OUTLINE[i])
-                    self.color_fill[i] = int(PLAYER_COLOR_FILL[i] - min(self.timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * PLAYER_COLOR_FILL[i])
-                    self.color_glass[i] = int(PLAYER_COLOR_GLASS[i] - min(self.timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * PLAYER_COLOR_GLASS[i])
                 self.timer_invul -= dt
 
             if self.timer_invul <= 0:
@@ -188,7 +159,6 @@ class Player(CircleShape):
                 self.is_invul = False
                 self.color_outline = list(PLAYER_COLOR_OUTLINE)
                 self.color_fill = list(PLAYER_COLOR_FILL)
-
 
     def take_damage_and_check_if_alive(self, gameinfo):
         if PLAYER_GOD_MODE:

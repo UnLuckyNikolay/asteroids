@@ -27,13 +27,14 @@ class Ship():
             [[],  [[0, -18], [0, -23]]] # Gun
         ]
 
-    def draw_rotated(self, screen, x : int, y : int, rotation : int):
+    def draw_rotated(self, screen, x : int, y : int, rotation : int, timer_invul=0):
         """Used to draw ships during gameplay."""
         
         #if PLAYER_SHOW_HITBOX:   # Draws player hit box in dark gray.
         #    pygame.draw.circle(screen, (50, 50, 50), (x ,y), 1, 2)
         #    pygame.draw.circle(screen, (50, 50, 50), (x ,y), self.radius, 2)
 
+        # Get ship parts
         match self.type:
             case ShipType.POLY2:
                 parts = self.parts_poly2
@@ -41,6 +42,14 @@ class Ship():
                 print(f"Error: trying to draw invalid ship `{type}`")
                 return
 
+        # Set opacity based on invulnerability timer
+        if timer_invul > 0:
+            for i in range(0, 4):
+                self.color_outline[i] = int(PLAYER_COLOR_OUTLINE[i] - min(timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * PLAYER_COLOR_OUTLINE[i])
+                self.color_fill[i] = int(PLAYER_COLOR_FILL[i] - min(timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * PLAYER_COLOR_FILL[i])
+                self.color_glass[i] = int(PLAYER_COLOR_GLASS[i] - min(timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * PLAYER_COLOR_GLASS[i])
+
+        # Rotate parts
         for part in self._rotate_sprite(parts, x, y, rotation):
             if len(part[1]) == 2:
                 pygame.draw.line(screen, self.color_outline, part[1][0], part[1][1], 2)
