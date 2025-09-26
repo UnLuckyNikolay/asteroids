@@ -34,6 +34,8 @@ class Button(Container):
         else:
             return False
 
-    def run_if_possible(self):
+    def run_if_possible(self) -> bool:
         if self.condition_func():
             self.key_func()
+            return True
+        return False

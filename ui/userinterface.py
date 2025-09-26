@@ -28,6 +28,8 @@ class UserInterface(pygame.sprite.Sprite):
         self.game = game
         self.gsm = None
         self.player = None
+        self.force_ui_reload = True
+
         self.__current_menu : Menu = Menu.MAIN_MENU
 
         # Getting the font
@@ -162,13 +164,15 @@ class UserInterface(pygame.sprite.Sprite):
             case Menu.MAIN_MENU:
                 for button in self.buttons_main_menu:
                     if button.check_click(position):
-                        button.run_if_possible()
+                        if button.run_if_possible():
+                            self.force_ui_reload = True
                         return
             
             case Menu.LEADERBOARDS:
                 for button in self.buttons_leaderboard:
                     if button.check_click(position):
-                        button.run_if_possible()
+                        if button.run_if_possible():
+                            self.force_ui_reload = True
                         return
             
             case Menu.HUD:
@@ -177,7 +181,8 @@ class UserInterface(pygame.sprite.Sprite):
             case Menu.PAUSE_MENU:
                 for button in self.buttons_pause_menu:
                     if button.check_click(position):
-                        button.run_if_possible()
+                        if button.run_if_possible():
+                            self.force_ui_reload = True
                         return
 
             case _:

@@ -26,7 +26,6 @@ class Game():
         self.dt = 0
         self.is_running = True
         self.is_paused = False
-        self.space_color = SPACE_COLOR_LIST[randint(0, len(SPACE_COLOR_LIST)-1)]
 
         self.updatable = pygame.sprite.Group()   # This group is cleaned (object.kill()) after each round
         self.drawable = pygame.sprite.Group()
@@ -68,8 +67,9 @@ class Game():
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == pygame.BUTTON_LEFT:
                         self.ui.check_click(pygame.mouse.get_pos())
-                
-            self.redraw_objects_and_ui()
+            
+            if self.ui.force_ui_reload:
+                self.redraw_objects_and_ui()
 
             pygame.display.flip()
             self.clock.tick(60)
@@ -90,6 +90,7 @@ class Game():
                     self.is_running = False
                     return
                 elif event.type == pygame.KEYDOWN:
+                    self.ui.force_ui_reload = True
                     if event.key == pygame.K_ESCAPE:
                         if not self.is_paused:
                             self.is_paused = True
@@ -101,6 +102,7 @@ class Game():
                     if event.button == pygame.BUTTON_LEFT:
                         self.ui.check_click(pygame.mouse.get_pos())
 
+            # Screen update - Game Loop
             if not self.is_paused:
                 for object in self.updatable:
                     object.update(self.dt)
@@ -130,12 +132,16 @@ class Game():
                             asteroid.split()
                             self.gsm.score += asteroid.reward
                     hitbox.kill()
+
+            # Screen update - Pause Menu
             else:
-                self.redraw_objects_and_ui()
-                    
+                if self.ui.force_ui_reload:
+                    self.redraw_objects_and_ui()
+
             pygame.display.flip()
             self.dt = self.clock.tick(60) / 1000
 
+        # Saving score and going back to Main Menu
         if not self.player.is_invul:
             self.check_score(self.gsm.score)
         self.ui.switch_menu(Menu.MAIN_MENU)
@@ -152,7 +158,8 @@ class Game():
     ### Helpers
     
     def redraw_objects_and_ui(self):
-        self.screen.fill(self.space_color)
+        #print("Updating screen!")
+        self.ui.force_ui_reload = False
 
         for object in sorted(list(self.drawable), key = lambda object: object.layer):
             object.draw(self.screen)
