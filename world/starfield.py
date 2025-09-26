@@ -16,17 +16,19 @@ class StarField(pygame.sprite.Sprite):
         self.start_small_amount = STAR_SMALL_AMOUNT
         self.stars = self._generate_stars()
 
-        #seed = randint(0, 100000)
-        seed = 789
-        print(f"Setting noise seed to {seed}")
-        opensimplex.seed(seed)
+        noise_seed = randint(0, 100000)
+        print(f"Setting noise seed to {noise_seed}")
+        opensimplex.seed(noise_seed)
+
+        color_seed = randint(0, len(SPACE_COLOR_LIST)-1)
+        color = SPACE_COLOR_LIST[color_seed]
         
         array_x = 64
         array_y = 36
         multiplier = 20
         scale = 10
 
-        #rng = numpy.random.default_rng(seed=0)
+        #rng = numpy.random.default_rng(seed=0) # Might need to switch to arrays later
         #ix, iy = rng.random(array_x), rng.random(array_y)
         #array = opensimplex.noise2array(ix, iy)
 
@@ -34,7 +36,10 @@ class StarField(pygame.sprite.Sprite):
         for x in range(array_x):
             for y in range(array_y):
                 gradient = (opensimplex.noise2(x/scale, y/scale)+1) * 0.5
-                self.bg.set_at((x,y), (int(10 * gradient), int(20 * gradient), int(70 * gradient)))
+                self.bg.set_at((x,y), 
+                               (int(color[0] * gradient), 
+                                int(color[1] * gradient), 
+                                int(color[2] * gradient)))
 
         self.bg_big = pygame.Surface((array_x*multiplier, array_y*multiplier))
         self.bg_big = pygame.transform.smoothscale_by(self.bg, multiplier)
