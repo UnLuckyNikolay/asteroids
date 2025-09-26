@@ -16,7 +16,7 @@ class Leaderboards():
             containers.append(
                 Container(self.x, self.y+65*i, 1080, 48, 15, 8, 15, 8,
                           (200, 200, 200, 100),
-                          TextF("{} - {}", 12, 9, self.font, (200, 200, 200, 100),
+                          TextF("{} - {}", 13, 8, self.font, (200, 200, 200, 100),
                                self.scores[i]['score'],
                                self.scores[i]['name']))
             )

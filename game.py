@@ -195,6 +195,11 @@ class Game():
         if self.player != None and self.player.is_alive:
             self.player.is_alive = False
 
+    def handler_regenerate_background(self):
+        self.star_field.regenerate()
+
+    ### Getters
+
     def get_current_weapon_name(self) -> str:
         if self.player == None:
             return "Missing"

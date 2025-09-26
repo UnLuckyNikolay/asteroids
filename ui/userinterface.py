@@ -24,79 +24,112 @@ class UserInterface(pygame.sprite.Sprite):
             super().__init__(self.containers)
         else:
             super().__init__()
+
         self.game = game
         self.gsm = None
         self.player = None
         self.__current_menu : Menu = Menu.MAIN_MENU
-        
-        # Checking scores
+
+        # Getting the font
+        font_path = "./fonts/anita-semi-square.normaali.ttf" #"../../fonts/anita-semi-square.normaali.ttf"
         try:
-            print("Trying to access file `./leaderboard.json`")
-            with open("leaderboard.json", "r") as file:
+            print(f"Trying to access file `{font_path}`")
+            with open(font_path, "r"):
+                pass
+        except FileNotFoundError:
+            print("Error: font not found")
+            font_path = None
+        
+        # Getting the scores
+        leaderboards_path = "./leaderboard.json"
+        try:
+            print(f"Trying to access file `{leaderboards_path}`")
+            with open(leaderboards_path, "r") as file:
                 self.scores = json.load(file)
         except FileNotFoundError:
             self.scores = []
 
         # Fonts
-        self.font_small = pygame.font.Font(None, 36)
-        self.font_medium = pygame.font.Font(None, 48)
-        self.font_big = pygame.font.Font(None, 72)
+        self.font_small = pygame.font.Font(font_path, 24)
+        self.font_medium = pygame.font.Font(font_path, 32)
+        self.font_big = pygame.font.Font(font_path, 48)
+
+        # Colors
+
+        self.color_white = (200, 200, 200, 100)
+        self.color_blue = (100, 200, 255, 100)
+        self.color_red = (255, 0, 0, 100)
 
         # Buttons and containers
         self.buttons_main_menu = (
-            Button(SCREEN_WIDTH / 2 - 170, 200, 340, 72, 8, 8, 20, 20, 
-                   lambda: self.game.game_loop(),
+            # Start button, starts a Round
+            Button(SCREEN_WIDTH / 2 - 185, 200, 370, 72, 8, 8, 20, 20, 
+                   self.game.game_loop,
                    lambda: True,
-                   (100, 200, 255, 100),
-                   TextH("Start", 114, 14, self.font_big, (100, 200, 255, 100))),
-            Button(SCREEN_WIDTH / 2 - 170, 300, 340, 72, 8, 8, 20, 20, 
+                   self.color_blue,
+                   TextH("Start", 117, 10, self.font_big, self.color_blue)),
+            # Opens the Leaderboards
+            Button(SCREEN_WIDTH / 2 - 185, 300, 370, 72, 8, 8, 20, 20, 
                    lambda: self.switch_menu(Menu.LEADERBOARDS),
                    lambda: True,
-                   (100, 200, 255, 100),
-                   TextH("Leaderboard", 16, 14, self.font_big, (100, 200, 255, 100))),
-            Button(SCREEN_WIDTH / 2 - 170, 400, 340, 72, 8, 8, 20, 20, 
-                   lambda: self.game.handler_turn_off(),
+                   self.color_blue,
+                   TextH("Leaderboard", 16, 10, self.font_big, self.color_blue)),
+            # Exits the game
+            Button(SCREEN_WIDTH / 2 - 185, 400, 370, 72, 8, 8, 20, 20, 
+                   self.game.handler_turn_off,
                    lambda: True,
-                   (100, 200, 255, 100),
-                   TextH("Exit", 120, 14, self.font_big, (100, 200, 255, 100))),
+                   self.color_blue,
+                   TextH("Exit", 135, 10, self.font_big, self.color_blue)),
+            Button(15, SCREEN_HEIGHT-55, 40, 40, 8, 8, 8, 8,
+                   self.game.handler_regenerate_background,
+                   lambda: True,
+                   self.color_blue,
+                   TextH("BG", 4, 7, self.font_small, self.color_blue))
         )
 
         self.buttons_leaderboard = (
+            # Returns to the Main Menu
             Button(100, 68, 100, 36, 15, 3, 3, 15, 
                    lambda: self.switch_menu(Menu.MAIN_MENU),
                    lambda: True,
-                   (100, 200, 255, 100),
-                   TextH("Back", 15, 7, self.font_small, (100, 200, 255, 100))),
+                   self.color_blue,
+                   TextH("Back", 18, 5, self.font_small, self.color_blue)),
         )
         self.containers_leaderboard = (
-            Container(SCREEN_WIDTH / 2 - 170, 35, 340, 72, 8, 8, 20, 20,
-                      (200, 200, 200, 100),
-                      TextH("Leaderboard", 17, 15, self.font_big, (200, 200, 200, 100))),
+            # Name of the menu
+            Container(SCREEN_WIDTH / 2 - 185, 35, 370, 72, 8, 8, 20, 20,
+                      self.color_white,
+                      TextH("Leaderboard", 16, 10, self.font_big, self.color_white)),
+            # List of high scores
             Leaderboards(100, 145, self.font_medium, self.scores)
         )
 
         self.containers_hud = (
-            Container(25, 25, 320, 36, 10, 10, 5, 5, 
-                      (200, 200, 200, 100),
-                      TextH("Weapon: {}", 9, 7, self.font_small, (200, 200, 200, 100), 
+            # Current weapon
+            Container(25, 25, 362, 36, 10, 10, 5, 5, 
+                      self.color_white,
+                      TextH("Weapon: {}", 9, 5, self.font_small, self.color_white, 
                            self.game.get_current_weapon_name)),
-            Container(25, 71, 155, 36, 5, 3, 5, 10, 
-                      (200, 200, 200, 100),
-                      TextH("Score: {}", 9, 7, self.font_small, (200, 200, 200, 100), 
+            # Current score
+            Container(25, 71, 176, 36, 5, 3, 5, 10, 
+                      self.color_white,
+                      TextH("Score: {}", 9, 5, self.font_small, self.color_white, 
                            self.game.get_current_score)),
-            Container(190, 71, 155, 36, 3, 5, 10, 5, 
-                      (200, 200, 200, 100),
-                      TextH("Lives", 9, 7, self.font_small, (200, 200, 200, 100)),
-                      HealthBar(82, 5, 
+            # Current health bar
+            Container(211, 71, 176, 36, 3, 5, 10, 5, 
+                      self.color_white,
+                      TextH("Lives", 9, 5, self.font_small, self.color_white),
+                      HealthBar(103, 5, 
                                 self.game.get_current_lives)),
         )
 
         self.buttons_pause_menu = (
+            # Ends the run and returns to the main menu
             Button(SCREEN_WIDTH - 390, SCREEN_HEIGHT - 122, 340, 72, 8, 8, 20, 20,
-                   lambda: self.game.handler_finish_round(),
+                   self.game.handler_finish_round,
                    lambda: True,
-                   (255, 0, 0, 100),
-                   TextH("End Run", 65, 14, self.font_big, (255, 0, 0, 100))),
+                   self.color_red,
+                   TextH("End Run", 54, 10, self.font_big, self.color_red)),
         )
 
     def switch_menu(self, menu : Menu):

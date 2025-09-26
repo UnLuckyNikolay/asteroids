@@ -1,5 +1,7 @@
 from typing import Callable
 from ui.container import Container
+from ui.textf import TextF
+from ui.texth import TextH
 
 class Button(Container):
     layer = 100 # pyright: ignore
@@ -32,5 +34,7 @@ class Button(Container):
             return False
 
     def run_if_possible(self):
+        if type(self.elements[0]) is TextH or type(self.elements[0]) is TextF:
+            print(f"Clicked the `{self.elements[0].text}` button")
         if self.condition_func():
             self.key_func()
