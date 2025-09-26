@@ -1,4 +1,4 @@
-import pygame, pygame.gfxdraw
+import pygame, pygame.gfxdraw, opensimplex, numpy
 from random import randint
 
 from constants import *
@@ -15,6 +15,29 @@ class StarField(pygame.sprite.Sprite):
         self.stars_amount = STAR_AMOUNT
         self.start_small_amount = STAR_SMALL_AMOUNT
         self.stars = self._generate_stars()
+
+        #seed = randint(0, 100000)
+        seed = 789
+        print(f"Setting noise seed to {seed}")
+        opensimplex.seed(seed)
+        
+        array_x = 64
+        array_y = 36
+        multiplier = 20
+        scale = 10
+
+        #rng = numpy.random.default_rng(seed=0)
+        #ix, iy = rng.random(array_x), rng.random(array_y)
+        #array = opensimplex.noise2array(ix, iy)
+
+        self.bg = pygame.Surface((array_x, array_y))
+        for x in range(array_x):
+            for y in range(array_y):
+                gradient = (opensimplex.noise2(x/scale, y/scale)+1) * 0.5
+                self.bg.set_at((x,y), (int(10 * gradient), int(20 * gradient), int(70 * gradient)))
+
+        self.bg_big = pygame.Surface((array_x*multiplier, array_y*multiplier))
+        self.bg_big = pygame.transform.smoothscale_by(self.bg, multiplier)
 
     def _generate_stars(self):
         stars = []
@@ -51,6 +74,7 @@ class StarField(pygame.sprite.Sprite):
                             (randint(150, 210), randint(150, 210), randint(50, 100)))
 
     def draw(self, screen):
+        screen.blit(self.bg_big, (0, 0))
         for star in self.stars:
             pygame.gfxdraw.filled_circle(screen, star[0], star[1], star[2], star[3])
             pygame.gfxdraw.filled_circle(screen, star[0], star[1], max(star[2] - 2, 0), (255, 255, 255))
