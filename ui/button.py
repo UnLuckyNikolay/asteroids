@@ -1,5 +1,6 @@
-from typing import Callable
-from ui.container import Container
+from typing import Callable, Any
+
+from ui.container import Container, Allignment
 from ui.textf import TextF
 from ui.texth import TextH
 
@@ -12,14 +13,14 @@ class Button(Container):
                  key_func : Callable, 
                  condition_func : Callable,
                  color,
-                 *elements
+                 *tuples_element_allignment : tuple[Any, Allignment]
     ):
         super().__init__(
             x, y, 
             width, height, 
             corner_topleft, corner_topright, corner_bottomright, corner_bottomleft, 
             color,
-            *elements
+            *tuples_element_allignment
         )
         self.key_func = key_func
         self.condition_func = condition_func
@@ -34,7 +35,5 @@ class Button(Container):
             return False
 
     def run_if_possible(self):
-        if type(self.elements[0]) is TextH or type(self.elements[0]) is TextF:
-            print(f"Clicked the `{self.elements[0].text}` button")
         if self.condition_func():
             self.key_func()

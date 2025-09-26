@@ -5,8 +5,8 @@ from enum import Enum
 
 from constants import *
 from ui.button import Button
-from ui.container import Container
-from ui.texth import TextH
+from ui.container import Container, Allignment
+from ui.text import Text, TextH
 from ui.sprites.healthbar import HealthBar
 from ui.sprites.leaderboards import Leaderboards
 
@@ -67,24 +67,28 @@ class UserInterface(pygame.sprite.Sprite):
                    self.game.game_loop,
                    lambda: True,
                    self.color_blue,
-                   TextH("Start", 117, 10, self.font_big, self.color_blue)),
+                   (Text("Start", 117, 10, self.font_big, self.color_blue),
+                           Allignment.NONE)),
             # Opens the Leaderboards
             Button(SCREEN_WIDTH / 2 - 185, 300, 370, 72, 8, 8, 20, 20, 
                    lambda: self.switch_menu(Menu.LEADERBOARDS),
                    lambda: True,
                    self.color_blue,
-                   TextH("Leaderboard", 16, 10, self.font_big, self.color_blue)),
+                   (Text("Leaderboard", 16, 10, self.font_big, self.color_blue),
+                           Allignment.NONE)),
             # Exits the game
             Button(SCREEN_WIDTH / 2 - 185, 400, 370, 72, 8, 8, 20, 20, 
                    self.game.handler_turn_off,
                    lambda: True,
                    self.color_blue,
-                   TextH("Exit", 135, 10, self.font_big, self.color_blue)),
+                   (Text("Exit", 135, 10, self.font_big, self.color_blue),
+                           Allignment.NONE)),
             Button(15, SCREEN_HEIGHT-55, 40, 40, 8, 8, 8, 8,
                    self.game.handler_regenerate_background,
                    lambda: True,
                    self.color_blue,
-                   TextH("BG", 4, 7, self.font_small, self.color_blue))
+                   (Text("BG", 4, 7, self.font_small, self.color_blue),
+                           Allignment.NONE))
         )
 
         self.buttons_leaderboard = (
@@ -93,13 +97,15 @@ class UserInterface(pygame.sprite.Sprite):
                    lambda: self.switch_menu(Menu.MAIN_MENU),
                    lambda: True,
                    self.color_blue,
-                   TextH("Back", 18, 5, self.font_small, self.color_blue)),
+                   (Text("Back", 18, 5, self.font_small, self.color_blue),
+                           Allignment.NONE)),
         )
         self.containers_leaderboard = (
             # Name of the menu
             Container(SCREEN_WIDTH / 2 - 185, 35, 370, 72, 8, 8, 20, 20,
                       self.color_white,
-                      TextH("Leaderboard", 16, 10, self.font_big, self.color_white)),
+                      (Text("Leaderboard", 16, 10, self.font_big, self.color_white),
+                           Allignment.NONE)),
             # List of high scores
             Leaderboards(100, 145, self.font_medium, self.scores)
         )
@@ -108,19 +114,23 @@ class UserInterface(pygame.sprite.Sprite):
             # Current weapon
             Container(25, 25, 362, 36, 10, 10, 5, 5, 
                       self.color_white,
-                      TextH("Weapon: {}", 9, 5, self.font_small, self.color_white, 
-                           self.game.get_current_weapon_name)),
+                      (TextH("Weapon: {}", 9, 5, self.font_small, self.color_white, 
+                           self.game.get_current_weapon_name),
+                           Allignment.NONE)),
             # Current score
             Container(25, 71, 176, 36, 5, 3, 5, 10, 
                       self.color_white,
-                      TextH("Score: {}", 9, 5, self.font_small, self.color_white, 
-                           self.game.get_current_score)),
+                      (TextH("Score: {}", 9, 5, self.font_small, self.color_white, 
+                           self.game.get_current_score),
+                           Allignment.NONE)),
             # Current health bar
             Container(211, 71, 176, 36, 3, 5, 10, 5, 
                       self.color_white,
-                      TextH("Lives", 9, 5, self.font_small, self.color_white),
-                      HealthBar(103, 5, 
-                                self.game.get_current_lives)),
+                      (Text("Lives", 9, 5, self.font_small, self.color_white),
+                            Allignment.NONE),
+                      (HealthBar(103, 5, 
+                                self.game.get_current_lives),
+                                Allignment.NONE)),
         )
 
         self.buttons_pause_menu = (
@@ -129,7 +139,18 @@ class UserInterface(pygame.sprite.Sprite):
                    self.game.handler_finish_round,
                    lambda: True,
                    self.color_red,
-                   TextH("End Run", 54, 10, self.font_big, self.color_red)),
+                   (Text("End Run", 54, 10, self.font_big, self.color_red),
+                        Allignment.NONE)),
+        )
+        self.containers_pause_menu = (
+            # Background
+            Container(50, 50, SCREEN_WIDTH-100, SCREEN_HEIGHT-182, 20, 20, 8, 20,
+                      self.color_white),
+            # Current ship
+            Container(65, 65, 215, 215, 15, 15, 15, 15,
+                      self.color_white,
+                      (self.game.get_player_ship,
+                            Allignment.CENTER))
         )
 
     def switch_menu(self, menu : Menu):
@@ -182,16 +203,19 @@ class UserInterface(pygame.sprite.Sprite):
             button.draw(screen)
 
     def draw_leaderboards(self, screen):
-        for button in self.buttons_leaderboard:
-            button.draw(screen)
-
         for container in self.containers_leaderboard:
             container.draw(screen)
+
+        for button in self.buttons_leaderboard:
+            button.draw(screen)
             
     def draw_hud(self, screen):
         for container in self.containers_hud:
             container.draw(screen)
 
     def draw_pause_menu(self, screen):
+        for container in self.containers_pause_menu:
+            container.draw(screen)
+
         for button in self.buttons_pause_menu:
             button.draw(screen)

@@ -214,3 +214,8 @@ class Game():
         if self.gsm == None:
             return 0
         return self.gsm.score
+    
+    def get_player_ship(self):
+        if self.player == None:
+            return None
+        return self.player.ship

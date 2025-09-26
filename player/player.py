@@ -1,12 +1,14 @@
 import pygame, pygame.gfxdraw
+
 from constants import *
 from shapes.circleshape import CircleShape
 from player.weapons.plasmagun import PlasmaGun
 from player.weapons.bomblauncher import BombLauncher
+from ui.sprites.ship import Ship, ShipType
 
 
 class Player(CircleShape):
-    layer = 50
+    layer = 50 # pyright: ignore[reportAssignmentType]
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 180
@@ -19,6 +21,8 @@ class Player(CircleShape):
         self.timer_invul = 0
         self.is_invul = False
         self.is_alive = True
+
+        self.ship = Ship(ShipType.POLY2)
 
         self.color_outline = list(PLAYER_COLOR_OUTLINE)
         self.color_fill = list(PLAYER_COLOR_FILL)
@@ -41,7 +45,7 @@ class Player(CircleShape):
                       [[],  [[0, 18], [0, 23]]] # Gun
                       ]
         
-        self.rotated_sprite = self.rotate_sprite()
+        #self.rotated_sprite = self.rotate_sprite()
     
 
     @property
@@ -78,30 +82,31 @@ class Player(CircleShape):
 
 
     def draw(self, screen):
-        if PLAYER_SHOW_HITBOX:   # Draws player hit box in dark gray.
-            pygame.draw.circle(screen, (50, 50, 50), self.position, 1, 2)
-            pygame.draw.circle(screen, (50, 50, 50), self.position, self.radius, 2)
+        self.ship.draw_rotated(screen, self.position.x, self.position.y, self.rotation+180)
+        #if PLAYER_SHOW_HITBOX:   # Draws player hit box in dark gray.
+        #    pygame.draw.circle(screen, (50, 50, 50), self.position, 1, 2)
+        #    pygame.draw.circle(screen, (50, 50, 50), self.position, self.radius, 2)
 
-        for part in self.rotated_sprite:
-            if len(part[1]) == 2:
-                pygame.draw.line(screen, self.color_outline, part[1][0], part[1][1], 2)
-            elif len(part[1]) > 2:
-                if len(part[0]) == 0:
-                    pygame.gfxdraw.filled_polygon(screen, part[1], self.color_fill)
-                    pygame.draw.polygon(screen, self.color_outline, part[1], 2)
-                else: 
-                    pygame.gfxdraw.filled_polygon(screen, part[1], part[0])
+        #for part in self.rotated_sprite:
+        #    if len(part[1]) == 2:
+        #        pygame.draw.line(screen, self.color_outline, part[1][0], part[1][1], 2)
+        #    elif len(part[1]) > 2:
+        #        if len(part[0]) == 0:
+        #            pygame.gfxdraw.filled_polygon(screen, part[1], self.color_fill)
+        #           pygame.draw.polygon(screen, self.color_outline, part[1], 2)
+        #       else: 
+        #            pygame.gfxdraw.filled_polygon(screen, part[1], part[0])
 
 
-    def rotate_sprite(self):
-        rotated_sprite = []
-        for part in self.parts:
-            rotated_part = []
-            for dot in part[1]:
-                dot_rotated = pygame.Vector2(dot).rotate(self.rotation)
-                rotated_part.append((int(self.position.x + dot_rotated.x), int(self.position.y + dot_rotated.y)))
-            rotated_sprite.append([part[0], rotated_part])
-        return rotated_sprite
+    #def rotate_sprite(self):
+    #    rotated_sprite = []
+    #    for part in self.parts:
+    #        rotated_part = []
+    #        for dot in part[1]:
+    #            dot_rotated = pygame.Vector2(dot).rotate(self.rotation)
+    #            rotated_part.append((int(self.position.x + dot_rotated.x), int(self.position.y + dot_rotated.y)))
+    #       rotated_sprite.append([part[0], rotated_part])
+    #    return rotated_sprite
 
 
     def rotate(self, dt):
@@ -131,7 +136,7 @@ class Player(CircleShape):
         self.last_dt = dt
         keys = pygame.key.get_pressed()
         self.time_since_last_shot += dt
-        self.rotated_sprite = self.rotate_sprite()
+        #self.rotated_sprite = self.rotate_sprite()
 
         # Turning
         if self.turning_speed != 0:
