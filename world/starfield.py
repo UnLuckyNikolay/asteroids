@@ -22,27 +22,32 @@ class StarField(pygame.sprite.Sprite):
 
         color_seed = randint(0, len(SPACE_COLOR_LIST)-1)
         color = SPACE_COLOR_LIST[color_seed]
+
+        color_seed_2 = randint(1, len(SPACE_COLOR_LIST)-1)
+        if color_seed_2 == color_seed:
+            color_seed_2 = 0
+        color_2 = SPACE_COLOR_LIST[color_seed_2]
         
         array_x = 64
         array_y = 36
-        multiplier = 20
-        scale = 10
+        scale = 10 # Used to get noise gradient
+        multiplier = 20 # Used to get array up to display resolution
 
         #rng = numpy.random.default_rng(seed=0) # Might need to switch to arrays later
         #ix, iy = rng.random(array_x), rng.random(array_y)
         #array = opensimplex.noise2array(ix, iy)
 
-        self.bg = pygame.Surface((array_x, array_y))
+        bg = pygame.Surface((array_x, array_y))
         for x in range(array_x):
             for y in range(array_y):
                 gradient = (opensimplex.noise2(x/scale, y/scale)+1) * 0.5
-                self.bg.set_at((x,y), 
-                               (int(color[0] * gradient), 
-                                int(color[1] * gradient), 
-                                int(color[2] * gradient)))
+                bg.set_at((x,y), 
+                            (int(color[0] * gradient + color_2[0] * (1 - gradient)), 
+                                int(color[1] * gradient + color_2[1] * (1 - gradient)), 
+                                int(color[2] * gradient + color_2[2] * (1 - gradient))))
 
         self.bg_big = pygame.Surface((array_x*multiplier, array_y*multiplier))
-        self.bg_big = pygame.transform.smoothscale_by(self.bg, multiplier)
+        self.bg_big = pygame.transform.smoothscale_by(bg, multiplier)
 
     def _generate_stars(self):
         stars = []

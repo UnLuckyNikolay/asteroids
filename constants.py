@@ -8,7 +8,12 @@ ASTEROID_MAX_RADIUS = ASTEROID_MIN_RADIUS * ASTEROID_KINDS
 
 STAR_AMOUNT = 50
 STAR_SMALL_AMOUNT = 500
-SPACE_COLOR_LIST = [(10, 20, 70), (5, 10, 35), (40, 0, 40), (20, 0, 20), (30, 30, 70), (15, 15, 35)]
+SPACE_COLOR_LIST = [(0, 0, 0), 
+                    (10, 20, 70), (5, 10, 35), 
+                    (40, 0, 40), (20, 0, 20), 
+                    (30, 30, 70), (15, 15, 35), 
+                    (0, 60, 50), (0, 30, 25), 
+                    (59, 87, 196), (30, 50, 127)]
 
 PLAYER_RADIUS = 20
 PLAYER_TURNING_MAX = 200
