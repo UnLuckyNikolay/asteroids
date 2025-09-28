@@ -12,8 +12,9 @@ class StarField(pygame.sprite.Sprite):
         else:
             super().__init__()
 
-        self.stars_amount = STAR_AMOUNT
-        self.start_small_amount = STAR_SMALL_AMOUNT
+        self.stars_big_amount = STAR_BIG_AMOUNT
+        self.stars_medium_amount = STAR_MEDIUM_AMOUNT
+        self.stars_small_amount = STAR_SMALL_AMOUNT
 
         color_seed = randint(0, len(SPACE_COLOR_LIST)-1)
         color = SPACE_COLOR_LIST[color_seed]
@@ -53,11 +54,13 @@ class StarField(pygame.sprite.Sprite):
     def _generate_stars(self) -> list:
         """Generates and returns a list of stars"""
         stars = []
-        for i in range (0, self.stars_amount):
+        for i in range (self.stars_big_amount):
             size = randint(2, 4)
             stars.append(self._generate_star(size))
-        for i in range (0, self.start_small_amount):
+        for i in range (self.stars_medium_amount):
             stars.append(self._generate_star(1))
+        for i in range (self.stars_small_amount):
+            stars.append(self._generate_star(0))
         return stars
 
     def _generate_star(self, size):
@@ -88,8 +91,9 @@ class StarField(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.bg_big, (0, 0))
         for star in self.stars:
-            pygame.gfxdraw.filled_circle(screen, star[0], star[1], star[2], star[3])
-            pygame.gfxdraw.filled_circle(screen, star[0], star[1], max(star[2] - 2, 0), (255, 255, 255))
+            pygame.gfxdraw.filled_circle(screen, *star)
+            if star[2] > 0:
+                pygame.gfxdraw.filled_circle(screen, star[0], star[1], max(star[2] - 2, 0), (255, 255, 255))
 
     def regenerate(self):
         self.stars = self._generate_stars()
