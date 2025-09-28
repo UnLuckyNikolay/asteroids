@@ -142,9 +142,9 @@ class Player(CircleShape):
                 self.speed += int(PLAYER_ACCELERATION / 2)
 
         # Weapon change
-        if keys[pygame.K_1] and self.weapon.get_name() != self.weapons[0].get_name():
+        if (keys[pygame.K_1] or keys[pygame.K_KP1]):
             self.weapon = self.weapons[0]
-        elif keys[pygame.K_2] and self.weapon.get_name() != self.weapons[1].get_name():
+        elif (keys[pygame.K_2] or keys[pygame.K_KP2]):
             self.weapon = self.weapons[1]
 
         if keys[pygame.K_SPACE] and self.attempt_shot(self.time_since_last_shot):
@@ -173,4 +173,12 @@ class Player(CircleShape):
             self.is_alive = False
             print(f"Game over! Final score: {gameinfo.score}")
             return self.is_alive
+        
+    ### Getters
+
+    def get_ship(self):
+        return self.ship
+    
+    def get_weapon_name(self):
+        return self.weapon.get_name()
         

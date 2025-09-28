@@ -6,9 +6,11 @@ from enum import Enum
 from constants import *
 from ui.button import Button
 from ui.container import Container, Allignment
-from ui.text import Text, TextH
+from ui.text import Text, TextH, TextF
 from ui.sprites.healthbar import HealthBar
 from ui.sprites.leaderboards import Leaderboards
+from gamestatemanager import GameStateManager
+from player.player import Player
 
 
 class Menu(Enum):
@@ -26,10 +28,10 @@ class UserInterface(pygame.sprite.Sprite):
             super().__init__()
 
         self.game = game
-        self.gsm = None
-        self.player = None
-        self.force_ui_reload = True
+        self.gsm :GameStateManager = None
+        self.player : Player = None
 
+        self.force_ui_reload = True
         self.__current_menu : Menu = Menu.MAIN_MENU
 
         # Getting the font
@@ -57,12 +59,16 @@ class UserInterface(pygame.sprite.Sprite):
         self.font_big = pygame.font.Font(font_path, 48)
 
         # Colors
-
         self.color_white = (200, 200, 200, 100)
         self.color_blue = (100, 200, 255, 100)
         self.color_red = (255, 0, 0, 100)
 
-        # Buttons and containers
+        self._initialize_main_menu()
+        self._initialize_leaderboards()
+
+    ### Buttons and containers
+
+    def _initialize_main_menu(self):
         self.buttons_main_menu = (
             # Start button, starts a Round
             Button(SCREEN_WIDTH / 2 - 185, 200, 370, 72, 8, 8, 20, 20, 
@@ -93,7 +99,9 @@ class UserInterface(pygame.sprite.Sprite):
                            Allignment.NONE))
         )
 
-        self.buttons_leaderboard = (
+
+    def _initialize_leaderboards(self):
+        self.buttons_leaderboards = (
             # Returns to the Main Menu
             Button(100, 68, 100, 36, 15, 3, 3, 15, 
                    lambda: self.switch_menu(Menu.MAIN_MENU),
@@ -102,7 +110,7 @@ class UserInterface(pygame.sprite.Sprite):
                    (Text("Back", 18, 5, self.font_small, self.color_blue),
                            Allignment.NONE)),
         )
-        self.containers_leaderboard = (
+        self.containers_leaderboards = (
             # Name of the menu
             Container(SCREEN_WIDTH / 2 - 185, 35, 370, 72, 8, 8, 20, 20,
                       self.color_white,
@@ -112,18 +120,19 @@ class UserInterface(pygame.sprite.Sprite):
             Leaderboards(100, 145, self.font_medium, self.scores)
         )
 
+    def _initialize_hud(self):
         self.containers_hud = (
             # Current weapon
             Container(25, 25, 362, 36, 10, 10, 5, 5, 
                       self.color_white,
                       (TextH("Weapon: {}", 9, 5, self.font_small, self.color_white, 
-                           self.game.get_current_weapon_name),
+                           self.player.get_weapon_name),
                            Allignment.NONE)),
             # Current score
             Container(25, 71, 176, 36, 5, 3, 5, 10, 
                       self.color_white,
                       (TextH("Score: {}", 9, 5, self.font_small, self.color_white, 
-                           self.game.get_current_score),
+                           self.gsm.get_score),
                            Allignment.NONE)),
             # Current health bar
             Container(211, 71, 176, 36, 3, 5, 10, 5, 
@@ -131,10 +140,11 @@ class UserInterface(pygame.sprite.Sprite):
                       (Text("Lives", 9, 5, self.font_small, self.color_white),
                             Allignment.NONE),
                       (HealthBar(103, 5, 
-                                self.game.get_current_lives),
+                                self.gsm.get_lives),
                                 Allignment.NONE)),
         )
 
+    def _initialize_pause_menu(self):
         self.buttons_pause_menu = (
             # Ends the run and returns to the main menu
             Button(SCREEN_WIDTH - 390, SCREEN_HEIGHT - 122, 340, 72, 8, 8, 20, 20,
@@ -151,15 +161,23 @@ class UserInterface(pygame.sprite.Sprite):
             # Current ship
             Container(65, 65, 215, 215, 15, 15, 15, 15,
                       self.color_white,
-                      (self.game.get_player_ship,
+                      (self.player.get_ship,
                             Allignment.CENTER))
         )
+
+    
+    def round_start(self, gsm, player):
+        self.gsm = gsm
+        self.player = player
+        self._initialize_hud()
+        self._initialize_pause_menu()
 
     def switch_menu(self, menu : Menu):
         self.__current_menu = menu
         print(f"Switching to {self.__current_menu.value}")
     
     def check_click(self, position):
+        """Checks mouse position against all the buttons in the current menus and tries to run the button function."""
         match self.__current_menu:
             case Menu.MAIN_MENU:
                 for button in self.buttons_main_menu:
@@ -169,7 +187,7 @@ class UserInterface(pygame.sprite.Sprite):
                         return
             
             case Menu.LEADERBOARDS:
-                for button in self.buttons_leaderboard:
+                for button in self.buttons_leaderboards:
                     if button.check_click(position):
                         if button.run_if_possible():
                             self.force_ui_reload = True
@@ -208,10 +226,10 @@ class UserInterface(pygame.sprite.Sprite):
             button.draw(screen)
 
     def draw_leaderboards(self, screen):
-        for container in self.containers_leaderboard:
+        for container in self.containers_leaderboards:
             container.draw(screen)
 
-        for button in self.buttons_leaderboard:
+        for button in self.buttons_leaderboards:
             button.draw(screen)
             
     def draw_hud(self, screen):

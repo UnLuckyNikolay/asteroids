@@ -24,3 +24,9 @@ class GameStateManager():
         for weapon in self.player.weapons:
             if self._score >= weapon.get_upgrade_cost():
                 weapon.upgrade()
+
+    def get_score(self):
+        return self._score
+    
+    def get_lives(self):
+        return self.lives

@@ -78,10 +78,11 @@ class Game():
         self.player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
         self.gsm = GameStateManager(self.player)
         self.asteroid_field = AsteroidField(self.player)
-        self.ui.switch_menu(Menu.HUD)
-        self.ui.player = self.player
         self.ui.gsm = self.gsm
         self.is_paused = False
+        
+        self.ui.switch_menu(Menu.HUD)
+        self.ui.round_start(self.gsm, self.player)
 
 
         while self.player.is_alive:
@@ -142,7 +143,7 @@ class Game():
             self.dt = self.clock.tick(60) / 1000
 
         # Saving score and going back to Main Menu
-        if not self.player.is_invul:
+        if not PLAYER_GOD_MODE:
             self.check_score(self.gsm.score)
         self.ui.switch_menu(Menu.MAIN_MENU)
 
@@ -204,25 +205,3 @@ class Game():
 
     def handler_regenerate_background(self):
         self.star_field.regenerate()
-
-    ### Getters
-
-    def get_current_weapon_name(self) -> str:
-        if self.player == None:
-            return "Missing"
-        return self.player.weapon.get_name()
-
-    def get_current_lives(self) -> int:
-        if self.gsm == None:
-            return 0
-        return self.gsm.lives
-    
-    def get_current_score(self) -> int:
-        if self.gsm == None:
-            return 0
-        return self.gsm.score
-    
-    def get_player_ship(self):
-        if self.player == None:
-            return None
-        return self.player.ship

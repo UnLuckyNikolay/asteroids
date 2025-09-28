@@ -12,10 +12,6 @@ class Weapon(pygame.sprite.Sprite):
         self.__upgrade_costs = upgrade_costs
         self.__name = name
 
-
-    def get_name(self):
-        return self.__name
-
         
     @abstractmethod
     def attempt_shot(self):
@@ -31,6 +27,9 @@ class Weapon(pygame.sprite.Sprite):
 
     def get_level(self):
         return self.__level
+    
+    def get_name(self):
+        return self.__name
         
 
     def upgrade(self):
