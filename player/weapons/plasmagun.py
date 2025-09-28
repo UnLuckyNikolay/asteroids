@@ -5,7 +5,7 @@ from player.weapons.projectiles.projectileplasma import ProjectilePlasma
 
 class PlasmaGun(Weapon):
     def __init__(self):
-        super().__init__((0, 25, 100), "PlasmaGun")
+        super().__init__("PlasmaGun", 3)
         self.__projectile_speed = 500
         self.__cooldown = 0.4
 
@@ -15,18 +15,18 @@ class PlasmaGun(Weapon):
             level = self.get_level()
 
             if level == 1 or level == 3:
-                self.spawn_bullet((0, 23), position, rotation)
+                self.__spawn_bullet((0, 23), position, rotation)
 
             if level == 2 or level == 3:
-                self.spawn_bullet((20, 9), position, rotation)
-                self.spawn_bullet((-20, 9), position, rotation)
+                self.__spawn_bullet((20, 9), position, rotation)
+                self.__spawn_bullet((-20, 9), position, rotation)
             
             return True
         else:
             return False
 
     
-    def spawn_bullet(self, dot, position, rotation):
+    def __spawn_bullet(self, dot, position, rotation):
         spawn = pygame.Vector2(dot).rotate(rotation)
         shot = ProjectilePlasma(int(position.x + spawn.x), int(position.y + spawn.y))
         shot.velocity = pygame.Vector2(0, 1).rotate(rotation) * self.__projectile_speed

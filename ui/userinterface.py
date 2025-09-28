@@ -201,6 +201,12 @@ class UserInterface(pygame.sprite.Sprite):
                    self.color_green, self.color_gray,
                    (Text("/\\", 5, 5, self.font_small, self.color_green),
                         Allignment.NONE)),
+            Button(1179, 269, 36, 36, 3, 6, 6, 3,
+                   lambda: self.player.buy_upgrade_weapon(1),
+                   lambda: self.player.can_upgrade_weapon(1),
+                   self.color_green, self.color_gray,
+                   (Text("/\\", 5, 5, self.font_small, self.color_green),
+                        Allignment.NONE)),
 
             # Ends the run and returns to the main menu
             Button(890, 600, 340, 72, 8, 8, 20, 20,
@@ -266,6 +272,17 @@ class UserInterface(pygame.sprite.Sprite):
                       self.color_white,
                       (TextH("Projectiles: {}g", 12, 5, self.font_small, self.color_white,
                             lambda: self.player.get_price_weapons(0)),
+                            Allignment.NONE)),
+            Container(760, 218, 455, 36, 6, 6, 6, 6,
+                      self.color_white,
+                      (TextH("Weapon 2: {}.v{}", 12, 5, self.font_small, self.color_white,
+                            self.player.weapons[1].get_name,
+                            self.player.weapons[1].get_level),
+                            Allignment.NONE)),
+            Container(760, 269, 409, 36, 6, 3, 3, 6,
+                      self.color_white,
+                      (TextH("Radius: {}g", 12, 5, self.font_small, self.color_white,
+                            lambda: self.player.get_price_weapons(1)),
                             Allignment.NONE)),
         )
 

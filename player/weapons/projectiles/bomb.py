@@ -5,11 +5,12 @@ from vfx.explosion import Explosion
 
 
 class Bomb(CircleShape):
-    layer = 20
-    def __init__(self, x, y):
+    layer = 20 # pyright: ignore
+    def __init__(self, x, y, explosion_radius):
         super().__init__(x, y, 15)
         self.time = 0
         self.color_change = 0
+        self.explosion_radius = explosion_radius
 
 
     def update(self, dt):
@@ -21,9 +22,9 @@ class Bomb(CircleShape):
     def draw(self, screen):
         if self.time < 2.5:
             pygame.gfxdraw.filled_circle(screen, int(self.position.x), int(self.position.y), self.radius, 
-                                         ((155 + self.color_change * 50), (self.color_change / 2 * 255), (self.color_change / 2 * 255)))
+                                         (int(155 + self.color_change * 50), int(self.color_change / 2 * 255), int(self.color_change / 2 * 255)))
             pygame.draw.circle(screen, (115, 0, 0), self.position, self.radius + 2, 3)
         else: 
             self.kill()
-            explosion = Explosion(self.position.x, self.position.y, 200)
-            hitbox = BombExplosion(self.position.x, self.position.y, 200)
+            explosion = Explosion(self.position.x, self.position.y, self.explosion_radius)
+            hitbox = BombExplosion(self.position.x, self.position.y, self.explosion_radius)
