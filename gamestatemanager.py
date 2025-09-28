@@ -21,9 +21,9 @@ class GameStateManager():
     @score.setter
     def score(self, value):
         self._score = value
-        for weapon in self.player.weapons:
-            if self._score >= weapon.get_upgrade_cost():
-                weapon.upgrade()
+        #for weapon in self.player.weapons:
+        #    if self._score >= weapon.get_upgrade_cost():
+        #        weapon.upgrade()
 
     def get_score(self):
         return self._score

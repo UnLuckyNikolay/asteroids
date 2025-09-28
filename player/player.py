@@ -204,7 +204,8 @@ class Player(CircleShape):
         return (1+self.times_healed) * 5
     
     def can_heal(self):
-        return self.money >= self.get_price_heal() and self.lives < self.lives_max
+        return (self.money >= self.get_price_heal() 
+                and self.lives < self.lives_max)
     
     def buy_heal(self):
         self.money = self.money - self.get_price_heal()
@@ -212,3 +213,20 @@ class Player(CircleShape):
         if self.lives < self.lives_max:
             self.lives += 1
     
+    ### Weapons
+
+    def get_price_weapons(self, weapon_num):
+        match self.weapons[weapon_num].get_level():
+            case 1:
+                return 15
+            case 2:
+                return 50
+            case _:
+                return 999999
+    
+    def can_upgrade_weapon(self, weapon_num):
+        return (self.money >= self.get_price_weapons(weapon_num))
+    
+    def buy_upgrade_weapon(self, weapon_num):
+        self.money = self.money - self.get_price_weapons(weapon_num)
+        self.weapons[weapon_num].upgrade()

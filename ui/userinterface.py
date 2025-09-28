@@ -132,13 +132,13 @@ class UserInterface(pygame.sprite.Sprite):
             # Current score
             Container(25, 71, 176, 36, 5, 3, 5, 10, 
                       self.color_white,
-                      (TextH("{}PTS", 9, 5, self.font_small, self.color_white, 
+                      (TextH("{}pts", 9, 5, self.font_small, self.color_white, 
                            self.gsm.get_score),
                            Allignment.NONE)),
             # Current money
             Container(211, 71, 176, 36, 3, 3, 3, 3, 
                       self.color_white,
-                      (TextH("{}G", 9, 5, self.font_small, (235, 205, 0), 
+                      (TextH("{}g", 9, 5, self.font_small, (235, 205, 0), 
                            self.player.get_money),
                            Allignment.NONE)),
             # Current health bar
@@ -167,6 +167,13 @@ class UserInterface(pygame.sprite.Sprite):
                    self.color_green, self.color_gray,
                    (Text("/\\", 5, 5, self.font_small, self.color_green),
                         Allignment.NONE)),
+            # Upgrade weapons
+            Button(1179, 116, 36, 36, 6, 6, 6, 6,
+                   lambda: self.player.buy_upgrade_weapon(0),
+                   lambda: self.player.can_upgrade_weapon(0),
+                   self.color_green, self.color_gray,
+                   (Text("/\\", 5, 5, self.font_small, self.color_green),
+                        Allignment.NONE)),
         )
         self.containers_pause_menu = (
             # Background
@@ -185,12 +192,21 @@ class UserInterface(pygame.sprite.Sprite):
                             Allignment.NONE)),
             Container(290, 116, 404, 36, 6, 6, 6, 6,
                       self.color_white,
-                      (TextH("Heal: {}G", 12, 5, self.font_small, self.color_white,
+                      (TextH("Heal: {}g", 12, 5, self.font_small, self.color_white,
                             self.player.get_price_heal),
                             Allignment.NONE)),
             # List - weapons
             Container(760, 65, 455, 36, 6, 12, 6, 6,
-                      self.color_white),
+                      self.color_white,
+                      (TextH("Weapon 1: {}.v{}", 12, 5, self.font_small, self.color_white,
+                            self.player.weapons[0].get_name,
+                            self.player.weapons[0].get_level),
+                            Allignment.NONE)),
+            Container(760, 116, 404, 36, 6, 6, 6, 6,
+                      self.color_white,
+                      (TextH("Projectiles: {}g", 12, 5, self.font_small, self.color_white,
+                            lambda: self.player.get_price_weapons(0)),
+                            Allignment.NONE)),
         )
 
     
