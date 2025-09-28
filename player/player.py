@@ -22,7 +22,7 @@ class Player(CircleShape):
         self.is_invul = False
         self.is_alive = True
 
-        self.ship = Ship(ShipType.POLY2)
+        self.ship = Ship(ShipType.POLY2, self.radius)
 
         self.color_outline = list(PLAYER_COLOR_OUTLINE)
         self.color_fill = list(PLAYER_COLOR_FILL)

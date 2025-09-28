@@ -8,8 +8,9 @@ class ShipType(Enum):
     POLY2 = "Poly.v2"
 
 class Ship():
-    def __init__(self, type : ShipType):
+    def __init__(self, type : ShipType, hitbox_radius):
         self.type = type
+        self.hitbox_radius = hitbox_radius
 
         self.color_outline = PLAYER_COLOR_OUTLINE
         self.color_fill = PLAYER_COLOR_FILL
@@ -31,9 +32,9 @@ class Ship():
     def draw_rotated(self, screen, x : int, y : int, rotation : int, timer_invul=0):
         """Used to draw ships during gameplay."""
         
-        #if PLAYER_SHOW_HITBOX:   # Draws player hit box in dark gray.
-        #    pygame.draw.circle(screen, (50, 50, 50), (x ,y), 1, 2)
-        #    pygame.draw.circle(screen, (50, 50, 50), (x ,y), self.radius, 2)
+        if PLAYER_SHOW_HITBOX:   # Draws player hit box in dark gray.
+            pygame.draw.circle(screen, (50, 50, 50), (x ,y), 1, 2)
+            pygame.draw.circle(screen, (50, 50, 50), (x ,y), self.hitbox_radius, 2)
 
         # Get ship parts
         match self.type:
