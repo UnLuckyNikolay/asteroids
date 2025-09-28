@@ -350,7 +350,7 @@ class UserInterface(pygame.sprite.Sprite):
         if not is_updated:
             return
 
-        print(f"Saving leaderboards to `./{self.leaderboards_path}`")
+        print(f"Saving leaderboards to `{self.leaderboards_path}`")
         with open(self.leaderboards_path, "w") as file:
             json.dump(self.scores, file)
 

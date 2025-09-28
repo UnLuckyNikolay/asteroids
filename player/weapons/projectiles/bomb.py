@@ -1,4 +1,5 @@
 import pygame, math, pygame.gfxdraw
+
 from shapes.circleshape import CircleShape
 from player.weapons.projectiles.bombexplosion import BombExplosion
 from vfx.explosion import Explosion
@@ -18,7 +19,6 @@ class Bomb(CircleShape):
         self.radius = int(15 - math.cos(10 * self.time) + 4 * self.time)
         self.color_change = 1 - math.cos(10 * self.time)
 
-
     def draw(self, screen):
         if self.time < 2.5:
             pygame.gfxdraw.filled_circle(screen, int(self.position.x), int(self.position.y), self.radius, 
@@ -28,3 +28,4 @@ class Bomb(CircleShape):
             self.kill()
             explosion = Explosion(self.position.x, self.position.y, self.explosion_radius)
             hitbox = BombExplosion(self.position.x, self.position.y, self.explosion_radius)
+            

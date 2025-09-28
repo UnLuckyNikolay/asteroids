@@ -1,4 +1,4 @@
-import pygame, pygame.gfxdraw
+import pygame
 
 from constants import *
 from shapes.circleshape import CircleShape
@@ -53,8 +53,6 @@ class Player(CircleShape):
                       [[],  [[-5, -12], [5, -12], [8, -20], [-8, -20]]], # Engine
                       [[],  [[0, 18], [0, 23]]] # Gun
                       ]
-        
-        #self.rotated_sprite = self.rotate_sprite()
     
 
     @property

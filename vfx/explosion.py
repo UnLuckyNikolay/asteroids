@@ -1,10 +1,11 @@
 import pygame, pygame.gfxdraw, random, math
+
 from constants import *
 from shapes.circleshape import CircleShape
 
 
 class Explosion(CircleShape):
-    layer = 10
+    layer = 10 # pyright: ignore
     def __init__(self, x, y, radius):
         super().__init__(x, y, radius)
         self.timer = 0
@@ -55,3 +56,4 @@ class Explosion(CircleShape):
         pygame.gfxdraw.filled_polygon(screen, self.points_for_drawing_L, (80, 60, 40))
         pygame.gfxdraw.filled_polygon(screen, self.points_for_drawing_M, (255, 50, 0))
         pygame.gfxdraw.filled_polygon(screen, self.points_for_drawing_S, (255, 200, 0))
+        

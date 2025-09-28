@@ -1,4 +1,5 @@
 import pygame
+
 from player.weapons.weapon import Weapon
 from player.weapons.projectiles.bomb import Bomb
 
@@ -26,3 +27,4 @@ class BombLauncher(Weapon):
                 bomb = Bomb(int(position.x + spawn.x), int(position.y + spawn.y), 150)
             case 3:
                 bomb = Bomb(int(position.x + spawn.x), int(position.y + spawn.y), 200)
+                

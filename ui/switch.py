@@ -2,7 +2,7 @@ import pygame, pygame.gfxdraw
 from typing import Callable, Any
 
 from ui.container import Container, Allignment
-from ui.text import Text, TextF, TextH
+from ui.text import Text
 from ui.helpers import get_points
 
 class Switch(Container):

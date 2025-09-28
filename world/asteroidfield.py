@@ -1,4 +1,5 @@
 import pygame, random
+
 from constants import *
 from asteroids.asteroidbasic import AsteroidBasic
 from asteroids.asteroidgolden import AsteroidGolden
@@ -28,7 +29,7 @@ class AsteroidField(pygame.sprite.Sprite):
 
 
     def __init__(self, player):
-        pygame.sprite.Sprite.__init__(self, self.containers)
+        pygame.sprite.Sprite.__init__(self, self.containers) # pyright: ignore[reportAttributeAccessIssue]
         self.spawn_timer = 0.0
         self.spawn_rate = ASTEROID_SPAWN_RATE
         self.spawn_increase_timer = 0.0

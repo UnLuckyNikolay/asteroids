@@ -3,6 +3,7 @@ from enum import Enum
 
 from constants import *
 
+
 class ShipType(Enum):
     POLY = "Poly.v1"
     POLY2 = "Poly.v2"

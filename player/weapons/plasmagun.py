@@ -1,4 +1,5 @@
 import pygame
+
 from player.weapons.weapon import Weapon
 from player.weapons.projectiles.projectileplasma import ProjectilePlasma
 

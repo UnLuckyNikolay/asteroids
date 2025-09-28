@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 class Weapon(pygame.sprite.Sprite):
     def __init__(self, name, max_level):
         if hasattr(self, "containers"):
-            super().__init__(self.containers)
+            super().__init__(self.containers) # pyright: ignore[reportAttributeAccessIssue]
         else:
             super().__init__()
         self.__level = 1

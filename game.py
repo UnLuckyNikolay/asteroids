@@ -1,7 +1,6 @@
 # pyright: reportAttributeAccessIssue=false
 
 import pygame
-from random import randint
 
 from constants import *
 from player.player import Player
@@ -156,7 +155,7 @@ class Game():
             self.dt = self.clock.tick(60) / 1000
 
         # Saving score and going back to Main Menu
-        if not PLAYER_GOD_MODE and self.gsm.score > 0:
+        if not self.cheat_godmode and self.gsm.score > 0:
             self.ui.check_score(self.gsm.score)
         self.ui.switch_menu(Menu.MAIN_MENU)
 

@@ -1,4 +1,5 @@
-import pygame, random, pygame.gfxdraw
+import pygame
+
 from constants import *
 from asteroids.asteroid import Asteroid
 from asteroids.asteroidbasic import AsteroidBasic
