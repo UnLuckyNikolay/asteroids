@@ -8,7 +8,7 @@ from ui.sprites.ship import Ship, ShipType
 
 
 class Player(CircleShape):
-    layer = 50 # pyright: ignore[reportAssignmentType]
+    layer = 50 # pyright: ignore
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 180
@@ -22,6 +22,7 @@ class Player(CircleShape):
         self.is_invul = False
         self.is_alive = True
 
+        self.money = 0
         self.ship = Ship(ShipType.POLY2, self.radius)
 
         self.color_outline = list(PLAYER_COLOR_OUTLINE)
@@ -84,7 +85,7 @@ class Player(CircleShape):
     def draw(self, screen):
         self.ship.draw_rotated(
             screen, 
-            self.position.x, self.position.y, 
+            self.position.x, self.position.y,  # pyright: ignore[reportAttributeAccessIssue]
             self.rotation+180, self.timer_invul
         )
 
@@ -174,6 +175,9 @@ class Player(CircleShape):
             print(f"Game over! Final score: {gameinfo.score}")
             return self.is_alive
         
+    def collect_ore(self, price):
+        self.money += price
+        
     ### Getters
 
     def get_ship(self):
@@ -181,4 +185,7 @@ class Player(CircleShape):
     
     def get_weapon_name(self):
         return self.weapon.get_name()
+    
+    def get_money(self):
+        return self.money
         

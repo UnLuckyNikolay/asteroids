@@ -1,11 +1,12 @@
 import pygame
+
 from constants import *
 
 
 class CircleShape(pygame.sprite.Sprite):
     def __init__(self, x, y, radius):
         if hasattr(self, "containers"):
-            super().__init__(self.containers)
+            super().__init__(self.containers) # pyright: ignore[reportAttributeAccessIssue]
         else:
             super().__init__()
         
@@ -17,10 +18,8 @@ class CircleShape(pygame.sprite.Sprite):
     def draw(self, screen):
         pass
 
-
     def update(self, dt):
         pass
-
 
     def check_colision(self, object):
         distance = pygame.math.Vector2.distance_to(self.position, object.position)
@@ -29,7 +28,6 @@ class CircleShape(pygame.sprite.Sprite):
         else:
             return True
 
-
     def is_off_screen(self):
         return(
             self.position.x < -ASTEROID_MAX_RADIUS or
@@ -37,3 +35,4 @@ class CircleShape(pygame.sprite.Sprite):
             self.position.y < -ASTEROID_MAX_RADIUS or
             self.position.y > SCREEN_HEIGHT + ASTEROID_MAX_RADIUS
         )
+    

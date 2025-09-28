@@ -1,6 +1,8 @@
-import pygame, pygame.gfxdraw
+import pygame, pygame.gfxdraw, random
+
 from constants import *
 from asteroids.asteroid import Asteroid
+from asteroids.ores import CopperOre, SilverOre, GoldenOre, Diamond
 
 
 class AsteroidHoming(Asteroid):
@@ -16,5 +18,21 @@ class AsteroidHoming(Asteroid):
 
 
     def split(self):
+        loot_quality = random.randint(1, 100)
+        angle = random.randint(-15, 15)
+
+        if loot_quality > 90:
+            loot = Diamond(self.position.x, self.position.y)
+            loot.velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
+        elif loot_quality > 50:
+            loot = GoldenOre(self.position.x, self.position.y)
+            loot.velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
+        elif loot_quality > 25:
+            loot = SilverOre(self.position.x, self.position.y)
+            loot.velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
+        else:
+            loot = CopperOre(self.position.x, self.position.y)
+            loot.velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
+
         pygame.sprite.Sprite.kill(self)
         self.has_been_hit = True

@@ -1,6 +1,8 @@
 import pygame, random, pygame.gfxdraw
+
 from constants import *
 from asteroids.asteroid import Asteroid
+from asteroids.ores import CopperOre, SilverOre, GoldenOre, Diamond
 
 
 class AsteroidBasic(Asteroid):
@@ -12,8 +14,24 @@ class AsteroidBasic(Asteroid):
     def split(self):
         pygame.sprite.Sprite.kill(self)
         self.has_been_hit = True
+
         if self.radius <= ASTEROID_MIN_RADIUS:
-            return
+            loot_quality = random.randint(1, 100)
+            angle = random.randint(-15, 15)
+
+            if loot_quality > 99:
+                loot = Diamond(self.position.x, self.position.y)
+                loot.velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
+            elif loot_quality > 95:
+                loot = GoldenOre(self.position.x, self.position.y)
+                loot.velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
+            elif loot_quality > 85:
+                loot = SilverOre(self.position.x, self.position.y)
+                loot.velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
+            elif loot_quality > 60:
+                loot = CopperOre(self.position.x, self.position.y)
+                loot.velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
+
         else:
             split_angle = random.uniform(20, 50)
             new_radius = self.radius - ASTEROID_MIN_RADIUS

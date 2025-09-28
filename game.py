@@ -13,6 +13,7 @@ from vfx.explosion import Explosion
 from world.starfield import StarField
 from world.asteroidfield import AsteroidField
 from asteroids.asteroid import Asteroid
+from asteroids.ores import Ore
 from ui.userinterface import UserInterface, Menu
 
 
@@ -29,6 +30,7 @@ class Game():
         self.updatable = pygame.sprite.Group()   # This group is cleaned (object.kill()) after each round
         self.drawable = pygame.sprite.Group()
         self.asteroids = pygame.sprite.Group()            # Used for colision detection
+        self.ores = pygame.sprite.Group()                  # ^
         self.projectiles = pygame.sprite.Group()          # ^
         self.explosion_hitboxes = pygame.sprite.Group()   # ^
         self.moving_objects = pygame.sprite.Group()        # Used to destroy objects that are off-screen
@@ -45,6 +47,7 @@ class Game():
 
         AsteroidField.containers = (self.updatable)
         Asteroid.containers = (self.asteroids, self.updatable, self.drawable, self.moving_objects)
+        Ore.containers = (self.ores, self.updatable, self.drawable, self.moving_objects)
 
         # Layers for drawable
         # 0 - StarField
@@ -113,6 +116,7 @@ class Game():
 
                 self.redraw_objects_and_ui()
 
+                # Colision checks
                 for asteroid in self.asteroids:
                     if asteroid.check_colision(self.player) and not self.player.is_invul:
                         if self.player.take_damage_and_check_if_alive(self.gsm):
@@ -132,6 +136,11 @@ class Game():
                             asteroid.split()
                             self.gsm.score += asteroid.reward
                     hitbox.kill()
+
+                for ore in self.ores:
+                    if ore.check_colision(self.player):
+                        self.player.collect_ore(ore.price)
+                        ore.kill()
 
             # Screen update - Pause Menu
             else:

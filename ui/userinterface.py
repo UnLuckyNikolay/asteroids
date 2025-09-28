@@ -99,7 +99,6 @@ class UserInterface(pygame.sprite.Sprite):
                            Allignment.NONE))
         )
 
-
     def _initialize_leaderboards(self):
         self.buttons_leaderboards = (
             # Returns to the Main Menu
@@ -123,7 +122,7 @@ class UserInterface(pygame.sprite.Sprite):
     def _initialize_hud(self):
         self.containers_hud = (
             # Current weapon
-            Container(25, 25, 362, 36, 10, 10, 5, 5, 
+            Container(25, 25, 548, 36, 10, 10, 5, 5, 
                       self.color_white,
                       (TextH("Weapon: {}", 9, 5, self.font_small, self.color_white, 
                            self.player.get_weapon_name),
@@ -131,11 +130,17 @@ class UserInterface(pygame.sprite.Sprite):
             # Current score
             Container(25, 71, 176, 36, 5, 3, 5, 10, 
                       self.color_white,
-                      (TextH("Score: {}", 9, 5, self.font_small, self.color_white, 
+                      (TextH("{}PTS", 9, 5, self.font_small, self.color_white, 
                            self.gsm.get_score),
                            Allignment.NONE)),
+            # Current money
+            Container(211, 71, 176, 36, 3, 3, 3, 3, 
+                      self.color_white,
+                      (TextH("{}G", 9, 5, self.font_small, (235, 205, 0), 
+                           self.player.get_money),
+                           Allignment.NONE)),
             # Current health bar
-            Container(211, 71, 176, 36, 3, 5, 10, 5, 
+            Container(397, 71, 176, 36, 3, 5, 10, 5, 
                       self.color_white,
                       (Text("Lives", 9, 5, self.font_small, self.color_white),
                             Allignment.NONE),
