@@ -6,14 +6,20 @@ A classic game of Asteroids built using Pygame as a Boot.dev project and then en
 
 1. Install [Python](https://www.python.org/downloads) 3.12 or higher.
 
-2. Clone the repository:
+2. Install Tkinter if needed:
+
+	```bash
+	sudo apt install python3-tk
+	```
+
+3. Clone the repository:
 
     ```bash
 	git clone https://github.com/UnLuckyNikolay/asteroids
     cd asteroids
 	```
 
-3. Activate venv and install requirements:
+4. Activate venv and install requirements:
 
 	```bash
 	python3 -m venv ./venv
@@ -21,7 +27,7 @@ A classic game of Asteroids built using Pygame as a Boot.dev project and then en
 	pip install -r ./requirements.txt
 	```
 
-4. Run:
+5. Run:
 
 	```bash 
 	python3 main.py
