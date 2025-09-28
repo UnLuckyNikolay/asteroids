@@ -11,8 +11,11 @@ class Text(pygame.sprite.Sprite):
         self.font = font
         self.color = color
 
-    def draw(self, screen, x, y):
-        button_text = self.font.render(self.text, True, self.color)
+    def draw(self, screen, x, y, color_override=None):
+        if color_override == None:
+            button_text = self.font.render(self.text, True, self.color)
+        else:
+            button_text = self.font.render(self.text, True, color_override)
         screen.blit(button_text, (x + self.x, y + self.y))
 
 class TextF(pygame.sprite.Sprite):
@@ -29,10 +32,13 @@ class TextF(pygame.sprite.Sprite):
         self.color = color
         self.strings = formatting_strings
 
-    def draw(self, screen, x, y):
+    def draw(self, screen, x, y, color_override=None):
         text = self.text
         text = text.format(*self.strings)
-        button_text = self.font.render(text, True, self.color)
+        if color_override == None:
+            button_text = self.font.render(text, True, self.color)
+        else:
+            button_text = self.font.render(text, True, color_override)
         screen.blit(button_text, (x + self.x, y + self.y))
 
 class TextH(pygame.sprite.Sprite):
@@ -49,9 +55,12 @@ class TextH(pygame.sprite.Sprite):
         self.color = color
         self.getters = formatting_getters
 
-    def draw(self, screen, x, y):
+    def draw(self, screen, x, y, color_override=None):
         text = self.text
         for getter in self.getters:
             text = text.replace("{}", str(getter()), 1)
-        button_text = self.font.render(text, True, self.color)
+        if color_override == None:
+            button_text = self.font.render(text, True, self.color)
+        else:
+            button_text = self.font.render(text, True, color_override)
         screen.blit(button_text, (x + self.x, y + self.y))

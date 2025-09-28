@@ -60,9 +60,11 @@ class UserInterface(pygame.sprite.Sprite):
         self.font_big = pygame.font.Font(font_path, 48)
 
         # Colors
-        self.color_white = (200, 200, 200, 100)
-        self.color_blue = (100, 200, 255, 100)
-        self.color_red = (255, 0, 0, 100)
+        self.color_white = (200, 200, 200)
+        self.color_gray = (100, 100, 100)
+        self.color_blue = (100, 200, 255)
+        self.color_red = (255, 0, 0)
+        self.color_green = (0, 255, 0)
 
         self._initialize_main_menu()
 
@@ -74,27 +76,27 @@ class UserInterface(pygame.sprite.Sprite):
             Button(SCREEN_WIDTH / 2 - 185, 200, 370, 72, 8, 8, 20, 20, 
                    self.game.game_loop,
                    lambda: True,
-                   self.color_blue,
+                   self.color_blue, self.color_gray,
                    (Text("Start", 117, 10, self.font_big, self.color_blue),
                            Allignment.NONE)),
             # Opens the Leaderboards
             Button(SCREEN_WIDTH / 2 - 185, 300, 370, 72, 8, 8, 20, 20, 
                    lambda: self.switch_menu(Menu.LEADERBOARDS),
                    lambda: True,
-                   self.color_blue,
+                   self.color_blue, self.color_gray,
                    (Text("Leaderboard", 16, 10, self.font_big, self.color_blue),
                            Allignment.NONE)),
             # Exits the game
             Button(SCREEN_WIDTH / 2 - 185, 400, 370, 72, 8, 8, 20, 20, 
                    self.game.handler_turn_off,
                    lambda: True,
-                   self.color_blue,
+                   self.color_blue, self.color_gray,
                    (Text("Exit", 135, 10, self.font_big, self.color_blue),
                            Allignment.NONE)),
             Button(15, SCREEN_HEIGHT-55, 40, 40, 8, 8, 8, 8,
                    self.game.handler_regenerate_background,
                    lambda: True,
-                   self.color_blue,
+                   self.color_blue, self.color_gray,
                    (Text("BG", 4, 7, self.font_small, self.color_blue),
                            Allignment.NONE))
         )
@@ -105,7 +107,7 @@ class UserInterface(pygame.sprite.Sprite):
             Button(100, 68, 100, 36, 15, 3, 3, 15, 
                    lambda: self.switch_menu(Menu.MAIN_MENU),
                    lambda: True,
-                   self.color_blue,
+                   self.color_blue, self.color_gray,
                    (Text("Back", 18, 5, self.font_small, self.color_blue),
                            Allignment.NONE)),
         )
@@ -145,29 +147,50 @@ class UserInterface(pygame.sprite.Sprite):
                       (Text("Lives", 9, 5, self.font_small, self.color_white),
                             Allignment.NONE),
                       (HealthBar(103, 5, 
-                                self.gsm.get_lives),
+                                self.player.get_lives),
                                 Allignment.NONE)),
         )
 
     def _initialize_pause_menu(self):
         self.buttons_pause_menu = (
             # Ends the run and returns to the main menu
-            Button(SCREEN_WIDTH - 390, SCREEN_HEIGHT - 122, 340, 72, 8, 8, 20, 20,
+            Button(890, 600, 340, 72, 8, 8, 20, 20,
                    self.game.handler_finish_round,
                    lambda: True,
-                   self.color_red,
+                   self.color_red, self.color_gray,
                    (Text("End Run", 54, 10, self.font_big, self.color_red),
+                        Allignment.NONE)),
+            # Heal
+            Button(709, 116, 36, 36, 6, 6, 6, 6,
+                   self.player.buy_heal,
+                   self.player.can_heal,
+                   self.color_green, self.color_gray,
+                   (Text("/\\", 5, 5, self.font_small, self.color_green),
                         Allignment.NONE)),
         )
         self.containers_pause_menu = (
             # Background
-            Container(50, 50, SCREEN_WIDTH-100, SCREEN_HEIGHT-182, 20, 20, 8, 20,
+            Container(50, 50, 1180, 540, 20, 20, 8, 20,
                       self.color_white),
             # Current ship
-            Container(65, 65, 215, 215, 15, 15, 15, 15,
+            Container(65, 65, 210, 210, 12, 6, 6, 6,
                       self.color_white,
                       (self.player.get_ship,
-                            Allignment.CENTER))
+                            Allignment.CENTER)),
+            # List - ship
+            Container(290, 65, 455, 36, 6, 6, 6, 6,
+                      self.color_white,
+                      (TextH("Model: {}", 12, 5, self.font_small, self.color_white,
+                            self.player.get_ship_name),
+                            Allignment.NONE)),
+            Container(290, 116, 404, 36, 6, 6, 6, 6,
+                      self.color_white,
+                      (TextH("Heal: {}G", 12, 5, self.font_small, self.color_white,
+                            self.player.get_price_heal),
+                            Allignment.NONE)),
+            # List - weapons
+            Container(760, 65, 455, 36, 6, 12, 6, 6,
+                      self.color_white),
         )
 
     

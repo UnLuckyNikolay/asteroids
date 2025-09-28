@@ -22,8 +22,11 @@ class Player(CircleShape):
         self.is_invul = False
         self.is_alive = True
 
-        self.money = 0
         self.ship = Ship(ShipType.POLY2, self.radius)
+        self.money = 0
+        self.lives = 3
+        self.lives_max = 3
+        self.times_healed = 0
 
         self.color_outline = list(PLAYER_COLOR_OUTLINE)
         self.color_fill = list(PLAYER_COLOR_FILL)
@@ -161,31 +164,51 @@ class Player(CircleShape):
                 self.color_outline = list(PLAYER_COLOR_OUTLINE)
                 self.color_fill = list(PLAYER_COLOR_FILL)
 
-    def take_damage_and_check_if_alive(self, gameinfo):
+    def take_damage_and_check_if_alive(self, gsm):
         if PLAYER_GOD_MODE:
             return self.is_alive
-        elif gameinfo.lives > 1:
-            gameinfo.lives -= 1
+        elif self.lives > 1:
+            self.lives -= 1
             self.timer_invul = 2
             self.is_invul = True
             return self.is_alive
         else:
-            gameinfo.lives -= 1
+            self.lives -= 1
             self.is_alive = False
-            print(f"Game over! Final score: {gameinfo.score}")
+            print(f"Game over! Final score: {gsm.score}")
             return self.is_alive
-        
+
     def collect_ore(self, price):
         self.money += price
-        
+
     ### Getters
 
     def get_ship(self):
         return self.ship
+    
+    def get_ship_name(self):
+        return self.ship.type.value
     
     def get_weapon_name(self):
         return self.weapon.get_name()
     
     def get_money(self):
         return self.money
-        
+    
+    ### Health
+    
+    def get_lives(self):
+        return self.lives
+
+    def get_price_heal(self):
+        return (1+self.times_healed) * 5
+    
+    def can_heal(self):
+        return self.money >= self.get_price_heal() and self.lives < self.lives_max
+    
+    def buy_heal(self):
+        self.money = self.money - self.get_price_heal()
+        self.times_healed += 1
+        if self.lives < self.lives_max:
+            self.lives += 1
+    

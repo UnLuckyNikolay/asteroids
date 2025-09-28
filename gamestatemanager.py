@@ -5,7 +5,7 @@ from constants import *
 class GameStateManager():
     def __init__(self, player):
         self._score = 0
-        self.lives = 3
+        #self.lives = 3
         self.player = player
 
         pygame.font.init()
@@ -28,5 +28,5 @@ class GameStateManager():
     def get_score(self):
         return self._score
     
-    def get_lives(self):
-        return self.lives
+    #def get_lives(self):
+    #    return self.lives
