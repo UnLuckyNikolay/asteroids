@@ -9,7 +9,7 @@ from ui.sprites.ship import Ship, ShipType
 
 class Player(CircleShape):
     layer = 50 # pyright: ignore
-    def __init__(self, x, y):
+    def __init__(self, x, y, cheat_godmode, cheat_hitbox):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 180
         self.rotation_inertia = self.rotation
@@ -18,11 +18,16 @@ class Player(CircleShape):
         self.__turning_speed = 0
         self.last_dt = 0
 
+        self.cheat_godmode = cheat_godmode
+
         self.timer_invul = 0
         self.is_invul = False
         self.is_alive = True
 
-        self.ship = Ship(ShipType.POLY2, self.radius)
+        self.unlocked_ships = [ShipType.POLY, ShipType.POLY2]
+        self.ship_model = 1
+        self.ship = Ship(self.unlocked_ships[1], self.radius, cheat_hitbox)
+
         self.money = 0
         self.lives = 3
         self.lives_max = 3
@@ -165,7 +170,7 @@ class Player(CircleShape):
                 self.color_fill = list(PLAYER_COLOR_FILL)
 
     def take_damage_and_check_if_alive(self, gsm):
-        if PLAYER_GOD_MODE:
+        if self.cheat_godmode:
             return self.is_alive
         elif self.lives > 1:
             self.lives -= 1
@@ -182,6 +187,11 @@ class Player(CircleShape):
         self.money += price
 
     ### Getters
+    
+    def get_money(self):
+        return self.money
+    
+    ### Ship
 
     def get_ship(self):
         return self.ship
@@ -189,8 +199,13 @@ class Player(CircleShape):
     def get_ship_name(self):
         return self.ship.type.value
     
-    def get_money(self):
-        return self.money
+    def switch_ship_model_to_next(self):
+        self.ship_model = (self.ship_model+1)%len(self.unlocked_ships)
+        self.ship.switch_model(self.unlocked_ships[self.ship_model])
+    
+    def switch_ship_model_to_previous(self):
+        self.ship_model = (self.ship_model-1)%len(self.unlocked_ships)
+        self.ship.switch_model(self.unlocked_ships[self.ship_model])
     
     ### Health
     

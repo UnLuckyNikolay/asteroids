@@ -27,6 +27,9 @@ class Game():
         self.is_running = True
         self.is_paused = False
 
+        self.cheat_godmode = False
+        self.cheat_hitbox = False
+
         self.updatable = pygame.sprite.Group()   # This group is cleaned (object.kill()) after each round
         self.drawable = pygame.sprite.Group()
         self.asteroids = pygame.sprite.Group()            # Used for colision detection
@@ -60,6 +63,7 @@ class Game():
 
         self.star_field = StarField()
         self.ui = UserInterface(self)
+        self.player = None
 
     def run(self):
         while self.is_running:
@@ -77,7 +81,8 @@ class Game():
             self.clock.tick(60)
 
     def game_loop(self):
-        self.player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+        self.player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+                             self.cheat_godmode, self.cheat_hitbox)
         self.gsm = GameStateManager(self.player)
         self.asteroid_field = AsteroidField(self.player)
         self.ui.gsm = self.gsm
@@ -184,3 +189,13 @@ class Game():
 
     def handler_regenerate_background(self):
         self.star_field.regenerate()
+
+    def switch_godmode(self):
+        self.cheat_godmode = False if self.cheat_godmode else True
+        if self.player != None:
+            self.player.cheat_godmode = self.cheat_godmode
+
+    def switch_hitbox(self):
+        self.cheat_hitbox = False if self.cheat_hitbox else True
+        if self.player != None:
+            self.player.ship.show_hitbox = self.cheat_hitbox

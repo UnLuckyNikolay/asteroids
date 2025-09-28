@@ -5,8 +5,9 @@ from enum import Enum
 from tkinter import Tk, simpledialog
 
 from constants import *
-from ui.button import Button
 from ui.container import Container, Allignment
+from ui.button import Button
+from ui.switch import Switch
 from ui.text import Text, TextH, TextF
 from ui.sprites.healthbar import HealthBar
 from ui.sprites.leaderboards import Leaderboards
@@ -65,6 +66,7 @@ class UserInterface(pygame.sprite.Sprite):
         self.color_blue = (100, 200, 255)
         self.color_red = (255, 0, 0)
         self.color_green = (0, 255, 0)
+        self.color_golden = (255, 215, 0)
 
         self._initialize_main_menu()
 
@@ -93,12 +95,27 @@ class UserInterface(pygame.sprite.Sprite):
                    self.color_blue, self.color_gray,
                    (Text("Exit", 135, 10, self.font_big, self.color_blue),
                            Allignment.NONE)),
+            # Regenerate background
             Button(15, SCREEN_HEIGHT-55, 40, 40, 8, 8, 8, 8,
                    self.game.handler_regenerate_background,
                    lambda: True,
                    self.color_blue, self.color_gray,
                    (Text("BG", 4, 7, self.font_small, self.color_blue),
-                           Allignment.NONE))
+                           Allignment.NONE)),
+            # Cheat - Show hitbox
+            Switch(SCREEN_WIDTH-110, SCREEN_HEIGHT-55, 40, 40, 8, 8, 8, 8,
+                   self.game.switch_hitbox,
+                   False,
+                   self.color_golden, self.color_blue,
+                   (Text("HB", 3, 7, self.font_small, self.color_blue),
+                           Allignment.NONE)),
+            # Cheat - Godmode
+            Switch(SCREEN_WIDTH-55, SCREEN_HEIGHT-55, 40, 40, 8, 8, 8, 8,
+                   self.game.switch_godmode,
+                   False,
+                   self.color_golden, self.color_blue,
+                   (Text("GM", 2, 7, self.font_small, self.color_blue),
+                           Allignment.NONE)),
         )
 
     def _initialize_leaderboards(self):
@@ -122,6 +139,7 @@ class UserInterface(pygame.sprite.Sprite):
         )
 
     def _initialize_hud(self):
+        # Space between elements - 10
         self.containers_hud = (
             # Current weapon
             Container(25, 25, 548, 36, 10, 10, 5, 5, 
@@ -147,13 +165,43 @@ class UserInterface(pygame.sprite.Sprite):
                       self.color_white,
                       (Text("Lives", 9, 5, self.font_small, self.color_white),
                             Allignment.NONE),
-                      (HealthBar(103, 5, 
+                      (HealthBar(102, 5, 2, 6,
                                 self.player.get_lives),
                                 Allignment.NONE)),
         )
 
     def _initialize_pause_menu(self):
+        # Space between elements - 15
         self.buttons_pause_menu = (
+            # Model switching
+            Button(290, 116, 36, 36, 6, 3, 3, 6, 
+                   self.player.switch_ship_model_to_previous,
+                   lambda: True,
+                   self.color_blue, self.color_gray,
+                   (Text("<", 12, 5, self.font_small, self.color_blue),
+                        Allignment.NONE)),
+            Button(709, 116, 36, 36, 3, 6, 6, 3, 
+                   self.player.switch_ship_model_to_next,
+                   lambda: True,
+                   self.color_blue, self.color_gray,
+                   (Text(">", 12, 5, self.font_small, self.color_blue),
+                        Allignment.NONE)),
+            # Heal
+            Button(709, 167, 36, 36, 3, 6, 6, 3,
+                   self.player.buy_heal,
+                   self.player.can_heal,
+                   self.color_green, self.color_gray,
+                   (Text("/\\", 5, 5, self.font_small, self.color_green),
+                        Allignment.NONE)),
+
+            # Upgrade weapons
+            Button(1179, 167, 36, 36, 3, 6, 6, 3,
+                   lambda: self.player.buy_upgrade_weapon(0),
+                   lambda: self.player.can_upgrade_weapon(0),
+                   self.color_green, self.color_gray,
+                   (Text("/\\", 5, 5, self.font_small, self.color_green),
+                        Allignment.NONE)),
+
             # Ends the run and returns to the main menu
             Button(890, 600, 340, 72, 8, 8, 20, 20,
                    self.game.handler_finish_round,
@@ -161,49 +209,60 @@ class UserInterface(pygame.sprite.Sprite):
                    self.color_red, self.color_gray,
                    (Text("End Run", 54, 10, self.font_big, self.color_red),
                         Allignment.NONE)),
-            # Heal
-            Button(709, 116, 36, 36, 6, 6, 6, 6,
-                   self.player.buy_heal,
-                   self.player.can_heal,
-                   self.color_green, self.color_gray,
-                   (Text("/\\", 5, 5, self.font_small, self.color_green),
-                        Allignment.NONE)),
-            # Upgrade weapons
-            Button(1179, 116, 36, 36, 6, 6, 6, 6,
-                   lambda: self.player.buy_upgrade_weapon(0),
-                   lambda: self.player.can_upgrade_weapon(0),
-                   self.color_green, self.color_gray,
-                   (Text("/\\", 5, 5, self.font_small, self.color_green),
-                        Allignment.NONE)),
         )
         self.containers_pause_menu = (
             # Background
             Container(50, 50, 1180, 540, 20, 20, 8, 20,
                       self.color_white),
+                    
             # Current ship
             Container(65, 65, 210, 210, 12, 6, 6, 6,
                       self.color_white,
                       (self.player.get_ship,
                             Allignment.CENTER)),
+
             # List - ship
             Container(290, 65, 455, 36, 6, 6, 6, 6,
                       self.color_white,
                       (TextH("Model: {}", 12, 5, self.font_small, self.color_white,
                             self.player.get_ship_name),
                             Allignment.NONE)),
-            Container(290, 116, 404, 36, 6, 6, 6, 6,
+            Container(336, 116, 363, 36, 3, 3, 3, 3,
+                      self.color_white,
+                      (Text("Switch model", 12, 5, self.font_small, self.color_white),
+                            Allignment.NONE)),
+            Container(290, 167, 409, 36, 6, 3, 3, 6,
                       self.color_white,
                       (TextH("Heal: {}g", 12, 5, self.font_small, self.color_white,
                             self.player.get_price_heal),
                             Allignment.NONE)),
+
+            # Current stats
+            Container(760, 65, 150, 36, 6, 3, 3, 6, # Current score
+                      self.color_white,
+                      (TextH("{}pts", 9, 5, self.font_small, self.color_white, 
+                           self.gsm.get_score),
+                           Allignment.NONE)),
+            Container(920, 65, 127, 36, 3, 3, 3, 3, # Current money
+                      self.color_white,
+                      (TextH("{}g", 9, 5, self.font_small, (235, 205, 0), 
+                           self.player.get_money),
+                           Allignment.NONE)),
+            Container(1057, 65, 158, 36, 3, 6, 6, 3, # Current health bar
+                      self.color_white,
+                      (Text("Lives", 9, 5, self.font_small, self.color_white),
+                            Allignment.NONE),
+                      (HealthBar(84, 5, 2, 2,
+                                self.player.get_lives),
+                                Allignment.NONE)),
             # List - weapons
-            Container(760, 65, 455, 36, 6, 12, 6, 6,
+            Container(760, 116, 455, 36, 6, 6, 6, 6,
                       self.color_white,
                       (TextH("Weapon 1: {}.v{}", 12, 5, self.font_small, self.color_white,
                             self.player.weapons[0].get_name,
                             self.player.weapons[0].get_level),
                             Allignment.NONE)),
-            Container(760, 116, 404, 36, 6, 6, 6, 6,
+            Container(760, 167, 409, 36, 6, 3, 3, 6,
                       self.color_white,
                       (TextH("Projectiles: {}g", 12, 5, self.font_small, self.color_white,
                             lambda: self.player.get_price_weapons(0)),
