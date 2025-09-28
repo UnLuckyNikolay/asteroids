@@ -1,6 +1,6 @@
 from constants import LEADERBOARD_LENGTH
 from ui.container import Container, Allignment
-from ui.textf import TextF
+from ui.text import TextF
 
 class Leaderboards():
     def __init__(self, x, y, font, scores):
