@@ -2,6 +2,7 @@
 
 import pygame, json
 from enum import Enum
+from tkinter import Tk, simpledialog
 
 from constants import *
 from ui.button import Button
@@ -45,10 +46,10 @@ class UserInterface(pygame.sprite.Sprite):
             font_path = None
         
         # Getting the scores
-        leaderboards_path = "./leaderboard.json"
+        self.leaderboards_path = "./leaderboard.json"
         try:
-            print(f"Trying to access file `{leaderboards_path}`")
-            with open(leaderboards_path, "r") as file:
+            print(f"Trying to access file `{self.leaderboards_path}`")
+            with open(self.leaderboards_path, "r") as file:
                 self.scores = json.load(file)
         except FileNotFoundError:
             self.scores = []
@@ -64,7 +65,6 @@ class UserInterface(pygame.sprite.Sprite):
         self.color_red = (255, 0, 0, 100)
 
         self._initialize_main_menu()
-        self._initialize_leaderboards()
 
     ### Buttons and containers
 
@@ -173,6 +173,10 @@ class UserInterface(pygame.sprite.Sprite):
         self._initialize_pause_menu()
 
     def switch_menu(self, menu : Menu):
+        match menu:
+            case Menu.LEADERBOARDS:
+                self._initialize_leaderboards()
+
         self.__current_menu = menu
         print(f"Switching to {self.__current_menu.value}")
     
@@ -205,6 +209,41 @@ class UserInterface(pygame.sprite.Sprite):
 
             case _:
                 print("How are you here? This menu shouldn't have BUTTONS!")
+
+    def check_score(self, new_score):
+        is_updated = False
+
+        while len(self.scores) > LEADERBOARD_LENGTH:   # Shortens leaderboard if max length was reduced
+            is_updated = True
+            self.scores.pop()
+        
+        if len(self.scores) == LEADERBOARD_LENGTH and new_score > self.scores[LEADERBOARD_LENGTH - 1]["score"]:
+            is_updated = True
+            self.scores.pop()
+        if len(self.scores) != LEADERBOARD_LENGTH:
+            is_updated = True
+            name = self.ask_player_name()
+            self.scores.append({"name": name, "score": new_score})
+            self.scores.sort(key=lambda x: x["score"], reverse=True)
+
+        if not is_updated:
+            return
+
+        print(f"Saving leaderboards to `./{self.leaderboards_path}`")
+        with open(self.leaderboards_path, "w") as file:
+            json.dump(self.scores, file)
+
+        self._initialize_leaderboards()
+
+    def ask_player_name(self):
+        root = Tk()
+        root.withdraw()
+
+        name = simpledialog.askstring("New record!", "Please enter your name: ")
+
+        root.destroy()
+
+        return name if name else "Player"
 
     ### Drawing menus
 

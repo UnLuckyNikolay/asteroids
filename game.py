@@ -1,7 +1,6 @@
 # pyright: reportAttributeAccessIssue=false
 
-import pygame, json
-from tkinter import Tk, simpledialog
+import pygame
 from random import randint
 
 from constants import *
@@ -143,8 +142,8 @@ class Game():
             self.dt = self.clock.tick(60) / 1000
 
         # Saving score and going back to Main Menu
-        if not PLAYER_GOD_MODE:
-            self.check_score(self.gsm.score)
+        if not PLAYER_GOD_MODE and self.gsm.score > 0:
+            self.ui.check_score(self.gsm.score)
         self.ui.switch_menu(Menu.MAIN_MENU)
 
         self.player = None
@@ -164,35 +163,6 @@ class Game():
 
         for object in sorted(list(self.drawable), key = lambda object: object.layer):
             object.draw(self.screen)
-
-    def check_score(self, score):
-        try:
-            with open("leaderboard.json", "r") as file:
-                scores = json.load(file)
-        except FileNotFoundError:
-            scores = []
-
-        while len(scores) > LEADERBOARD_LENGTH:   # Shortens leaderboard if max length was reduced
-            scores.pop()
-        if len(scores) == LEADERBOARD_LENGTH and score > scores[LEADERBOARD_LENGTH - 1]["score"]:
-            scores.pop()
-        if len(scores) != LEADERBOARD_LENGTH:
-            name = self.ask_player_name()
-            scores.append({"name": name, "score": score})
-            scores.sort(key=lambda x: x["score"], reverse=True)
-
-        with open("leaderboard.json", "w") as file:
-            json.dump(scores, file)
-
-    def ask_player_name(self):
-        root = Tk()
-        root.withdraw()
-
-        name = simpledialog.askstring("New record!", "Please enter your name: ")
-
-        root.destroy()
-
-        return name if name else "Player"
     
     ### Handlers
     
