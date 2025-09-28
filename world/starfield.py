@@ -5,7 +5,8 @@ from constants import *
 
 
 class StarField(pygame.sprite.Sprite):
-    layer = 0 # pyright: ignore[reportAssignmentType]
+    """Countless procedurally generated planets as Todd intended"""
+    layer = 0 # pyright: ignore
     def __init__(self):
         if hasattr(self, "containers"):
             super().__init__(self.containers) # pyright: ignore[reportAttributeAccessIssue]
@@ -29,8 +30,6 @@ class StarField(pygame.sprite.Sprite):
         self.scale = 10 # Used to get noise gradient
         self.multiplier = 20 # Used to get array up to display resolution
 
-        self.stars = self._generate_stars()
-
         noise_seed = randint(0, 100000)
         print(f"Setting noise seed to {noise_seed}")
         opensimplex.seed(noise_seed)
@@ -51,53 +50,58 @@ class StarField(pygame.sprite.Sprite):
         self.bg_big = pygame.Surface((self.array_x*self.multiplier, self.array_y*self.multiplier))
         self.bg_big = pygame.transform.smoothscale_by(bg, self.multiplier)
 
-    def _generate_stars(self) -> list:
-        """Generates and returns a list of stars"""
-        stars = []
+        self._generate_stars(self.bg_big)
+
+    def _generate_stars(self, surface):
+        """Generates stars and draws them on the surface"""
+        for i in range (self.stars_small_amount):
+            star = self._generate_star(0)
+            self._draw_star(surface, star)
+        for i in range (self.stars_medium_amount):
+            star = self._generate_star(1)
+            self._draw_star(surface, star)
         for i in range (self.stars_big_amount):
             size = randint(2, 4)
-            stars.append(self._generate_star(size))
-        for i in range (self.stars_medium_amount):
-            stars.append(self._generate_star(1))
-        for i in range (self.stars_small_amount):
-            stars.append(self._generate_star(0))
-        return stars
+            star = self._generate_star(size)
+            self._draw_star(surface, star)
 
     def _generate_star(self, size):
-            color = randint(1, 4)
-            #color = 3
-            match color:
-                case 1:
-                    return (randint(5, SCREEN_WIDTH - 5),
-                            randint(5, SCREEN_HEIGHT - 5),
-                            size,
-                            (randint(150, 210), randint(150, 210), randint(150, 210)))
-                case 2:
-                    return (randint(5, SCREEN_WIDTH - 5),
-                            randint(5, SCREEN_HEIGHT - 5),
-                            size,
-                            (randint(50, 100), randint(150, 210), randint(150, 210)))
-                case 3:
-                    return (randint(5, SCREEN_WIDTH - 5),
-                            randint(5, SCREEN_HEIGHT - 5),
-                            size,
-                            (randint(150, 210), randint(50, 100), randint(150, 210)))
-                case 4:
-                    return (randint(5, SCREEN_WIDTH - 5),
-                            randint(5, SCREEN_HEIGHT - 5),
-                            size,
-                            (randint(150, 210), randint(150, 210), randint(50, 100)))
+        """Generates and returns a star"""
+        color = randint(1, 4)
+        #color = 3
+        match color:
+            case 1:
+                return (randint(5, SCREEN_WIDTH - 5),
+                        randint(5, SCREEN_HEIGHT - 5),
+                        size,
+                        (randint(150, 210), randint(150, 210), randint(150, 210)))
+            case 2:
+                return (randint(5, SCREEN_WIDTH - 5),
+                        randint(5, SCREEN_HEIGHT - 5),
+                        size,
+                        (randint(50, 100), randint(150, 210), randint(150, 210)))
+            case 3:
+                return (randint(5, SCREEN_WIDTH - 5),
+                        randint(5, SCREEN_HEIGHT - 5),
+                        size,
+                        (randint(150, 210), randint(50, 100), randint(150, 210)))
+            case 4:
+                return (randint(5, SCREEN_WIDTH - 5),
+                        randint(5, SCREEN_HEIGHT - 5),
+                        size,
+                        (randint(150, 210), randint(150, 210), randint(50, 100)))
+                
+    def _draw_star(self, surface, star):
+        """Draws the star on the surface"""
+        pygame.gfxdraw.filled_circle(surface, *star)
+        if star[2] > 0:
+            pygame.gfxdraw.filled_circle(surface, star[0], star[1], max(star[2] - 2, 0), (255, 255, 255))
 
     def draw(self, screen):
         screen.blit(self.bg_big, (0, 0))
-        for star in self.stars:
-            pygame.gfxdraw.filled_circle(screen, *star)
-            if star[2] > 0:
-                pygame.gfxdraw.filled_circle(screen, star[0], star[1], max(star[2] - 2, 0), (255, 255, 255))
 
     def regenerate(self):
-        self.stars = self._generate_stars()
-
+        """Regenerates the background with a new gradient and stars"""
         noise_seed = randint(0, 100000)
         print(f"Setting noise seed to {noise_seed}")
         opensimplex.seed(noise_seed)
@@ -120,3 +124,5 @@ class StarField(pygame.sprite.Sprite):
                                 int(color[2] * gradient + color_2[2] * (1 - gradient))))
 
         self.bg_big = pygame.transform.smoothscale_by(bg, self.multiplier)
+
+        self._generate_stars(self.bg_big)
