@@ -5,7 +5,7 @@ from player.weapons.projectiles.bomb import Bomb
 
 class BombLauncher(Weapon):
     def __init__(self):
-        super().__init__((50,), "Bomb Launcher")
+        super().__init__((50,), "BombLauncher")
         self.__cooldown = 1.0
 
 

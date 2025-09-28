@@ -189,9 +189,6 @@ class Player(CircleShape):
     def get_ship_name(self):
         return self.ship.type.value
     
-    def get_weapon_name(self):
-        return self.weapon.get_name()
-    
     def get_money(self):
         return self.money
     
@@ -214,6 +211,12 @@ class Player(CircleShape):
             self.lives += 1
     
     ### Weapons
+    
+    def get_current_weapon_name(self):
+        return self.weapon.get_name()
+    
+    def get_current_weapon_level(self):
+        return self.weapon.get_level()
 
     def get_price_weapons(self, weapon_num):
         match self.weapons[weapon_num].get_level():

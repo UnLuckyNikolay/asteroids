@@ -126,8 +126,9 @@ class UserInterface(pygame.sprite.Sprite):
             # Current weapon
             Container(25, 25, 548, 36, 10, 10, 5, 5, 
                       self.color_white,
-                      (TextH("Weapon: {}", 9, 5, self.font_small, self.color_white, 
-                           self.player.get_weapon_name),
+                      (TextH("Weapon: {}.v{}", 9, 5, self.font_small, self.color_white, 
+                           self.player.get_current_weapon_name,
+                           self.player.get_current_weapon_level),
                            Allignment.NONE)),
             # Current score
             Container(25, 71, 176, 36, 5, 3, 5, 10, 
