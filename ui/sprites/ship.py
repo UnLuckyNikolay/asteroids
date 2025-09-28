@@ -11,9 +11,10 @@ class Ship():
     def __init__(self, type : ShipType):
         self.type = type
 
-        self.color_outline = list(PLAYER_COLOR_OUTLINE)
-        self.color_fill = list(PLAYER_COLOR_FILL)
-        self.color_glass = list(PLAYER_COLOR_GLASS)
+        self.color_outline = PLAYER_COLOR_OUTLINE
+        self.color_fill = PLAYER_COLOR_FILL
+        self.color_glass = PLAYER_COLOR_GLASS
+        self.alpha = 255
 
         # Each part is [[color_override],  [list of dots]]
         self.parts_poly2 = [
@@ -44,21 +45,18 @@ class Ship():
 
         # Set opacity based on invulnerability timer
         if timer_invul > 0:
-            for i in range(0, 4):
-                self.color_outline[i] = int(PLAYER_COLOR_OUTLINE[i] - min(timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * PLAYER_COLOR_OUTLINE[i])
-                self.color_fill[i] = int(PLAYER_COLOR_FILL[i] - min(timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * PLAYER_COLOR_FILL[i])
-                self.color_glass[i] = int(PLAYER_COLOR_GLASS[i] - min(timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * PLAYER_COLOR_GLASS[i])
+            self.alpha = int(255 - min(timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * 255)
 
-        # Rotate parts
+        # Rotate and draw parts
         for part in self._rotate_sprite(parts, x, y, rotation):
             if len(part[1]) == 2:
-                pygame.draw.line(screen, self.color_outline, part[1][0], part[1][1], 2)
+                pygame.draw.line(screen, (*self.color_outline, self.alpha), part[1][0], part[1][1], 2)
             elif len(part[1]) > 2:
                 if len(part[0]) == 0:
-                    pygame.gfxdraw.filled_polygon(screen, part[1], self.color_fill)
-                    pygame.draw.polygon(screen, self.color_outline, part[1], 2)
+                    pygame.gfxdraw.filled_polygon(screen, part[1], (*self.color_fill, self.alpha))
+                    pygame.draw.polygon(screen, (*self.color_outline, self.alpha), part[1], 2)
                 else: 
-                    pygame.gfxdraw.filled_polygon(screen, part[1], part[0])
+                    pygame.gfxdraw.filled_polygon(screen, part[1], (*part[0], self.alpha))
 
     def draw(self, screen, x, y, multiplier=2):
         """Used to draw ships in menus."""
