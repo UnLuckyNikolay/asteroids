@@ -8,6 +8,7 @@ class ShipType(Enum):
     POLY = "Poly.v1"
     POLY2BP = "Poly.v2:Bp"
     POLY2 = "Poly.v2"
+    POLY3 = "Poly.v3"
 
 class Ship():
     def __init__(self, type : ShipType, hitbox_radius, show_hitbox):
@@ -44,6 +45,28 @@ class Ship():
             [[],  [[-5, 12], [5, 12], [8, 20], [-8, 20]]], # Engine
             [[],  [[0, -18], [0, -23]]] # Gun
         ]
+        black = (41, 41, 41)
+        gray_light = (150, 150, 170)
+        gray_mid = (119, 119, 132)
+        gray_dark = (90, 90, 103)
+        glass_light = (90, 120, 150)
+        glass_mid = (72, 100, 128)
+        glass_dark = (50, 73, 96)
+        self.parts_poly3 = [
+            [[None, gray_dark],  [[20, -4], [20, -9]]],   # Guns
+            [[None, gray_dark],  [[-20, -4], [-20, -9]]], # ^
+            [[None, gray_dark],  [[0, -18], [0, -23]]],   # ^
+            [[gray_light],  [[-25, -4], [0, -8], [25, -4], [29, 7], [22, 3], [-22, 3], [-29, 7]]], # Wings - light
+            [[gray_mid],  [[-23, 1], [23, 1], [29, 7], [22, 3], [-22, 3], [-29, 7]]],              # Wings - mid
+            [[gray_dark],  [[4, -18], [-4, -18], [-7, 0], [-11, 3], 
+                            [-5, 12], [-8, 20], [8, 20], [5, 12], [11, 3], [7, 0]]], # Body - dark
+            [[gray_mid],  [[4, -18], [-4, -18], [-2, -16], [-5, 1], [-6, 3], 
+                            [-4, 12], [-6, 20], [6, 20], [4, 12], [6, 3], [5, 1], [2, -16]]], # Body - mid
+            [[gray_light],  [[-1, -15], [-3, 3], [-2, 12], [-3, 20], [3, 20], [2, 12], [3, 3], [1, -15]]], # Body - light
+            [[glass_dark],  [[-2, -16], [-5, 1], [-3, 3], [3, 3], [5, 1], [2, -16]]], # Glass - dark
+            [[glass_mid],  [[-2, -16], [-1, -15], [1, -15], [2, -16]]], # Glass - dark
+            [[glass_light],  [[-1, -15], [1, -15], [3, 3], [0, 4], [-3, 3]]], # Glass - dark
+        ]
 
     def switch_model(self, model : ShipType):
         self.type = model
@@ -76,7 +99,8 @@ class Ship():
                     pygame.gfxdraw.filled_polygon(screen, part[1], (*self.color_fill, self.alpha))
                     pygame.draw.polygon(screen, (*self.color_outline, self.alpha), part[1], 2)
                 else:
-                    pygame.gfxdraw.filled_polygon(screen, part[1], (*part[0][0], self.alpha))
+                    if part[0][0] != None:
+                        pygame.gfxdraw.filled_polygon(screen, part[1], (*part[0][0], self.alpha))
                     if len(part[0]) > 1:
                         pygame.draw.polygon(screen, (*part[0][1], self.alpha), part[1], 2)
 
@@ -98,7 +122,8 @@ class Ship():
                     pygame.gfxdraw.filled_polygon(screen, part[1], self.color_fill)
                     pygame.draw.polygon(screen, self.color_outline, part[1], 2)
                 else:
-                    pygame.gfxdraw.filled_polygon(screen, part[1], part[0][0])
+                    if part[0][0] != None:
+                        pygame.gfxdraw.filled_polygon(screen, part[1], part[0][0])
                     if len(part[0]) > 1:
                         pygame.draw.polygon(screen, part[0][1], part[1], 2)
 
@@ -111,6 +136,8 @@ class Ship():
                 return self.parts_poly2bp
             case ShipType.POLY2:
                 return self.parts_poly2
+            case ShipType.POLY3:
+                return self.parts_poly3
             case _:
                 print(f"Error: trying to draw invalid ship `{type}`")
                 return None
