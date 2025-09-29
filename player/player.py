@@ -24,35 +24,24 @@ class Player(CircleShape):
         self.is_invul = False
         self.is_alive = True
 
-        self.unlocked_ships = [ShipType.POLY, ShipType.POLY2]
-        self.ship_model = 1
-        self.ship = Ship(self.unlocked_ships[1], self.radius, cheat_hitbox)
+        self.unlocked_ships = [
+            ShipType.POLY,
+            ShipType.POLY2BP,
+            ShipType.POLY2,
+        ]
+        self.ship_model = 2
+        self.ship = Ship(self.unlocked_ships[self.ship_model], self.radius, cheat_hitbox)
 
         self.money = 0
         self.lives = 3
         self.lives_max = 3
         self.times_healed = 0
 
-        self.color_outline = list(PLAYER_COLOR_OUTLINE)
-        self.color_fill = list(PLAYER_COLOR_FILL)
-        self.color_glass = list(PLAYER_COLOR_GLASS)
-
         self.time_since_last_shot = 0
         self.weapons = []
         self.weapons.append(PlasmaGun())
         self.weapons.append(BombLauncher())
         self.weapon = self.weapons[0]
-        
-        # Each part is [[color_override],  [list of dots]]
-        self.parts = [[[],  [[-25, 4], [25, 4], [22, -5], [0, -11], [-22, -5]]], # Wings
-                      [[],  [[20, 4], [20, 9]]],   # Wing guns
-                      [[],  [[-20, 4], [-20, 9]]], # ^
-                      [[],  [[7, 0], [-7, 0], [-4, 18], [4, 18]]], # Cockpit
-                      [self.color_glass,  [[5, -3], [-5, -3], [-2, 15], [2, 15]]], # Cockpit window
-                      [[],  [[15, 0], [-15, 0], [-10, -12], [10, -12]]], # Center part
-                      [[],  [[-5, -12], [5, -12], [8, -20], [-8, -20]]], # Engine
-                      [[],  [[0, 18], [0, 23]]] # Gun
-                      ]
     
 
     @property

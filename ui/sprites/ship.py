@@ -6,6 +6,7 @@ from constants import *
 
 class ShipType(Enum):
     POLY = "Poly.v1"
+    POLY2BP = "Poly.v2:Bp"
     POLY2 = "Poly.v2"
 
 class Ship():
@@ -22,6 +23,16 @@ class Ship():
         # Each part is [colors[fill_override, outline_override],  [list of dots]]
         self.parts_poly = [
             [[(0, 0, 0), (255, 255, 255)],  [[0, -20], [-10, 15], [10, 15]]]
+        ]
+        self.parts_poly2bp = [
+            [[(20, 100, 200), (255, 255, 255)],  [[-25, -4], [25, -4], [22, 5], [0, 11], [-22, 5]]], # Wings
+            [[(20, 100, 200), (255, 255, 255)],  [[20, -4], [20, -9]]],   # Wing guns
+            [[(20, 100, 200), (255, 255, 255)],  [[-20, -4], [-20, -9]]], # ^
+            [[(20, 100, 200), (255, 255, 255)],  [[7, 0], [-7, 0], [-4, -18], [4, -18]]], # Cockpit
+            [[(20, 100, 200), (255, 255, 255)],  [[5, 3], [-5, 3], [-2, -15], [2, -15]]], # Cockpit window
+            [[(20, 100, 200), (255, 255, 255)],  [[15, 0], [-15, 0], [-10, 12], [10, 12]]], # Center part
+            [[(20, 100, 200), (255, 255, 255)],  [[-5, 12], [5, 12], [8, 20], [-8, 20]]], # Engine
+            [[(20, 100, 200), (255, 255, 255)],  [[0, -18], [0, -23]]] # Gun
         ]
         self.parts_poly2 = [
             [[],  [[-25, -4], [25, -4], [22, 5], [0, 11], [-22, 5]]], # Wings
@@ -56,7 +67,10 @@ class Ship():
         # Rotate and draw parts
         for part in self.__rotate_sprite(parts, x, y, rotation):
             if len(part[1]) == 2:
-                pygame.draw.line(screen, (*self.color_outline, self.alpha), part[1][0], part[1][1], 2)
+                if len(part[0]) < 2:
+                    pygame.draw.line(screen, (*self.color_outline, self.alpha), part[1][0], part[1][1], 2)
+                else:
+                    pygame.draw.line(screen, (*part[0][1], self.alpha), part[1][0], part[1][1], 2)
             elif len(part[1]) > 2:
                 if len(part[0]) == 0:
                     pygame.gfxdraw.filled_polygon(screen, part[1], (*self.color_fill, self.alpha))
@@ -75,21 +89,26 @@ class Ship():
 
         for part in self.__move_and_scale_sprite(parts, x, y, multiplier):
             if len(part[1]) == 2:
-                pygame.draw.line(screen, self.color_outline, part[1][0], part[1][1], 2)
+                if len(part[0]) < 2:
+                    pygame.draw.line(screen, self.color_outline, part[1][0], part[1][1], 2)
+                else:
+                    pygame.draw.line(screen, part[0][1], part[1][0], part[1][1], 2)
             elif len(part[1]) > 2:
                 if len(part[0]) == 0:
                     pygame.gfxdraw.filled_polygon(screen, part[1], self.color_fill)
                     pygame.draw.polygon(screen, self.color_outline, part[1], 2)
                 else:
-                    pygame.gfxdraw.filled_polygon(screen, part[1], (*part[0][0], self.alpha))
+                    pygame.gfxdraw.filled_polygon(screen, part[1], part[0][0])
                     if len(part[0]) > 1:
-                        pygame.draw.polygon(screen, (*part[0][1], self.alpha), part[1], 2)
+                        pygame.draw.polygon(screen, part[0][1], part[1], 2)
 
     
     def __get_parts(self, type):
         match type:
             case ShipType.POLY:
                 return self.parts_poly
+            case ShipType.POLY2BP:
+                return self.parts_poly2bp
             case ShipType.POLY2:
                 return self.parts_poly2
             case _:
