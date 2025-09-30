@@ -19,8 +19,14 @@ from ui.userinterface import UserInterface, Menu
 class Game():
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.screen_resolution_windowed = (SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.screen_resolution_fullscreen = pygame.display.get_desktop_sizes()[0]
+        self.screen_resolution = self.screen_resolution_windowed
+        self.is_fullscreen = False
+        self.is_window_resized = False
+        self.screen = pygame.display.set_mode(self.screen_resolution, pygame.RESIZABLE, display=0)
         pygame.display.set_caption("Asteroids from Outer Space")
+
         self.clock = pygame.time.Clock()
         self.dt = 0
         self.is_running = True
@@ -32,10 +38,10 @@ class Game():
         self.updatable = pygame.sprite.Group()   # This group is cleaned (object.kill()) after each round
         self.drawable = pygame.sprite.Group()
         self.asteroids = pygame.sprite.Group()            # Used for colision detection
-        self.ores = pygame.sprite.Group()                  # ^
+        self.ores = pygame.sprite.Group()                 # ^
         self.projectiles = pygame.sprite.Group()          # ^
         self.explosion_hitboxes = pygame.sprite.Group()   # ^
-        self.moving_objects = pygame.sprite.Group()        # Used to destroy objects that are off-screen
+        self.moving_objects = pygame.sprite.Group()       # Used to destroy objects that are off-screen
 
         UserInterface.containers = (self.drawable)
 
@@ -60,8 +66,9 @@ class Game():
         # 60 - ProjectilePlasma
         # 100 - UserInterface
 
-        self.star_field = StarField()
+        self.star_field = StarField(self.screen_resolution_fullscreen)
         self.ui = UserInterface(self)
+        self.asteroid_field = None
         self.player = None
 
     def run(self):
@@ -69,9 +76,8 @@ class Game():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == pygame.BUTTON_LEFT:
-                        self.ui.check_click(pygame.mouse.get_pos())
+                else:
+                    self.handle_event(event)
             
             if self.ui.force_ui_reload:
                 self.redraw_objects_and_ui()
@@ -80,15 +86,14 @@ class Game():
             self.clock.tick(60)
 
     def game_loop(self):
-        self.player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+        self.player = Player(self, self.screen_resolution[0] / 2, self.screen_resolution[1] / 2,
                              self.cheat_godmode, self.cheat_hitbox)
         self.gsm = GameStateManager(self.player)
-        self.asteroid_field = AsteroidField(self.player)
+        self.asteroid_field = AsteroidField(self, self.player, self.screen_resolution)
         self.ui.gsm = self.gsm
         self.is_paused = False
         
-        self.ui.switch_menu(Menu.HUD)
-        self.ui.round_start(self.gsm, self.player)
+        self.ui.start_round(self.gsm, self.player)
 
 
         while self.player.is_alive:
@@ -105,9 +110,8 @@ class Game():
                         else:
                             self.is_paused = False
                             self.ui.switch_menu(Menu.HUD)
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == pygame.BUTTON_LEFT:
-                        self.ui.check_click(pygame.mouse.get_pos())
+                else:
+                    self.handle_event(event)
 
             # Screen update - Game Loop
             if not self.is_paused:
@@ -115,7 +119,7 @@ class Game():
                     object.update(self.dt)
 
                 for object in self.moving_objects:
-                    if object.is_off_screen():
+                    if self.check_if_object_is_off_screen(object):
                         object.kill()
 
                 self.redraw_objects_and_ui()
@@ -169,14 +173,45 @@ class Game():
             object.kill()
 
     ### Helpers
+
+    def handle_event(self, event : pygame.event.Event):
+        """Used for handling events in all menus"""
+        # Returns to fullscreen after Alt-tabing/loosing focus
+        if event.type == pygame.WINDOWFOCUSGAINED and self.is_fullscreen:
+            self.__switch_to_fullscreen()
+            self.ui.force_ui_reload = True
+        # Checks button press
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == pygame.BUTTON_LEFT:
+                self.ui.check_click(pygame.mouse.get_pos())
+        # Window resizing
+        elif event.type == pygame.WINDOWRESIZED and self.is_fullscreen == False:
+            self.is_window_resized = True
+            self.screen_resolution_windowed = (event.dict["x"], event.dict["y"])
+        elif event.type == pygame.WINDOWENTER and self.is_window_resized:
+            self.is_window_resized = False
+            self.ui.force_ui_reload = True
+            self.__switch_to_windowed()
+            if self.asteroid_field != None:
+                self.asteroid_field.update_spawns(self.screen_resolution)
+        #elif event.type != pygame.MOUSEMOTION:
+            #print(event)
     
     def redraw_objects_and_ui(self):
-        #print("Updating screen!")
         self.ui.force_ui_reload = False
 
         for object in sorted(list(self.drawable), key = lambda object: object.layer):
             object.draw(self.screen)
     
+    def check_if_object_is_off_screen(self, object) -> bool:
+        offset = 100
+        return (
+            object.position.x < -offset or
+            object.position.x > self.screen_resolution[0]+offset or
+            object.position.y < -offset or
+            object.position.y > self.screen_resolution[1]+offset
+        )
+
     ### Handlers
     
     def handler_turn_off(self):
@@ -198,3 +233,25 @@ class Game():
         self.cheat_hitbox = False if self.cheat_hitbox else True
         if self.player != None:
             self.player.ship.show_hitbox = self.cheat_hitbox
+
+    def switch_fullscreen(self):
+        if not self.is_fullscreen:
+            self.is_fullscreen = True
+            self.__switch_to_fullscreen()
+        else:
+            self.is_fullscreen = False
+            self.__switch_to_windowed()
+    
+    def __switch_to_fullscreen(self):
+            self.screen_resolution = self.screen_resolution_fullscreen
+            flags = pygame.FULLSCREEN
+            self.screen = pygame.display.set_mode(self.screen_resolution, flags)
+            self.ui.initialize_current_menu()
+
+    def __switch_to_windowed(self):
+            self.screen_resolution = self.screen_resolution_windowed
+            # Changes mode twice because first change disables fullcreen,
+            # second change changes window size
+            self.screen = pygame.display.set_mode(self.screen_resolution)
+            self.screen = pygame.display.set_mode(self.screen_resolution, pygame.RESIZABLE)
+            self.ui.initialize_current_menu()

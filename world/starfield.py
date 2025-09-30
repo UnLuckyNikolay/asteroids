@@ -7,15 +7,16 @@ from constants import *
 class StarField(pygame.sprite.Sprite):
     """Countless procedurally generated planets as Todd intended"""
     layer = 0 # pyright: ignore
-    def __init__(self):
+    def __init__(self, fullscreen_resolution):
         if hasattr(self, "containers"):
             super().__init__(self.containers) # pyright: ignore[reportAttributeAccessIssue]
         else:
             super().__init__()
+        self.resolution = fullscreen_resolution
 
-        self.stars_big_amount = STAR_BIG_AMOUNT
-        self.stars_medium_amount = STAR_MEDIUM_AMOUNT
-        self.stars_small_amount = STAR_SMALL_AMOUNT
+        self.stars_big_amount = int(STAR_BIG_MULT / 100 * self.resolution[0])
+        self.stars_medium_amount = int(STAR_MEDIUM_MULT / 100 * self.resolution[0])
+        self.stars_small_amount = int(STAR_SMALL_MULT / 100 * self.resolution[0])
 
         color_seed = randint(0, len(SPACE_COLOR_LIST)-1)
         color = SPACE_COLOR_LIST[color_seed]
@@ -25,10 +26,10 @@ class StarField(pygame.sprite.Sprite):
             color_seed_2 = 0
         color_2 = SPACE_COLOR_LIST[color_seed_2]
         
-        self.array_x = 64
-        self.array_y = 36
-        self.scale = 10 # Used to get noise gradient
         self.multiplier = 20 # Used to get array up to display resolution
+        self.array_x = int(self.resolution[0] / self.multiplier)
+        self.array_y = int(self.resolution[1] / self.multiplier)
+        self.scale = 10 # Used to get noise gradient
 
         noise_seed = randint(0, 100000)
         print(f"Setting noise seed to {noise_seed}")
@@ -71,23 +72,23 @@ class StarField(pygame.sprite.Sprite):
         #color = 3
         match color:
             case 1:
-                return (randint(5, SCREEN_WIDTH - 5),
-                        randint(5, SCREEN_HEIGHT - 5),
+                return (randint(5, self.resolution[0] - 5),
+                        randint(5, self.resolution[1] - 5),
                         size,
                         (randint(150, 210), randint(150, 210), randint(150, 210)))
             case 2:
-                return (randint(5, SCREEN_WIDTH - 5),
-                        randint(5, SCREEN_HEIGHT - 5),
+                return (randint(5, self.resolution[0] - 5),
+                        randint(5, self.resolution[1] - 5),
                         size,
                         (randint(50, 100), randint(150, 210), randint(150, 210)))
             case 3:
-                return (randint(5, SCREEN_WIDTH - 5),
-                        randint(5, SCREEN_HEIGHT - 5),
+                return (randint(5, self.resolution[0] - 5),
+                        randint(5, self.resolution[1] - 5),
                         size,
                         (randint(150, 210), randint(50, 100), randint(150, 210)))
             case 4:
-                return (randint(5, SCREEN_WIDTH - 5),
-                        randint(5, SCREEN_HEIGHT - 5),
+                return (randint(5, self.resolution[0] - 5),
+                        randint(5, self.resolution[1] - 5),
                         size,
                         (randint(150, 210), randint(150, 210), randint(50, 100)))
                 

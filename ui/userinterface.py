@@ -30,7 +30,7 @@ class UserInterface(pygame.sprite.Sprite):
             super().__init__()
 
         self.game = game
-        self.gsm :GameStateManager = None
+        self.gsm : GameStateManager = None
         self.player : Player = None
 
         self.force_ui_reload = True
@@ -72,47 +72,67 @@ class UserInterface(pygame.sprite.Sprite):
 
     ### Buttons and containers
 
+    def initialize_current_menu(self):
+        match self.__current_menu:
+            case Menu.MAIN_MENU:
+                self._initialize_main_menu()
+            case Menu.LEADERBOARDS:
+                self._initialize_leaderboards()
+            case Menu.HUD:
+                self._initialize_hud()
+            case Menu.PAUSE_MENU:
+                self._initialize_pause_menu()
+            case _:
+                print(f"> Error: missing menu {self.__current_menu.value} in UserInterface.initialize_current_menu")
+
     def _initialize_main_menu(self):
         self.buttons_main_menu = (
             # Start button, starts a Round
-            Button(SCREEN_WIDTH / 2 - 185, 200, 370, 72, 8, 8, 20, 20, 
+            Button(self.game.screen_resolution[0] / 2 - 185, 200, 370, 72, 8, 8, 20, 20, 
                    self.game.game_loop,
                    lambda: True,
                    self.color_blue, self.color_gray,
                    (Text("Start", 117, 10, self.font_big, self.color_blue),
                            Allignment.NONE)),
             # Opens the Leaderboards
-            Button(SCREEN_WIDTH / 2 - 185, 300, 370, 72, 8, 8, 20, 20, 
+            Button(self.game.screen_resolution[0] / 2 - 185, 300, 370, 72, 8, 8, 20, 20, 
                    lambda: self.switch_menu(Menu.LEADERBOARDS),
                    lambda: True,
                    self.color_blue, self.color_gray,
                    (Text("Leaderboard", 16, 10, self.font_big, self.color_blue),
                            Allignment.NONE)),
             # Exits the game
-            Button(SCREEN_WIDTH / 2 - 185, 400, 370, 72, 8, 8, 20, 20, 
+            Button(self.game.screen_resolution[0] / 2 - 185, 400, 370, 72, 8, 8, 20, 20, 
                    self.game.handler_turn_off,
                    lambda: True,
                    self.color_blue, self.color_gray,
                    (Text("Exit", 135, 10, self.font_big, self.color_blue),
                            Allignment.NONE)),
             # Regenerate background
-            Button(15, SCREEN_HEIGHT-55, 40, 40, 8, 8, 8, 8,
+            Button(15, self.game.screen_resolution[1]-55, 40, 40, 8, 8, 8, 8,
                    self.game.handler_regenerate_background,
                    lambda: True,
                    self.color_blue, self.color_gray,
                    (Text("BG", 4, 7, self.font_small, self.color_blue),
                            Allignment.NONE)),
+            # Switch Fullscreen
+            Switch(70, self.game.screen_resolution[1]-55, 40, 40, 8, 8, 8, 8,
+                   self.game.switch_fullscreen,
+                   self.game.is_fullscreen,
+                   self.color_green, self.color_blue,
+                   (Text("FS", 3, 7, self.font_small, self.color_blue),
+                           Allignment.NONE)),
             # Cheat - Show hitbox
-            Switch(SCREEN_WIDTH-110, SCREEN_HEIGHT-55, 40, 40, 8, 8, 8, 8,
+            Switch(self.game.screen_resolution[0]-110, self.game.screen_resolution[1]-55, 40, 40, 8, 8, 8, 8,
                    self.game.switch_hitbox,
-                   False,
+                   self.game.cheat_hitbox,
                    self.color_golden, self.color_blue,
                    (Text("HB", 3, 7, self.font_small, self.color_blue),
                            Allignment.NONE)),
             # Cheat - Godmode
-            Switch(SCREEN_WIDTH-55, SCREEN_HEIGHT-55, 40, 40, 8, 8, 8, 8,
+            Switch(self.game.screen_resolution[0]-55, self.game.screen_resolution[1]-55, 40, 40, 8, 8, 8, 8,
                    self.game.switch_godmode,
-                   False,
+                   self.game.cheat_godmode,
                    self.color_golden, self.color_blue,
                    (Text("GM", 2, 7, self.font_small, self.color_blue),
                            Allignment.NONE)),
@@ -130,12 +150,12 @@ class UserInterface(pygame.sprite.Sprite):
         )
         self.containers_leaderboards = (
             # Name of the menu
-            Container(SCREEN_WIDTH / 2 - 185, 35, 370, 72, 8, 8, 20, 20,
+            Container(self.game.screen_resolution[0] / 2 - 185, 35, 370, 72, 8, 8, 20, 20,
                       self.color_white,
                       (Text("Leaderboard", 16, 10, self.font_big, self.color_white),
                            Allignment.NONE)),
             # List of high scores
-            Leaderboards(100, 145, self.font_medium, self.scores)
+            Leaderboards(int(self.game.screen_resolution[0]/2)-540, 145, self.font_medium, self.scores)
         )
 
     def _initialize_hud(self):
@@ -172,22 +192,24 @@ class UserInterface(pygame.sprite.Sprite):
 
     def _initialize_pause_menu(self):
         # Space between elements - 15
+        offset_x = int((self.game.screen_resolution[0] - 1280)/2)
+        offset_y = int((self.game.screen_resolution[1] - 720)/2)
         self.buttons_pause_menu = (
             # Model switching
-            Button(290, 116, 36, 36, 6, 3, 3, 6, 
+            Button(offset_x+290, offset_y+116, 36, 36, 6, 3, 3, 6, 
                    self.player.switch_ship_model_to_previous,
                    lambda: True,
                    self.color_blue, self.color_gray,
                    (Text("<", 12, 5, self.font_small, self.color_blue),
                         Allignment.NONE)),
-            Button(709, 116, 36, 36, 3, 6, 6, 3, 
+            Button(offset_x+709, offset_y+116, 36, 36, 3, 6, 6, 3, 
                    self.player.switch_ship_model_to_next,
                    lambda: True,
                    self.color_blue, self.color_gray,
                    (Text(">", 12, 5, self.font_small, self.color_blue),
                         Allignment.NONE)),
             # Heal
-            Button(709, 167, 36, 36, 3, 6, 6, 3,
+            Button(offset_x+709, offset_y+167, 36, 36, 3, 6, 6, 3,
                    self.player.buy_heal,
                    self.player.can_heal,
                    self.color_green, self.color_gray,
@@ -195,13 +217,13 @@ class UserInterface(pygame.sprite.Sprite):
                         Allignment.NONE)),
 
             # Upgrade weapons
-            Button(1179, 167, 36, 36, 3, 6, 6, 3,
+            Button(offset_x+1179, offset_y+167, 36, 36, 3, 6, 6, 3,
                    lambda: self.player.buy_upgrade_weapon(0),
                    lambda: self.player.can_upgrade_weapon(0),
                    self.color_green, self.color_gray,
                    (Text("/\\", 5, 5, self.font_small, self.color_green),
                         Allignment.NONE)),
-            Button(1179, 269, 36, 36, 3, 6, 6, 3,
+            Button(offset_x+1179, offset_y+269, 36, 36, 3, 6, 6, 3,
                    lambda: self.player.buy_upgrade_weapon(1),
                    lambda: self.player.can_upgrade_weapon(1),
                    self.color_green, self.color_gray,
@@ -209,7 +231,7 @@ class UserInterface(pygame.sprite.Sprite):
                         Allignment.NONE)),
 
             # Ends the run and returns to the main menu
-            Button(890, 600, 340, 72, 8, 8, 20, 20,
+            Button(offset_x+890, offset_y+600, 340, 72, 8, 8, 20, 20,
                    self.game.handler_finish_round,
                    lambda: True,
                    self.color_red, self.color_gray,
@@ -218,43 +240,43 @@ class UserInterface(pygame.sprite.Sprite):
         )
         self.containers_pause_menu = (
             # Background
-            Container(50, 50, 1180, 540, 20, 20, 8, 20,
+            Container(offset_x+50, offset_y+50, 1180, 540, 20, 20, 8, 20,
                       self.color_white),
                     
             # Current ship
-            Container(65, 65, 210, 210, 12, 6, 6, 6,
+            Container(offset_x+65, offset_y+65, 210, 210, 12, 6, 6, 6,
                       self.color_white,
                       (self.player.get_ship,
                             Allignment.CENTER)),
 
             # List - ship
-            Container(290, 65, 455, 36, 6, 6, 6, 6,
+            Container(offset_x+290, offset_y+65, 455, 36, 6, 6, 6, 6,
                       self.color_white,
                       (TextH("Model: {}", 12, 5, self.font_small, self.color_white,
                             self.player.get_ship_name),
                             Allignment.NONE)),
-            Container(336, 116, 363, 36, 3, 3, 3, 3,
+            Container(offset_x+336, offset_y+116, 363, 36, 3, 3, 3, 3,
                       self.color_white,
                       (Text("Switch model", 12, 5, self.font_small, self.color_white),
                             Allignment.NONE)),
-            Container(290, 167, 409, 36, 6, 3, 3, 6,
+            Container(offset_x+290, offset_y+167, 409, 36, 6, 3, 3, 6,
                       self.color_white,
                       (TextH("Heal: {}g", 12, 5, self.font_small, self.color_white,
                             self.player.get_price_heal),
                             Allignment.NONE)),
 
             # Current stats
-            Container(760, 65, 150, 36, 6, 3, 3, 6, # Current score
+            Container(offset_x+760, offset_y+65, 150, 36, 6, 3, 3, 6, # Current score
                       self.color_white,
                       (TextH("{}pts", 9, 5, self.font_small, self.color_white, 
                            self.gsm.get_score),
                            Allignment.NONE)),
-            Container(920, 65, 127, 36, 3, 3, 3, 3, # Current money
+            Container(offset_x+920, offset_y+65, 127, 36, 3, 3, 3, 3, # Current money
                       self.color_white,
                       (TextH("{}g", 9, 5, self.font_small, (235, 205, 0), 
                            self.player.get_money),
                            Allignment.NONE)),
-            Container(1057, 65, 158, 36, 3, 6, 6, 3, # Current health bar
+            Container(offset_x+1057, offset_y+65, 158, 36, 3, 6, 6, 3, # Current health bar
                       self.color_white,
                       (Text("Lives", 9, 5, self.font_small, self.color_white),
                             Allignment.NONE),
@@ -262,24 +284,24 @@ class UserInterface(pygame.sprite.Sprite):
                                 self.player.get_lives),
                                 Allignment.NONE)),
             # List - weapons
-            Container(760, 116, 455, 36, 6, 6, 6, 6,
+            Container(offset_x+760, offset_y+116, 455, 36, 6, 6, 6, 6,
                       self.color_white,
                       (TextH("Weapon 1: {}.v{}", 12, 5, self.font_small, self.color_white,
                             self.player.weapons[0].get_name,
                             self.player.weapons[0].get_level),
                             Allignment.NONE)),
-            Container(760, 167, 409, 36, 6, 3, 3, 6,
+            Container(offset_x+760, offset_y+167, 409, 36, 6, 3, 3, 6,
                       self.color_white,
                       (TextH("Projectiles: {}g", 12, 5, self.font_small, self.color_white,
                             lambda: self.player.get_price_weapons(0)),
                             Allignment.NONE)),
-            Container(760, 218, 455, 36, 6, 6, 6, 6,
+            Container(offset_x+760, offset_y+218, 455, 36, 6, 6, 6, 6,
                       self.color_white,
                       (TextH("Weapon 2: {}.v{}", 12, 5, self.font_small, self.color_white,
                             self.player.weapons[1].get_name,
                             self.player.weapons[1].get_level),
                             Allignment.NONE)),
-            Container(760, 269, 409, 36, 6, 3, 3, 6,
+            Container(offset_x+760, offset_y+269, 409, 36, 6, 3, 3, 6,
                       self.color_white,
                       (TextH("Radius: {}g", 12, 5, self.font_small, self.color_white,
                             lambda: self.player.get_price_weapons(1)),
@@ -287,19 +309,25 @@ class UserInterface(pygame.sprite.Sprite):
         )
 
     
-    def round_start(self, gsm, player):
+    def start_round(self, gsm, player):
         self.gsm = gsm
         self.player = player
-        self._initialize_hud()
-        self._initialize_pause_menu()
+        self.switch_menu(Menu.HUD)
 
     def switch_menu(self, menu : Menu):
+        self.__current_menu = menu
+
         match menu:
+            case Menu.MAIN_MENU:
+                self._initialize_main_menu()
             case Menu.LEADERBOARDS:
                 self._initialize_leaderboards()
-
-        self.__current_menu = menu
-        print(f"Switching to {self.__current_menu.value}")
+            case Menu.HUD:
+                self._initialize_hud()
+            case Menu.PAUSE_MENU:
+                self._initialize_pause_menu()
+            case _:
+                print(f"> Error: missing menu {self.__current_menu.value} in UserInterface.switch_menu")
     
     def check_click(self, position):
         """Checks mouse position against all the buttons in the current menus and tries to run the button function."""

@@ -27,12 +27,3 @@ class CircleShape(pygame.sprite.Sprite):
             return False
         else:
             return True
-
-    def is_off_screen(self):
-        return(
-            self.position.x < -ASTEROID_MAX_RADIUS or
-            self.position.x > SCREEN_WIDTH + ASTEROID_MAX_RADIUS or
-            self.position.y < -ASTEROID_MAX_RADIUS or
-            self.position.y > SCREEN_HEIGHT + ASTEROID_MAX_RADIUS
-        )
-    

@@ -9,7 +9,7 @@ from ui.sprites.ship import Ship, ShipType
 
 class Player(CircleShape):
     layer = 50 # pyright: ignore
-    def __init__(self, x, y, cheat_godmode, cheat_hitbox):
+    def __init__(self, game, x, y, cheat_godmode, cheat_hitbox):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 180
         self.rotation_inertia = self.rotation
@@ -18,6 +18,7 @@ class Player(CircleShape):
         self.__turning_speed = 0
         self.last_dt = 0
 
+        self.game = game
         self.cheat_godmode = cheat_godmode
 
         self.timer_invul = 0
@@ -30,7 +31,7 @@ class Player(CircleShape):
             ShipType.POLY2,
             ShipType.POLY3,
         ]
-        self.ship_model = 2
+        self.ship_model = 3
         self.ship = Ship(self.unlocked_ships[self.ship_model], self.radius, cheat_hitbox)
 
         self.money = 0
@@ -92,14 +93,15 @@ class Player(CircleShape):
         self.inertia = self.inertia * ((100 - PLAYER_ACCELERATION) / 100) + pygame.Vector2(0, 1).rotate(self.rotation_inertia) * (PLAYER_ACCELERATION / 100)
         self.position += self.inertia * self.speed * dt
 
+        screen_resolution = self.game.screen_resolution
         # Teleports player if off-screen
         if self.position.x < -ASTEROID_MAX_RADIUS:
-            self.position.x = SCREEN_WIDTH + ASTEROID_MAX_RADIUS
-        elif self.position.x > SCREEN_WIDTH + ASTEROID_MAX_RADIUS:
+            self.position.x = screen_resolution[0] + ASTEROID_MAX_RADIUS
+        elif self.position.x > screen_resolution[0] + ASTEROID_MAX_RADIUS:
             self.position.x = -ASTEROID_MAX_RADIUS
         if self.position.y < -ASTEROID_MAX_RADIUS:
-            self.position.y = SCREEN_HEIGHT + ASTEROID_MAX_RADIUS
-        elif self.position.y > SCREEN_HEIGHT + ASTEROID_MAX_RADIUS:
+            self.position.y = screen_resolution[1] + ASTEROID_MAX_RADIUS
+        elif self.position.y > screen_resolution[1] + ASTEROID_MAX_RADIUS:
             self.position.y = -ASTEROID_MAX_RADIUS
 
     def attempt_shot(self, time_since_last_shot):
