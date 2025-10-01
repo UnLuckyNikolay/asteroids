@@ -87,28 +87,31 @@ class UserInterface(pygame.sprite.Sprite):
                 print(f"> Error: missing menu {self.__current_menu.value} in UserInterface.initialize_current_menu")
 
     def _initialize_main_menu(self):
+        center_x = int((self.game.screen_resolution[0])/2)
+        center_y = int((self.game.screen_resolution[1])/2)
         self.buttons_main_menu = (
             # Start button, starts a Round
-            Button(self.game.screen_resolution[0] / 2 - 185, 200, 370, 72, 8, 8, 20, 20, 
+            Button(center_x-185, center_y-136, 370, 72, 8, 8, 20, 20, 
                    self.game.game_loop,
                    lambda: True,
                    self.color_blue, self.color_gray,
                    (Text("Start", 117, 10, self.font_big, self.color_blue),
                            Allignment.NONE)),
             # Opens the Leaderboards
-            Button(self.game.screen_resolution[0] / 2 - 185, 300, 370, 72, 8, 8, 20, 20, 
+            Button(center_x-185, center_y-36, 370, 72, 8, 8, 20, 20, 
                    lambda: self.switch_menu(Menu.LEADERBOARDS),
                    lambda: True,
                    self.color_blue, self.color_gray,
                    (Text("Leaderboard", 16, 10, self.font_big, self.color_blue),
                            Allignment.NONE)),
             # Exits the game
-            Button(self.game.screen_resolution[0] / 2 - 185, 400, 370, 72, 8, 8, 20, 20, 
+            Button(center_x-185, center_y+64, 370, 72, 8, 8, 20, 20, 
                    self.game.handler_turn_off,
                    lambda: True,
                    self.color_blue, self.color_gray,
                    (Text("Exit", 135, 10, self.font_big, self.color_blue),
                            Allignment.NONE)),
+
             # Regenerate background
             Button(15, self.game.screen_resolution[1]-55, 40, 40, 8, 8, 8, 8,
                    self.game.handler_regenerate_background,
@@ -122,6 +125,7 @@ class UserInterface(pygame.sprite.Sprite):
                    self.game.is_fullscreen,
                    self.color_green, self.color_blue,
                    (SymbolFullscreen(0, 0, self.color_blue), Allignment.CENTER)),
+
             # Cheat - Show hitbox
             Switch(self.game.screen_resolution[0]-110, self.game.screen_resolution[1]-55, 40, 40, 8, 8, 8, 8,
                    self.game.switch_hitbox,
