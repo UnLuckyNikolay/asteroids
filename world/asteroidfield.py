@@ -42,13 +42,13 @@ class AsteroidField(pygame.sprite.Sprite):
 
     def spawn(self, radius, position, velocity, speed):
         roll = random.randint(1, 100)
-        if roll <= 5:
+        if roll <= CHANCE_GOLDEN:
             velocity = velocity * 3
             asteroid = AsteroidGolden(position, velocity, speed*3)
-        elif roll <= 12:
+        elif roll <= CHANCE_HOMING:
             velocity = velocity * 2
             asteroid = AsteroidHoming(position, velocity, speed*2, self.player)
-        elif roll <= 22:
+        elif roll <= CHANCE_EXPLOSIVE:
             velocity = velocity
             asteroid = AsteroidExplosive(position, velocity, speed)
         else:

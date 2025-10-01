@@ -5,7 +5,7 @@ from constants import *
 
 
 class CircleShape(pygame.sprite.Sprite):
-    def __init__(self, position, velocity, radius, create_copy_of_position=False):
+    def __init__(self, position, velocity, radius, create_copy_of_position=True):
         if hasattr(self, "containers"):
             super().__init__(self.containers) # pyright: ignore[reportAttributeAccessIssue]
         else:
