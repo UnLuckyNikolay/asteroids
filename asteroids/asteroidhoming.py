@@ -12,8 +12,6 @@ class AsteroidHoming(Asteroid):
 
     
     def update(self, dt):
-        #angle = pygame.math.Vector2(self.velocity).angle_to(self.target.position - self.position)
-        #self.velocity = pygame.Vector2(self.velocity).rotate(angle)
         direction_vector = (self.target.position - self.position).normalize() * self.max_speed
         self.velocity = self.velocity.move_towards(direction_vector, HOMING_SPEED)
         self.position += self.velocity * dt

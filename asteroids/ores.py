@@ -8,7 +8,7 @@ class Ore(CircleShape):
     layer = 30 # pyright: ignore
     def __init__(self, position, velocity, max_speed, color_fill, color_outline, price, radius, draw_points):
         super().__init__(position, velocity, radius)
-        self.max_speed = max_speed
+        self.max_speed : int = max_speed
         self.size = int(self.radius / ASTEROID_MIN_RADIUS)
         self.price = price
 
@@ -25,6 +25,10 @@ class Ore(CircleShape):
 
     def update(self, dt):
         self.position += self.velocity * dt
+
+    def home_towards(self, position : pygame.Vector2):
+        direction_vector = (position - self.position).normalize() * self.max_speed
+        self.velocity = self.velocity.move_towards(direction_vector, HOMING_SPEED)
 
 
     def __get_points_for_drawing(self, draw_points):
@@ -48,16 +52,16 @@ class Ore(CircleShape):
     
 class Diamond(Ore):
     def __init__(self, position, velocity, max_speed):
-        super().__init__(position, velocity, max_speed, (185, 242, 255), (125, 182, 195), 10, 5, 3)
+        super().__init__(position, velocity, max_speed*2, (185, 242, 255), (125, 182, 195), 10, 5, 3)
     
 class GoldenOre(Ore):
     def __init__(self, position, velocity, max_speed):
-        super().__init__(position, velocity, max_speed, (235, 205, 0), (175, 145, 0), 5, 7, 5)
+        super().__init__(position, velocity, max_speed*2, (235, 205, 0), (175, 145, 0), 5, 7, 5)
     
 class SilverOre(Ore):
     def __init__(self, position, velocity, max_speed):
-        super().__init__(position, velocity, max_speed, (224, 224, 224), (164, 164, 164), 3, 7, 5)
+        super().__init__(position, velocity, max_speed*2, (224, 224, 224), (164, 164, 164), 3, 7, 5)
     
 class CopperOre(Ore):
     def __init__(self, position, velocity, max_speed):
-        super().__init__(position, velocity, max_speed, (206, 112, 43), (146, 72, 13), 1, 7, 5)
+        super().__init__(position, velocity, max_speed*2, (206, 112, 43), (146, 72, 13), 1, 7, 5)

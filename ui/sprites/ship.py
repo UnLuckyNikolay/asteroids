@@ -71,12 +71,13 @@ class Ship():
     def switch_model(self, model : ShipType):
         self.type = model
 
-    def draw_rotated(self, screen, position : pygame.Vector2 , rotation : int, timer_invul=0):
+    def draw_rotated(self, screen, position : pygame.Vector2 , rotation : int, magnet_radius, timer_invul=0):
         """Used to draw ships during gameplay."""
         
-        if self.show_hitbox:   # Draws player hit box in dark gray.
-            pygame.draw.circle(screen, (50, 50, 50), position, 1, 2)
-            pygame.draw.circle(screen, (50, 50, 50), position, self.hitbox_radius, 2)
+        if self.show_hitbox:   # Draws player hit box in dark red.
+            pygame.draw.circle(screen, (50, 50, 100), position, magnet_radius, 2)
+            pygame.draw.circle(screen, (100, 50, 50), position, 1, 2)
+            pygame.draw.circle(screen, (100, 50, 50), position, self.hitbox_radius, 2)
 
         # Get ship parts
         parts = self.__get_parts(self.type)

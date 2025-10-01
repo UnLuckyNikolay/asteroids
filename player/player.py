@@ -4,6 +4,7 @@ from constants import *
 from shapes.circleshape import CircleShape
 from player.weapons.plasmagun import PlasmaGun
 from player.weapons.bomblauncher import BombLauncher
+from player.ship_parts.magnet import Magnet
 from ui.sprites.ship import Ship, ShipType
 
 
@@ -33,6 +34,7 @@ class Player(CircleShape):
         ]
         self.ship_model = 3
         self.ship = Ship(self.unlocked_ships[self.ship_model], self.radius, cheat_hitbox)
+        self.magnet = Magnet(self.position, 100)
 
         self.money = 0
         self.lives = 3
@@ -83,7 +85,9 @@ class Player(CircleShape):
         self.ship.draw_rotated(
             screen, 
             self.position,
-            self.rotation+180, self.timer_invul
+            self.rotation+180,
+            self.magnet.radius, 
+            self.timer_invul
         )
 
     def rotate(self, dt):
@@ -173,7 +177,7 @@ class Player(CircleShape):
             print(f"Game over! Final score: {gsm.score}")
             return self.is_alive
 
-    def collect_ore(self, price):
+    def collect_loot(self, price):
         self.money += price
 
     ### Getters

@@ -40,7 +40,7 @@ class Game():
         self.updatable = pygame.sprite.Group()   # This group is cleaned (object.kill()) after each round
         self.drawable = pygame.sprite.Group()
         self.asteroids = pygame.sprite.Group()            # Used for colision detection
-        self.ores = pygame.sprite.Group()                 # ^
+        self.loot = pygame.sprite.Group()                 # ^ + magnet
         self.projectiles = pygame.sprite.Group()          # ^
         self.explosion_hitboxes = pygame.sprite.Group()   # ^
         self.moving_objects = pygame.sprite.Group()       # Used to destroy objects that are off-screen
@@ -57,7 +57,7 @@ class Game():
 
         AsteroidField.containers = (self.updatable)
         Asteroid.containers = (self.asteroids, self.updatable, self.drawable, self.moving_objects)
-        Ore.containers = (self.ores, self.updatable, self.drawable, self.moving_objects)
+        Ore.containers = (self.loot, self.updatable, self.drawable, self.moving_objects)
 
         # Layers for drawable
         # 0 - StarField
@@ -120,12 +120,14 @@ class Game():
                         object.kill()
 
                 # Colision checks
+                # Player hit
                 for asteroid in self.asteroids:
                     if asteroid.check_colision(self.player) and not self.player.is_invul:
                         if self.player.take_damage_and_check_if_alive(self.gsm):
                             asteroid.kill()
                             explosion = Explosion(asteroid.position, asteroid.radius)
-                        
+                    
+                    # Asteroid shot
                     for projectile in self.projectiles:
                         if projectile.check_colision(asteroid) and not asteroid.has_been_hit:
                             projectile.kill()
@@ -133,6 +135,7 @@ class Game():
                             explosion = Explosion(asteroid.position, asteroid.radius)
                             self.gsm.score += asteroid.reward
                     
+                # Asteroid exploded
                 for hitbox in self.explosion_hitboxes:
                     for asteroid in self.asteroids:
                         if hitbox.check_colision(asteroid) and not asteroid.has_been_hit:
@@ -140,10 +143,13 @@ class Game():
                             self.gsm.score += asteroid.reward
                     hitbox.kill()
 
-                for ore in self.ores:
-                    if ore.check_colision(self.player):
-                        self.player.collect_ore(ore.price)
-                        ore.kill()
+                # Loot collected
+                for loot in self.loot:
+                    if loot.check_colision(self.player):
+                        self.player.collect_loot(loot.price)
+                        loot.kill()
+                    elif loot.check_colision(self.player.magnet):
+                        loot.home_towards(self.player.position)
 
                 self.dt = self.redraw_objects_and_ui()
 
