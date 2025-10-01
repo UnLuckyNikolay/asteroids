@@ -11,6 +11,7 @@ from ui.switch import Switch
 from ui.text import Text, TextH, TextF
 from ui.sprites.healthbar import HealthBar
 from ui.sprites.leaderboards import Leaderboards
+from ui.sprites.symbol_fullscreen import SymbolFullscreen
 from gamestatemanager import GameStateManager
 from player.player import Player
 
@@ -120,8 +121,7 @@ class UserInterface(pygame.sprite.Sprite):
                    self.game.switch_fullscreen,
                    self.game.is_fullscreen,
                    self.color_green, self.color_blue,
-                   (Text("FS", 3, 7, self.font_small, self.color_blue),
-                           Allignment.NONE)),
+                   (SymbolFullscreen(0, 0, self.color_blue), Allignment.CENTER)),
             # Cheat - Show hitbox
             Switch(self.game.screen_resolution[0]-110, self.game.screen_resolution[1]-55, 40, 40, 8, 8, 8, 8,
                    self.game.switch_hitbox,

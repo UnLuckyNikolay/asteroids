@@ -3,6 +3,7 @@ from typing import Callable, Any
 
 from ui.container import Container, Allignment
 from ui.text import Text
+from ui.simple_sprite import SimpleSprite
 from ui.helpers import get_points
 
 class Switch(Container):
@@ -55,7 +56,7 @@ class Switch(Container):
             else:
                 element = tuple[0]
 
-            if isinstance(element, Text) and self.is_active:
+            if (isinstance(element, Text) or isinstance(element, SimpleSprite)) and self.is_active:
                 element.draw(screen, x, y, self.color) # pyright: ignore[reportAttributeAccessIssue]
             else:
                 element.draw(screen, x, y) # pyright: ignore[reportAttributeAccessIssue]
