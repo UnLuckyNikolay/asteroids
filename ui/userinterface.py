@@ -18,9 +18,10 @@ from player.player import Player
 
 class Menu(Enum):
     MAIN_MENU = "Main Menu"
+    LEADERBOARDS = "Leaderboards"
     HUD = "HUD"
     PAUSE_MENU = "Pause"
-    LEADERBOARDS = "Leaderboards"
+    NAME_CHECK = "Name check"
 
 class UserInterface(pygame.sprite.Sprite):
     layer = 100 # pyright: ignore
@@ -308,6 +309,34 @@ class UserInterface(pygame.sprite.Sprite):
                             Allignment.NONE)),
         )
 
+    def _initialize_name_check(self):
+        root_x = self.game.screen_resolution[0]/2-225
+        root_y = self.game.screen_resolution[1]/2-100
+
+        self.buttons_name_check = [
+
+        ]
+        self.containers_name_check = [
+            Container(root_x, root_y, 450, 200, 10, 25, 10, 25, 
+                      self.color_white,
+                      (TextF("New record! {}pts", 10, 10, 
+                            self.font_medium, self.color_white, 
+                            0),#self.game.gsm.score), 
+                            Allignment.NONE),
+                      (Text("Enter your name:", 10, 50, 
+                            self.font_medium, self.color_white), 
+                            Allignment.NONE),),
+            Container(root_x, root_y, 450, 200, 10, 25, 10, 25, 
+                      self.color_white,
+                      (TextF("New record! {}pts", 10, 10, 
+                            self.font_medium, self.color_white, 
+                            0),#self.game.gsm.score), 
+                            Allignment.NONE),
+                      (Text("Enter your name:", 10, 50, 
+                            self.font_medium, self.color_white), 
+                            Allignment.NONE),),
+        ]
+
     
     def start_round(self, gsm, player):
         self.gsm = gsm
@@ -326,6 +355,8 @@ class UserInterface(pygame.sprite.Sprite):
                 self._initialize_hud()
             case Menu.PAUSE_MENU:
                 self._initialize_pause_menu()
+            case Menu.NAME_CHECK:
+                self._initialize_name_check()
             case _:
                 print(f"> Error: missing menu {self.__current_menu.value} in UserInterface.switch_menu")
     
@@ -406,8 +437,10 @@ class UserInterface(pygame.sprite.Sprite):
                 self.draw_hud(screen)
             case Menu.PAUSE_MENU:
                 self.draw_pause_menu(screen)
+            case Menu.NAME_CHECK:
+                self.draw_name_check(screen)
             case _:
-                print("Menu not implemented yet!")        
+                print(f"> Error: missing menu {self.__current_menu.value} in UserInterface.draw")        
 
     def draw_main_menu(self, screen):
         for button in self.buttons_main_menu:
@@ -429,4 +462,11 @@ class UserInterface(pygame.sprite.Sprite):
             container.draw(screen)
 
         for button in self.buttons_pause_menu:
+            button.draw(screen)
+
+    def draw_name_check(self, screen):
+        for container in self.containers_name_check:
+            container.draw(screen)
+
+        for button in self.buttons_name_check:
             button.draw(screen)

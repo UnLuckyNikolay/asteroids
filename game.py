@@ -31,6 +31,8 @@ class Game():
         self.dt = 0
         self.is_running = True
         self.is_paused = False
+        self.getting_player_name = False
+        self.player_name = ""
 
         self.cheat_godmode = False
         self.cheat_hitbox = False
@@ -79,6 +81,7 @@ class Game():
                 else:
                     self.handle_event(event)
             
+            self.ui.switch_menu(Menu.NAME_CHECK)
             if self.ui.force_ui_reload:
                 self.redraw_objects_and_ui()
 
@@ -160,7 +163,13 @@ class Game():
 
         # Saving score and going back to Main Menu
         if not self.cheat_godmode and self.gsm.score > 0:
-            self.ui.check_score(self.gsm.score)
+            self.ui.switch_menu(Menu.NAME_CHECK)
+            self.getting_player_name = True
+            while self.getting_player_name:
+                print("> We here")
+                self.redraw_objects_and_ui()
+                self.player_name, self.getting_player_name = self.get_input_string(self.player_name)
+            #self.ui.check_score(self.gsm.score)
         self.ui.switch_menu(Menu.MAIN_MENU)
 
         self.player = None
@@ -211,6 +220,15 @@ class Game():
             object.position.y < -offset or
             object.position.y > self.screen_resolution[1]+offset
         )
+    
+    def get_input_string(self, current_string : str) -> tuple[str, bool]:
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.is_running = False
+                    return current_string, False
+                else:
+                    self.handle_event(event)
 
     ### Handlers
     
