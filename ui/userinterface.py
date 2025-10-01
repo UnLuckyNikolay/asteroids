@@ -35,7 +35,6 @@ class UserInterface(pygame.sprite.Sprite):
         self.gsm : GameStateManager = None
         self.player : Player = None
 
-        self.force_ui_reload = True
         self.__current_menu : Menu = Menu.MAIN_MENU
 
         # Getting the font
@@ -311,30 +310,33 @@ class UserInterface(pygame.sprite.Sprite):
 
     def _initialize_name_check(self):
         root_x = self.game.screen_resolution[0]/2-225
-        root_y = self.game.screen_resolution[1]/2-100
+        root_y = self.game.screen_resolution[1]/2-105
 
         self.buttons_name_check = [
-
+            Button(root_x+125, root_y+150, 200, 50, 3, 10, 3, 10,
+                   self.game.finish_getting_player_name,
+                   lambda: True, 
+                   self.color_blue, self.color_gray,
+                   (Text("Confirm", 10, 8, 
+                         self.font_medium, self.color_blue),
+                         Allignment.NONE)),
         ]
         self.containers_name_check = [
-            Container(root_x, root_y, 450, 200, 10, 25, 10, 25, 
+            Container(root_x, root_y, 450, 210, 10, 25, 10, 25, 
                       self.color_white,
-                      (TextF("New record! {}pts", 10, 10, 
+                      (TextF("New record! {}pts", 15, 7, 
                             self.font_medium, self.color_white, 
-                            0),#self.game.gsm.score), 
+                            self.game.gsm.score),
                             Allignment.NONE),
-                      (Text("Enter your name:", 10, 50, 
+                      (Text("Enter your name:", 15, 47, 
                             self.font_medium, self.color_white), 
-                            Allignment.NONE),),
-            Container(root_x, root_y, 450, 200, 10, 25, 10, 25, 
+                            Allignment.NONE)),
+            Container(root_x+10, root_y+90, 430, 50, 3, 10, 3, 10, 
                       self.color_white,
-                      (TextF("New record! {}pts", 10, 10, 
+                      (TextH("{}", 10, 10, 
                             self.font_medium, self.color_white, 
-                            0),#self.game.gsm.score), 
-                            Allignment.NONE),
-                      (Text("Enter your name:", 10, 50, 
-                            self.font_medium, self.color_white), 
-                            Allignment.NONE),),
+                            lambda: self.game.player_name),
+                            Allignment.NONE)),
         ]
 
     
@@ -366,15 +368,13 @@ class UserInterface(pygame.sprite.Sprite):
             case Menu.MAIN_MENU:
                 for button in self.buttons_main_menu:
                     if button.check_click(position):
-                        if button.run_if_possible():
-                            self.force_ui_reload = True
+                        button.run_if_possible()
                         return
             
             case Menu.LEADERBOARDS:
                 for button in self.buttons_leaderboards:
                     if button.check_click(position):
-                        if button.run_if_possible():
-                            self.force_ui_reload = True
+                        button.run_if_possible()
                         return
             
             case Menu.HUD:
@@ -383,8 +383,13 @@ class UserInterface(pygame.sprite.Sprite):
             case Menu.PAUSE_MENU:
                 for button in self.buttons_pause_menu:
                     if button.check_click(position):
-                        if button.run_if_possible():
-                            self.force_ui_reload = True
+                        button.run_if_possible()
+                        return
+            
+            case Menu.NAME_CHECK:
+                for button in self.buttons_name_check:
+                    if button.check_click(position):
+                        button.run_if_possible()
                         return
 
             case _:
@@ -402,8 +407,8 @@ class UserInterface(pygame.sprite.Sprite):
             self.scores.pop()
         if len(self.scores) != LEADERBOARD_LENGTH:
             is_updated = True
-            name = self.ask_player_name()
-            self.scores.append({"name": name, "score": new_score})
+            self.game.get_player_name()
+            self.scores.append({"name": self.game.player_name, "score": new_score})
             self.scores.sort(key=lambda x: x["score"], reverse=True)
 
         if not is_updated:
@@ -414,16 +419,6 @@ class UserInterface(pygame.sprite.Sprite):
             json.dump(self.scores, file)
 
         self._initialize_leaderboards()
-
-    def ask_player_name(self):
-        root = Tk()
-        root.withdraw()
-
-        name = simpledialog.askstring("New record!", "Please enter your name: ")
-
-        root.destroy()
-
-        return name if name else "Player"
 
     ### Drawing menus
 

@@ -32,7 +32,7 @@ class Game():
         self.is_running = True
         self.is_paused = False
         self.getting_player_name = False
-        self.player_name = ""
+        self.player_name = "Player"
 
         self.cheat_godmode = False
         self.cheat_hitbox = False
@@ -81,12 +81,7 @@ class Game():
                 else:
                     self.handle_event(event)
             
-            self.ui.switch_menu(Menu.NAME_CHECK)
-            if self.ui.force_ui_reload:
-                self.redraw_objects_and_ui()
-
-            pygame.display.flip()
-            self.clock.tick(60)
+            self.redraw_objects_and_ui()
 
     def game_loop(self):
         self.player = Player(self, self.screen_resolution[0] / 2, self.screen_resolution[1] / 2,
@@ -105,7 +100,6 @@ class Game():
                     self.is_running = False
                     return
                 elif event.type == pygame.KEYDOWN:
-                    self.ui.force_ui_reload = True
                     if event.key == pygame.K_ESCAPE:
                         if not self.is_paused:
                             self.is_paused = True
@@ -124,8 +118,6 @@ class Game():
                 for object in self.moving_objects:
                     if self.check_if_object_is_off_screen(object):
                         object.kill()
-
-                self.redraw_objects_and_ui()
 
                 # Colision checks
                 for asteroid in self.asteroids:
@@ -153,23 +145,16 @@ class Game():
                         self.player.collect_ore(ore.price)
                         ore.kill()
 
+                self.dt = self.redraw_objects_and_ui()
+
             # Screen update - Pause Menu
             else:
-                if self.ui.force_ui_reload:
-                    self.redraw_objects_and_ui()
-
-            pygame.display.flip()
-            self.dt = self.clock.tick(60) / 1000
+                self.redraw_objects_and_ui()
 
         # Saving score and going back to Main Menu
         if not self.cheat_godmode and self.gsm.score > 0:
             self.ui.switch_menu(Menu.NAME_CHECK)
-            self.getting_player_name = True
-            while self.getting_player_name:
-                print("> We here")
-                self.redraw_objects_and_ui()
-                self.player_name, self.getting_player_name = self.get_input_string(self.player_name)
-            #self.ui.check_score(self.gsm.score)
+            self.ui.check_score(self.gsm.score)
         self.ui.switch_menu(Menu.MAIN_MENU)
 
         self.player = None
@@ -188,7 +173,6 @@ class Game():
         # Returns to fullscreen after Alt-tabing/loosing focus
         if event.type == pygame.WINDOWFOCUSGAINED and self.is_fullscreen:
             self.__switch_to_fullscreen()
-            self.ui.force_ui_reload = True
         # Checks button press
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == pygame.BUTTON_LEFT:
@@ -199,18 +183,19 @@ class Game():
             self.screen_resolution_windowed = (event.dict["x"], event.dict["y"])
         elif event.type == pygame.WINDOWENTER and self.is_window_resized:
             self.is_window_resized = False
-            self.ui.force_ui_reload = True
             self.__switch_to_windowed()
             if self.asteroid_field != None:
                 self.asteroid_field.update_spawns(self.screen_resolution)
         #elif event.type != pygame.MOUSEMOTION:
             #print(event)
     
-    def redraw_objects_and_ui(self):
-        self.ui.force_ui_reload = False
-
+    def redraw_objects_and_ui(self) -> float:
+        """Updates the screen and returns delta time"""
         for object in sorted(list(self.drawable), key = lambda object: object.layer):
             object.draw(self.screen)
+
+        pygame.display.flip()
+        return self.clock.tick(60) / 1000
     
     def check_if_object_is_off_screen(self, object) -> bool:
         offset = 100
@@ -221,14 +206,33 @@ class Game():
             object.position.y > self.screen_resolution[1]+offset
         )
     
-    def get_input_string(self, current_string : str) -> tuple[str, bool]:
-        while True:
+    def get_player_name(self):
+        self.getting_player_name = True
+        while self.getting_player_name:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.is_running = False
-                    return current_string, False
+                    return
+                elif event.type == pygame.KEYDOWN:
+                    #print(event)
+                    if event.key == pygame.K_BACKSPACE:
+                        self.player_name = self.player_name[:-1]
+                    elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
+                        return
+                    elif event.key == pygame.K_TAB or event.key == pygame.K_ESCAPE:
+                        continue
+                    else:
+                        k = event.dict["unicode"]
+                        if k != "" and len(self.player_name) < PLAYER_MAX_NAME_LENGTH:
+                            self.player_name = self.player_name + k
                 else:
                     self.handle_event(event)
+            
+            self.redraw_objects_and_ui()
+
+        self.player_name = self.player_name.strip()
+        if self.player_name == "":
+            self.player_name = "Player"
 
     ### Handlers
     
@@ -241,6 +245,9 @@ class Game():
 
     def handler_regenerate_background(self):
         self.star_field.regenerate()
+
+    def finish_getting_player_name(self):
+        self.getting_player_name = False
 
     def switch_godmode(self):
         self.cheat_godmode = False if self.cheat_godmode else True
