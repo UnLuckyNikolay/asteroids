@@ -65,7 +65,7 @@ class UserInterface(pygame.sprite.Sprite):
         self.color_white = (200, 200, 200)
         self.color_gray = (100, 100, 100)
         self.color_blue = (100, 200, 255)
-        self.color_red = (255, 0, 0)
+        self.color_red = (200, 0, 0)
         self.color_green = (0, 255, 0)
         self.color_golden = (255, 215, 0)
 

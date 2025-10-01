@@ -71,12 +71,12 @@ class Ship():
     def switch_model(self, model : ShipType):
         self.type = model
 
-    def draw_rotated(self, screen, x : int, y : int, rotation : int, timer_invul=0):
+    def draw_rotated(self, screen, position : pygame.Vector2 , rotation : int, timer_invul=0):
         """Used to draw ships during gameplay."""
         
         if self.show_hitbox:   # Draws player hit box in dark gray.
-            pygame.draw.circle(screen, (50, 50, 50), (x ,y), 1, 2)
-            pygame.draw.circle(screen, (50, 50, 50), (x ,y), self.hitbox_radius, 2)
+            pygame.draw.circle(screen, (50, 50, 50), position, 1, 2)
+            pygame.draw.circle(screen, (50, 50, 50), position, self.hitbox_radius, 2)
 
         # Get ship parts
         parts = self.__get_parts(self.type)
@@ -88,7 +88,7 @@ class Ship():
             self.alpha = int(255 - min(timer_invul, PLAYER_TIMER_INVUL) / PLAYER_TIMER_INVUL * 255)
 
         # Rotate and draw parts
-        for part in self.__rotate_sprite(parts, x, y, rotation):
+        for part in self.__rotate_sprite(parts, position, rotation):
             if len(part[1]) == 2:
                 if len(part[0]) < 2:
                     pygame.draw.line(screen, (*self.color_outline, self.alpha), part[1][0], part[1][1], 2)
@@ -151,12 +151,12 @@ class Ship():
 
         return new_parts
     
-    def __rotate_sprite(self, parts, x, y, rotation):
+    def __rotate_sprite(self, parts, position : pygame.Vector2, rotation):
         rotated_sprite = []
         for part in parts:
             rotated_part = []
             for dot in part[1]:
                 dot_rotated = pygame.Vector2(dot).rotate(rotation)
-                rotated_part.append((int(x + dot_rotated.x), int(y + dot_rotated.y)))
+                rotated_part.append((int(position.x + dot_rotated.x), int(position.y + dot_rotated.y)))
             rotated_sprite.append([part[0], rotated_part])
         return rotated_sprite

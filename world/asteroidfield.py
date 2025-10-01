@@ -40,20 +40,20 @@ class AsteroidField(pygame.sprite.Sprite):
         spawn_rate = (ASTEROID_SPAWN_RATE * (1280*720) / (screen_resolution[0]*screen_resolution[1]))
         return edges, spawn_rate
 
-    def spawn(self, radius, position, velocity):
+    def spawn(self, radius, position, velocity, speed):
         roll = random.randint(1, 100)
         if roll <= 5:
-            asteroid = AsteroidGolden(position.x, position.y)
-            asteroid.velocity = velocity * 3
+            velocity = velocity * 3
+            asteroid = AsteroidGolden(position, velocity, speed*3)
         elif roll <= 12:
-            asteroid = AsteroidHoming(position.x, position.y, self.player)
-            asteroid.velocity = velocity * 2
+            velocity = velocity * 2
+            asteroid = AsteroidHoming(position, velocity, speed*2, self.player)
         elif roll <= 22:
-            asteroid = AsteroidExplosive(position.x, position.y)
-            asteroid.velocity = velocity
+            velocity = velocity
+            asteroid = AsteroidExplosive(position, velocity, speed)
         else:
-            asteroid = AsteroidBasic(position.x, position.y, radius)
-            asteroid.velocity = velocity
+            velocity = velocity
+            asteroid = AsteroidBasic(position, velocity, speed, radius)
     
     def update(self, dt):
         self.spawn_timer += dt
@@ -68,7 +68,7 @@ class AsteroidField(pygame.sprite.Sprite):
             velocity = velocity.rotate(random.randint(-30, 30))
             position = edge[1](random.uniform(0, 1))
             kind = random.randint(1, ASTEROID_KINDS)
-            self.spawn(ASTEROID_MIN_RADIUS * kind, position, velocity)
+            self.spawn(ASTEROID_MIN_RADIUS * kind, position, velocity, speed)
             
         if self.spawn_increase_timer >= 15:
             self.spawn_increase_timer -= 15

@@ -6,8 +6,8 @@ from shapes.circleshape import CircleShape
 
 class Explosion(CircleShape):
     layer = 10 # pyright: ignore
-    def __init__(self, x, y, radius):
-        super().__init__(x, y, radius)
+    def __init__(self, position, radius):
+        super().__init__(position, pygame.Vector2(0, 0), radius)
         self.timer = 0
         self.explosion_count = 3
         self.points_for_drawing_L = []

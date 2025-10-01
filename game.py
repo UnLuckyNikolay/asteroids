@@ -84,7 +84,7 @@ class Game():
             self.redraw_objects_and_ui()
 
     def game_loop(self):
-        self.player = Player(self, self.screen_resolution[0] / 2, self.screen_resolution[1] / 2,
+        self.player = Player(self, pygame.Vector2(self.screen_resolution[0] / 2, self.screen_resolution[1] / 2),
                              self.cheat_godmode, self.cheat_hitbox)
         self.gsm = GameStateManager(self.player)
         self.asteroid_field = AsteroidField(self, self.player, self.screen_resolution)
@@ -124,13 +124,13 @@ class Game():
                     if asteroid.check_colision(self.player) and not self.player.is_invul:
                         if self.player.take_damage_and_check_if_alive(self.gsm):
                             asteroid.kill()
-                            explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
+                            explosion = Explosion(asteroid.position, asteroid.radius)
                         
                     for projectile in self.projectiles:
                         if projectile.check_colision(asteroid) and not asteroid.has_been_hit:
                             projectile.kill()
                             asteroid.split()
-                            explosion = Explosion(asteroid.position.x, asteroid.position.y, asteroid.radius)
+                            explosion = Explosion(asteroid.position, asteroid.radius)
                             self.gsm.score += asteroid.reward
                     
                 for hitbox in self.explosion_hitboxes:

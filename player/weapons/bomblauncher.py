@@ -22,9 +22,9 @@ class BombLauncher(Weapon):
         spawn = pygame.Vector2(dot).rotate(rotation)
         match self.get_level():
             case 1:
-                bomb = Bomb(int(position.x + spawn.x), int(position.y + spawn.y), 100)
+                bomb = Bomb(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), pygame.Vector2(0, 0), 100)
             case 2:
-                bomb = Bomb(int(position.x + spawn.x), int(position.y + spawn.y), 150)
+                bomb = Bomb(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), pygame.Vector2(0, 0), 100)
             case 3:
-                bomb = Bomb(int(position.x + spawn.x), int(position.y + spawn.y), 200)
+                bomb = Bomb(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), pygame.Vector2(0, 0), 100)
                 

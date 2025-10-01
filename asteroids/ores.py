@@ -6,8 +6,9 @@ from shapes.circleshape import CircleShape
 
 class Ore(CircleShape):
     layer = 30 # pyright: ignore
-    def __init__(self, x, y, color_fill, color_outline, price, radius, draw_points):
-        super().__init__(x, y, radius)
+    def __init__(self, position, velocity, max_speed, color_fill, color_outline, price, radius, draw_points):
+        super().__init__(position, velocity, radius)
+        self.max_speed = max_speed
         self.size = int(self.radius / ASTEROID_MIN_RADIUS)
         self.price = price
 
@@ -42,21 +43,21 @@ class Ore(CircleShape):
     def __recalculate_points_for_drawing(self):
         new_points = []
         for point in self.default_points:
-            new_points.append((int(point[0]) + self.position.x, int(point[1]) + self.position.y)) # pyright: ignore[reportAttributeAccessIssue]
+            new_points.append((int(point[0]) + self.position[0], int(point[1]) + self.position[1])) # pyright: ignore[reportAttributeAccessIssue]
         return new_points
     
 class Diamond(Ore):
-    def __init__(self, x, y):
-        super().__init__(x, y, (185, 242, 255), (125, 182, 195), 10, 5, 3)
+    def __init__(self, position, velocity, max_speed):
+        super().__init__(position, velocity, max_speed, (185, 242, 255), (125, 182, 195), 10, 5, 3)
     
 class GoldenOre(Ore):
-    def __init__(self, x, y):
-        super().__init__(x, y, (235, 205, 0), (175, 145, 0), 5, 7, 5)
+    def __init__(self, position, velocity, max_speed):
+        super().__init__(position, velocity, max_speed, (235, 205, 0), (175, 145, 0), 5, 7, 5)
     
 class SilverOre(Ore):
-    def __init__(self, x, y):
-        super().__init__(x, y, (224, 224, 224), (164, 164, 164), 3, 7, 5)
+    def __init__(self, position, velocity, max_speed):
+        super().__init__(position, velocity, max_speed, (224, 224, 224), (164, 164, 164), 3, 7, 5)
     
 class CopperOre(Ore):
-    def __init__(self, x, y):
-        super().__init__(x, y, (206, 112, 43), (146, 72, 13), 1, 7, 5)
+    def __init__(self, position, velocity, max_speed):
+        super().__init__(position, velocity, max_speed, (206, 112, 43), (146, 72, 13), 1, 7, 5)

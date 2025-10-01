@@ -9,8 +9,8 @@ from ui.sprites.ship import Ship, ShipType
 
 class Player(CircleShape):
     layer = 50 # pyright: ignore
-    def __init__(self, game, x, y, cheat_godmode, cheat_hitbox):
-        super().__init__(x, y, PLAYER_RADIUS)
+    def __init__(self, game, position : pygame.Vector2, cheat_godmode : bool, cheat_hitbox : bool):
+        super().__init__(position, (0,0), PLAYER_RADIUS)
         self.rotation = 180
         self.rotation_inertia = self.rotation
         self.inertia = pygame.Vector2(0, 0)
@@ -82,7 +82,7 @@ class Player(CircleShape):
     def draw(self, screen):
         self.ship.draw_rotated(
             screen, 
-            self.position.x, self.position.y,  # pyright: ignore[reportAttributeAccessIssue]
+            self.position,
             self.rotation+180, self.timer_invul
         )
 

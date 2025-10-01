@@ -6,9 +6,9 @@ from asteroids.ores import CopperOre, SilverOre, GoldenOre, Diamond
 
 
 class AsteroidBasic(Asteroid):
-    def __init__(self, x, y, radius):
+    def __init__(self, position, velocity, max_speed, radius):
         color = random.randint(30, 80)
-        super().__init__(x, y, radius, (color, color, color), (color + 50, color + 50, color + 50), 1)
+        super().__init__(position, velocity, max_speed, radius, (color, color, color), (color + 50, color + 50, color + 50), 1)
 
 
     def split(self):
@@ -20,24 +20,24 @@ class AsteroidBasic(Asteroid):
             angle = random.randint(-15, 15)
 
             if loot_quality > 99:
-                loot = Diamond(self.position.x, self.position.y)
-                loot.velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
+                velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
+                loot = Diamond(self.position, velocity, int(self.max_speed * LOOT_SLOWDOWN))
             elif loot_quality > 95:
-                loot = GoldenOre(self.position.x, self.position.y)
-                loot.velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
+                velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
+                loot = GoldenOre(self.position, velocity, int(self.max_speed * LOOT_SLOWDOWN))
             elif loot_quality > 85:
-                loot = SilverOre(self.position.x, self.position.y)
-                loot.velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
+                velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
+                loot = SilverOre(self.position, velocity, int(self.max_speed * LOOT_SLOWDOWN))
             elif loot_quality > 60:
-                loot = CopperOre(self.position.x, self.position.y)
-                loot.velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
+                velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
+                loot = CopperOre(self.position, velocity, int(self.max_speed * LOOT_SLOWDOWN))
 
         else:
             split_angle = random.uniform(20, 50)
             new_radius = self.radius - ASTEROID_MIN_RADIUS
 
-            asteroid_1 = AsteroidBasic(self.position.x, self.position.y, new_radius)
-            asteroid_1.velocity = self.velocity.rotate(split_angle) * 1.3
+            velocity = self.velocity.rotate(split_angle) * 1.3
+            asteroid_1 = AsteroidBasic(self.position, velocity, int(self.max_speed * 1.3), new_radius)
             
-            asteroid_2 = AsteroidBasic(self.position.x, self.position.y, new_radius)
-            asteroid_2.velocity = self.velocity.rotate(-split_angle) * 1.3
+            velocity = self.velocity.rotate(-split_angle) * 1.3
+            asteroid_2 = AsteroidBasic(self.position, velocity, int(self.max_speed * 1.3), new_radius)

@@ -6,8 +6,8 @@ from shapes.circleshape import CircleShape
 
 class ProjectilePlasma(CircleShape):
     layer = 60 # pyright: ignore
-    def __init__(self, x, y):
-        super().__init__(x, y, 5)
+    def __init__(self, position, velocity):
+        super().__init__(position, velocity, 5)
 
     
     def draw(self, screen):

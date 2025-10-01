@@ -7,11 +7,20 @@ from shapes.circleshape import CircleShape
 
 class Asteroid(CircleShape):
     layer = 30 # pyright: ignore
-    def __init__(self, x, y, radius, color_fill, color_outline, reward):
-        super().__init__(x, y, radius)
-        self.size = int(self.radius / ASTEROID_MIN_RADIUS)
-        self.has_been_hit = False
-        self.reward = reward
+    def __init__(self, 
+                 position : pygame.Vector2, 
+                 velocity : pygame.Vector2, 
+                 max_speed : int, 
+                 radius : int, 
+                 color_fill : tuple[int, int, int], 
+                 color_outline : tuple[int, int, int], 
+                 reward : int
+    ):
+        super().__init__(position, velocity, radius)
+        self.max_speed : int = max_speed
+        self.size : int = int(self.radius / ASTEROID_MIN_RADIUS)
+        self.has_been_hit : bool = False
+        self.reward : int = reward
 
         self.color_fill = color_fill
         self.color_outline = color_outline
@@ -49,5 +58,5 @@ class Asteroid(CircleShape):
     def __recalculate_points_for_drawing(self):
         new_points = []
         for point in self.default_points:
-            new_points.append((int(point[0]) + self.position.x, int(point[1]) + self.position.y))
+            new_points.append((int(point[0]) + self.position[0], int(point[1]) + self.position[1]))
         return new_points

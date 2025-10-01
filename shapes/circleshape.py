@@ -1,17 +1,21 @@
 import pygame
+from copy import deepcopy
 
 from constants import *
 
 
 class CircleShape(pygame.sprite.Sprite):
-    def __init__(self, x, y, radius):
+    def __init__(self, position, velocity, radius, create_copy_of_position=False):
         if hasattr(self, "containers"):
             super().__init__(self.containers) # pyright: ignore[reportAttributeAccessIssue]
         else:
             super().__init__()
         
-        self.position = pygame.Vector2(x, y)
-        self.velocity = pygame.Vector2(0, 0)
+        if create_copy_of_position:
+            self.position : pygame.Vector2 = deepcopy(position)
+        else:
+            self.position : pygame.Vector2 = position
+        self.velocity : pygame.Vector2 = deepcopy(velocity)
         self.radius = radius
 
 

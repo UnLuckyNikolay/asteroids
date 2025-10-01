@@ -29,5 +29,5 @@ class PlasmaGun(Weapon):
     
     def __spawn_bullet(self, dot, position, rotation):
         spawn = pygame.Vector2(dot).rotate(rotation)
-        shot = ProjectilePlasma(int(position.x + spawn.x), int(position.y + spawn.y))
-        shot.velocity = pygame.Vector2(0, 1).rotate(rotation) * self.__projectile_speed
+        velocity = pygame.Vector2(0, 1).rotate(rotation) * self.__projectile_speed
+        shot = ProjectilePlasma(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), velocity)

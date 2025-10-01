@@ -7,8 +7,8 @@ from vfx.explosion import Explosion
 
 class Bomb(CircleShape):
     layer = 20 # pyright: ignore
-    def __init__(self, x, y, explosion_radius):
-        super().__init__(x, y, 15)
+    def __init__(self, position, velocity, explosion_radius):
+        super().__init__(position, velocity, 15)
         self.time = 0
         self.color_change = 0
         self.explosion_radius = explosion_radius
@@ -26,6 +26,6 @@ class Bomb(CircleShape):
             pygame.draw.circle(screen, (115, 0, 0), self.position, self.radius + 2, 3)
         else: 
             self.kill()
-            explosion = Explosion(self.position.x, self.position.y, self.explosion_radius)
-            hitbox = BombExplosion(self.position.x, self.position.y, self.explosion_radius)
+            explosion = Explosion(self.position, self.explosion_radius)
+            hitbox = BombExplosion(self.position, self.explosion_radius)
             
