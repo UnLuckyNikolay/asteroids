@@ -6,9 +6,9 @@ from shapes.circleshape import CircleShape
 
 class Ore(CircleShape):
     layer = 30 # pyright: ignore
-    def __init__(self, position, velocity, max_speed, color_fill, color_outline, price, radius, draw_points):
+    def __init__(self, position, velocity, color_fill, color_outline, price, radius, draw_points):
         super().__init__(position, velocity, radius)
-        self.max_speed : int = max_speed
+        self.max_speed : int = 250
         self.size = int(self.radius / ASTEROID_MIN_RADIUS)
         self.price = price
 
@@ -51,17 +51,17 @@ class Ore(CircleShape):
         return new_points
     
 class Diamond(Ore):
-    def __init__(self, position, velocity, max_speed):
-        super().__init__(position, velocity, max_speed*2, (185, 242, 255), (125, 182, 195), 10, 5, 3)
+    def __init__(self, position, velocity):
+        super().__init__(position, velocity, (185, 242, 255), (125, 182, 195), 10, 5, 3)
     
 class GoldenOre(Ore):
-    def __init__(self, position, velocity, max_speed):
-        super().__init__(position, velocity, max_speed*2, (235, 205, 0), (175, 145, 0), 5, 7, 5)
+    def __init__(self, position, velocity):
+        super().__init__(position, velocity, (235, 205, 0), (175, 145, 0), 5, 7, 5)
     
 class SilverOre(Ore):
-    def __init__(self, position, velocity, max_speed):
-        super().__init__(position, velocity, max_speed*2, (224, 224, 224), (164, 164, 164), 3, 7, 5)
+    def __init__(self, position, velocity):
+        super().__init__(position, velocity, (224, 224, 224), (164, 164, 164), 3, 7, 5)
     
 class CopperOre(Ore):
-    def __init__(self, position, velocity, max_speed):
-        super().__init__(position, velocity, max_speed*2, (206, 112, 43), (146, 72, 13), 1, 7, 5)
+    def __init__(self, position, velocity):
+        super().__init__(position, velocity, (206, 112, 43), (146, 72, 13), 1, 7, 5)
