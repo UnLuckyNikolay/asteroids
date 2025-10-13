@@ -2,9 +2,9 @@
 
 import pygame, json
 from enum import Enum
-from tkinter import Tk, simpledialog
 
 from constants import *
+from json_helper.leaderboards.validator import ValidateLeaderboards
 from ui.container import Container, Allignment
 from ui.button import Button
 from ui.switch import Switch
@@ -39,8 +39,8 @@ class UserInterface(pygame.sprite.Sprite):
 
         # Getting the font
         font_path = "./fonts/anita-semi-square.normaali.ttf" #"../../fonts/anita-semi-square.normaali.ttf"
+        print(f"Trying to access file `{font_path}`")
         try:
-            print(f"Trying to access file `{font_path}`")
             with open(font_path, "r"):
                 pass
         except FileNotFoundError:
@@ -49,12 +49,7 @@ class UserInterface(pygame.sprite.Sprite):
         
         # Getting the scores
         self.leaderboards_path = "./leaderboard.json"
-        try:
-            print(f"Trying to access file `{self.leaderboards_path}`")
-            with open(self.leaderboards_path, "r") as file:
-                self.scores = json.load(file)
-        except FileNotFoundError:
-            self.scores = []
+        self.scores = ValidateLeaderboards(self.leaderboards_path)
 
         # Fonts
         self.font_small = pygame.font.Font(font_path, 24)
