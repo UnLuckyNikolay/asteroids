@@ -85,7 +85,7 @@ class UserInterface(pygame.sprite.Sprite):
     def _initialize_main_menu(self):
         center_x = int((self.game.screen_resolution[0])/2)
         center_y = int((self.game.screen_resolution[1])/2)
-        self.buttons_main_menu = (
+        self.buttons_main_menu = [
             # Start button, starts a Round
             Button(center_x-185, center_y-136, 370, 72, 8, 8, 20, 20, 
                    self.game.game_loop,
@@ -143,9 +143,9 @@ class UserInterface(pygame.sprite.Sprite):
                    self.color_golden, self.color_blue,
                    (Text("GM", 2, 7, self.font_small, self.color_blue),
                            Allignment.NONE)),
-        )
+        ]
         
-        self.containers_main_menu = (
+        self.containers_main_menu = [
             # Settings
             Container(10, self.game.screen_resolution[1]-80, 90, 20, 8, 2, 8, 2,
                       self.color_white,
@@ -156,10 +156,10 @@ class UserInterface(pygame.sprite.Sprite):
                       self.color_white,
                       (Text("Cheats", 13, 1, self.font_very_small, self.color_white),
                            Allignment.NONE)),
-        )
+        ]
 
     def _initialize_leaderboards(self):
-        self.buttons_leaderboards = (
+        self.buttons_leaderboards = [
             # Returns to the Main Menu
             Button(100, 68, 100, 36, 15, 3, 3, 15, 
                    lambda: self.switch_menu(Menu.MAIN_MENU),
@@ -167,8 +167,9 @@ class UserInterface(pygame.sprite.Sprite):
                    self.color_blue, self.color_gray,
                    (Text("Back", 18, 5, self.font_small, self.color_blue),
                            Allignment.NONE)),
-        )
-        self.containers_leaderboards = (
+        ]
+
+        self.containers_leaderboards = [
             # Name of the menu
             Container(self.game.screen_resolution[0] / 2 - 185, 35, 370, 72, 8, 8, 20, 20,
                       self.color_white,
@@ -176,11 +177,11 @@ class UserInterface(pygame.sprite.Sprite):
                            Allignment.NONE)),
             # List of high scores
             Leaderboards(int(self.game.screen_resolution[0]/2)-540, 145, self.font_medium, self.scores)
-        )
+        ]
 
     def _initialize_hud(self):
         # Space between elements - 10
-        self.containers_hud = (
+        self.containers_hud = [
             # Current weapon
             Container(25, 25, 548, 36, 10, 10, 5, 5, 
                       self.color_white,
@@ -208,14 +209,23 @@ class UserInterface(pygame.sprite.Sprite):
                       (HealthBar(102, 5, 2, 6,
                                 self.player.get_lives),
                                 Allignment.NONE)),
-        )
+        ]
+
+        if self.player.is_sus:
+            self.containers_hud.append(
+                # Cheats detected
+                Container(self.game.screen_resolution[0]-400, self.game.screen_resolution[1]-25, 400, 25, 5, 0, 0, 0, 
+                        self.color_white,
+                        (Text("Cheats enabled! Score won't be saved.", 6, 3, self.font_very_small, self.color_white),
+                                Allignment.NONE))
+            )
 
     def _initialize_pause_menu(self):
         # Space between elements - 15
         offset_x = int((self.game.screen_resolution[0] - 1280)/2)
         offset_y = int((self.game.screen_resolution[1] - 720)/2)
         row_height = 51
-        self.buttons_pause_menu = (
+        self.buttons_pause_menu = [
             # Model switching
             Button(offset_x+290, offset_y+65+row_height*1, 36, 36, 6, 3, 3, 6, 
                    self.player.switch_ship_model_to_previous,
@@ -271,8 +281,9 @@ class UserInterface(pygame.sprite.Sprite):
                    self.color_red, self.color_gray,
                    (Text("End Run", 54, 10, self.font_big, self.color_red),
                         Allignment.NONE)),
-        )
-        self.containers_pause_menu = (
+        ]
+
+        self.containers_pause_menu = [
             # Background
             Container(offset_x+50, offset_y+50, 1180, 540, 20, 20, 8, 20,
                       self.color_white),
@@ -356,7 +367,7 @@ class UserInterface(pygame.sprite.Sprite):
                       (TextH("Radius: {}g", 12, 5, self.font_small, self.color_white,
                             lambda: self.player.get_upgrade_price(ShipPart.WEAPON2)),
                             Allignment.NONE)),
-        )
+        ]
 
     def _initialize_name_check(self):
         root_x = self.game.screen_resolution[0]/2-225

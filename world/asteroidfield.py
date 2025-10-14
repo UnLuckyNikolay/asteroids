@@ -40,7 +40,6 @@ class AsteroidField(pygame.sprite.Sprite):
             ],
         ]
         self.spawn_time = (ASTEROID_SPAWN_RATE * (1280*720) / (screen_resolution[0]*screen_resolution[1]))
-        print(f">>> Setting Asteroid Field size to {screen_resolution[0]}x{screen_resolution[1]}, spawns {self.spawn_time}")
     
     def update(self, dt):
         self.time_passed_for_spawns += dt

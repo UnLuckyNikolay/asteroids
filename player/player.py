@@ -57,10 +57,10 @@ class Player(CircleShape):
         self.weapons.append(BombLauncher())
         self.weapon = self.weapons[0]
 
+        self.is_sus = False
+        """True if cheats are enabled"""
         if cheat_godmode or cheat_hitbox or cheat_stonks:
-            self.sus = True
-        else:
-            self.sus = False
+            self.is_sus = True
     
 
     @property

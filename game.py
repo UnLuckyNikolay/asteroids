@@ -160,7 +160,7 @@ class Game():
                 self.redraw_objects_and_ui()
 
         # Saving score and going back to Main Menu
-        if not self.player.sus and self.gsm.score > 0:
+        if not self.player.is_sus and self.gsm.score > 0:
             self.ui.switch_menu(Menu.NAME_CHECK)
             self.ui.check_score(self.gsm.score)
         self.ui.switch_menu(Menu.MAIN_MENU)
