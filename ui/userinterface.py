@@ -52,6 +52,7 @@ class UserInterface(pygame.sprite.Sprite):
         self.scores = ValidateLeaderboards(self.leaderboards_path)
 
         # Fonts
+        self.font_very_small = pygame.font.Font(font_path, 16)
         self.font_small = pygame.font.Font(font_path, 24)
         self.font_medium = pygame.font.Font(font_path, 32)
         self.font_big = pygame.font.Font(font_path, 48)
@@ -108,39 +109,52 @@ class UserInterface(pygame.sprite.Sprite):
                            Allignment.NONE)),
 
             # Regenerate background
-            Button(15, self.game.screen_resolution[1]-55, 40, 40, 8, 8, 8, 8,
+            Button(10, self.game.screen_resolution[1]-50, 40, 40, 8, 8, 8, 8,
                    self.game.handler_regenerate_background,
                    lambda: True,
                    self.color_blue, self.color_gray,
                    (Text("BG", 4, 7, self.font_small, self.color_blue),
                            Allignment.NONE)),
             # Switch Fullscreen
-            Switch(70, self.game.screen_resolution[1]-55, 40, 40, 8, 8, 8, 8,
+            Switch(60, self.game.screen_resolution[1]-50, 40, 40, 8, 8, 8, 8,
                    self.game.switch_fullscreen,
                    self.game.is_fullscreen,
                    self.color_green, self.color_blue,
                    (SymbolFullscreen(0, 0, self.color_blue), Allignment.CENTER)),
 
             # Cheat - Show hitbox
-            Switch(self.game.screen_resolution[0]-165, self.game.screen_resolution[1]-55, 40, 40, 8, 8, 8, 8,
+            Switch(self.game.screen_resolution[0]-150, self.game.screen_resolution[1]-50, 40, 40, 8, 8, 8, 8,
                    self.game.switch_hitbox,
                    self.game.cheat_hitbox,
                    self.color_golden, self.color_blue,
                    (Text("HB", 3, 7, self.font_small, self.color_blue),
                            Allignment.NONE)),
             # Cheat - Money cheat
-            Switch(self.game.screen_resolution[0]-110, self.game.screen_resolution[1]-55, 40, 40, 8, 8, 8, 8,
+            Switch(self.game.screen_resolution[0]-100, self.game.screen_resolution[1]-50, 40, 40, 8, 8, 8, 8,
                    self.game.switch_stonks,
                    self.game.cheat_stonks,
                    self.color_golden, self.color_blue,
                    (Text("MN", 2, 7, self.font_small, self.color_blue),
                            Allignment.NONE)),
             # Cheat - Godmode
-            Switch(self.game.screen_resolution[0]-55, self.game.screen_resolution[1]-55, 40, 40, 8, 8, 8, 8,
+            Switch(self.game.screen_resolution[0]-50, self.game.screen_resolution[1]-50, 40, 40, 8, 8, 8, 8,
                    self.game.switch_godmode,
                    self.game.cheat_godmode,
                    self.color_golden, self.color_blue,
                    (Text("GM", 2, 7, self.font_small, self.color_blue),
+                           Allignment.NONE)),
+        )
+        
+        self.containers_main_menu = (
+            # Settings
+            Container(10, self.game.screen_resolution[1]-80, 90, 20, 8, 2, 8, 2,
+                      self.color_white,
+                      (Text("Settings", 5, 1, self.font_very_small, self.color_white),
+                           Allignment.NONE)),
+            # Cheats
+            Container(self.game.screen_resolution[0]-100, self.game.screen_resolution[1]-80, 90, 20, 2, 8, 2, 8,
+                      self.color_white,
+                      (Text("Cheats", 13, 1, self.font_very_small, self.color_white),
                            Allignment.NONE)),
         )
 
@@ -474,6 +488,9 @@ class UserInterface(pygame.sprite.Sprite):
                 print(f"> Error: missing menu {self.__current_menu.value} in UserInterface.draw")        
 
     def draw_main_menu(self, screen):
+        for container in self.containers_main_menu:
+            container.draw(screen)
+        
         for button in self.buttons_main_menu:
             button.draw(screen)
 
