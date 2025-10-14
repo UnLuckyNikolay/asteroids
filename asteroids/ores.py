@@ -5,7 +5,7 @@ from shapes.circleshape import CircleShape
 
 
 class Ore(CircleShape):
-    layer = 30 # pyright: ignore
+    layer = 40 # pyright: ignore
     def __init__(self, position, velocity, color_fill, color_outline, price, radius, draw_points):
         super().__init__(position, velocity, radius)
         self.max_speed : int = 250

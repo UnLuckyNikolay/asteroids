@@ -65,6 +65,7 @@ class Game():
         # 10 - Explosion
         # 20 - Bomb
         # 30 - Asteroid(and children)
+        # 40 - Loot
         # 50 - Player
         # 60 - ProjectilePlasma
         # 100 - UserInterface
