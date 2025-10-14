@@ -9,10 +9,14 @@ from player.ship_parts.magnet import Magnet
 from ui.sprites.ship import Ship, ShipType
 
 
+# New upgrades should be added to methods get_upgrade_level and buy_upgrade
 class ShipPart(Enum):
+    """List of player upgrades"""
+
     WEAPON1 = "Weapon 1"
     WEAPON2 = "Weapon 2"
     MAGNETRADIUS = "Magnet Radius"
+    MAGNETSTRENGTH = "Magnet Strength"
 
 class Player(CircleShape):
     layer = 50 # pyright: ignore
@@ -119,7 +123,7 @@ class Player(CircleShape):
         elif self.position.y > screen_resolution[1] + ASTEROID_MAX_RADIUS:
             self.position.y = -ASTEROID_MAX_RADIUS
 
-    def attempt_shot(self, time_since_last_shot):
+    def attempt_shot(self, time_since_last_shot) -> bool:
         return self.weapon.attempt_shot(self.position, self.rotation, time_since_last_shot)
 
     def update(self, dt):
@@ -174,7 +178,7 @@ class Player(CircleShape):
                 self.color_outline = list(PLAYER_COLOR_OUTLINE)
                 self.color_fill = list(PLAYER_COLOR_FILL)
 
-    def take_damage_and_check_if_alive(self, gsm):
+    def take_damage_and_check_if_alive(self, gsm) -> bool:
         if self.cheat_godmode:
             return self.is_alive
         elif self.lives > 1:
@@ -193,21 +197,21 @@ class Player(CircleShape):
 
     ### Getters
     
-    def get_money(self):
+    def get_money(self) -> int:
         return self.money
 
-    def get_current_weapon_name(self):
+    def get_current_weapon_name(self) -> str:
         return self.weapon.get_name()
     
-    def get_current_weapon_level(self):
+    def get_current_weapon_level(self) -> int:
         return self.weapon.get_level()
     
     ### Ship
 
-    def get_ship(self):
+    def get_ship(self) -> Ship:
         return self.ship
     
-    def get_ship_name(self):
+    def get_ship_name(self) -> str:
         return self.ship.type.value
     
     def switch_ship_model_to_next(self):
@@ -220,13 +224,13 @@ class Player(CircleShape):
     
     ### Health
     
-    def get_lives(self):
+    def get_lives(self) -> int:
         return self.lives
 
-    def get_price_heal(self):
+    def get_price_heal(self) -> int:
         return (1+self.times_healed) * 5
     
-    def can_heal(self):
+    def can_heal(self) -> bool:
         return (self.money >= self.get_price_heal() 
                 and self.lives < self.lives_max)
     
@@ -246,6 +250,8 @@ class Player(CircleShape):
                 return self.weapons[1].get_level()
             case ShipPart.MAGNETRADIUS:
                 return self.magnet.radius_level
+            case ShipPart.MAGNETSTRENGTH:
+                return self.magnet.strength_level
             
     def get_upgrade_price(self, ship_part : ShipPart) -> int:
         level = self.get_upgrade_level(ship_part)
@@ -257,7 +263,7 @@ class Player(CircleShape):
             case _:
                 return 999999
             
-    def can_buy_upgrade(self, ship_part : ShipPart):
+    def can_buy_upgrade(self, ship_part : ShipPart) -> bool:
         return (self.money >= self.get_upgrade_price(ship_part))
     
     def buy_upgrade(self, ship_part : ShipPart):
@@ -269,3 +275,5 @@ class Player(CircleShape):
                 self.weapons[1].upgrade()
             case ShipPart.MAGNETRADIUS:
                 self.magnet.upgrade_radius()
+            case ShipPart.MAGNETSTRENGTH:
+                self.magnet.upgrade_strength()

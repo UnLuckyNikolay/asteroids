@@ -150,7 +150,7 @@ class Game():
                         self.player.collect_loot(loot.price)
                         loot.kill()
                     elif loot.check_colision(self.player.magnet):
-                        loot.home_towards(self.player.position)
+                        loot.home_towards(self.player.position, self.player.magnet.strength)
 
                 self.dt = self.redraw_objects_and_ui()
 

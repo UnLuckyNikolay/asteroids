@@ -26,9 +26,9 @@ class Ore(CircleShape):
     def update(self, dt):
         self.position += self.velocity * dt
 
-    def home_towards(self, position : pygame.Vector2):
+    def home_towards(self, position : pygame.Vector2, homing_strength : int):
         direction_vector = (position - self.position).normalize() * self.max_speed
-        self.velocity = self.velocity.move_towards(direction_vector, HOMING_SPEED)
+        self.velocity = self.velocity.move_towards(direction_vector, homing_strength)
 
 
     def __get_points_for_drawing(self, draw_points):
