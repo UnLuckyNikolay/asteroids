@@ -35,6 +35,7 @@ class Game():
         self.player_name = "Player"
 
         self.cheat_godmode = False
+        self.cheat_stonks = False
         self.cheat_hitbox = False
 
         self.updatable = pygame.sprite.Group()   # This group is cleaned (object.kill()) after each round
@@ -85,7 +86,7 @@ class Game():
 
     def game_loop(self):
         self.player = Player(self, pygame.Vector2(self.screen_resolution[0] / 2, self.screen_resolution[1] / 2),
-                             self.cheat_godmode, self.cheat_hitbox)
+                             self.cheat_godmode, self.cheat_stonks, self.cheat_hitbox)
         self.gsm = GameStateManager(self.player)
         self.asteroid_field = AsteroidField(self, self.player, self.screen_resolution)
         self.ui.gsm = self.gsm
@@ -158,7 +159,7 @@ class Game():
                 self.redraw_objects_and_ui()
 
         # Saving score and going back to Main Menu
-        if not self.cheat_godmode and self.gsm.score > 0:
+        if not self.player.sus and self.gsm.score > 0:
             self.ui.switch_menu(Menu.NAME_CHECK)
             self.ui.check_score(self.gsm.score)
         self.ui.switch_menu(Menu.MAIN_MENU)
@@ -259,6 +260,9 @@ class Game():
         self.cheat_godmode = False if self.cheat_godmode else True
         if self.player != None:
             self.player.cheat_godmode = self.cheat_godmode
+
+    def switch_stonks(self):
+        self.cheat_stonks = False if self.cheat_stonks else True
 
     def switch_hitbox(self):
         self.cheat_hitbox = False if self.cheat_hitbox else True

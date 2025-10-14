@@ -1,4 +1,5 @@
 import pygame
+from enum import Enum
 
 from constants import *
 from shapes.circleshape import CircleShape
@@ -8,9 +9,14 @@ from player.ship_parts.magnet import Magnet
 from ui.sprites.ship import Ship, ShipType
 
 
+class ShipPart(Enum):
+    WEAPON1 = "Weapon 1"
+    WEAPON2 = "Weapon 2"
+    MAGNET = "Magnet"
+
 class Player(CircleShape):
     layer = 50 # pyright: ignore
-    def __init__(self, game, position : pygame.Vector2, cheat_godmode : bool, cheat_hitbox : bool):
+    def __init__(self, game, position : pygame.Vector2, cheat_godmode : bool, cheat_stonks : bool, cheat_hitbox : bool):
         super().__init__(position, (0,0), PLAYER_RADIUS)
         self.rotation = 180
         self.rotation_inertia = self.rotation
@@ -36,7 +42,7 @@ class Player(CircleShape):
         self.ship = Ship(self.unlocked_ships[self.ship_model], self.radius, cheat_hitbox)
         self.magnet = Magnet(self.position, 100)
 
-        self.money = 0
+        self.money = 0 if not cheat_stonks else 9999
         self.lives = 3
         self.lives_max = 3
         self.times_healed = 0
@@ -46,6 +52,11 @@ class Player(CircleShape):
         self.weapons.append(PlasmaGun())
         self.weapons.append(BombLauncher())
         self.weapon = self.weapons[0]
+
+        if cheat_godmode or cheat_hitbox or cheat_stonks:
+            self.sus = True
+        else:
+            self.sus = False
     
 
     @property
@@ -219,7 +230,16 @@ class Player(CircleShape):
         if self.lives < self.lives_max:
             self.lives += 1
     
-    ### Weapons
+    ### Upgrades
+
+    def get_level(self, ship_part : ShipPart):
+        match ship_part:
+            case ShipPart.WEAPON1:
+                return self.weapons[0].get_level()
+            case ShipPart.WEAPON2:
+                return self.weapons[1].get_level()
+            case ShipPart.MAGNET:
+                return self.magnet.level
     
     def get_current_weapon_name(self):
         return self.weapon.get_name()

@@ -122,11 +122,18 @@ class UserInterface(pygame.sprite.Sprite):
                    (SymbolFullscreen(0, 0, self.color_blue), Allignment.CENTER)),
 
             # Cheat - Show hitbox
-            Switch(self.game.screen_resolution[0]-110, self.game.screen_resolution[1]-55, 40, 40, 8, 8, 8, 8,
+            Switch(self.game.screen_resolution[0]-165, self.game.screen_resolution[1]-55, 40, 40, 8, 8, 8, 8,
                    self.game.switch_hitbox,
                    self.game.cheat_hitbox,
                    self.color_golden, self.color_blue,
                    (Text("HB", 3, 7, self.font_small, self.color_blue),
+                           Allignment.NONE)),
+            # Cheat - Money cheat
+            Switch(self.game.screen_resolution[0]-110, self.game.screen_resolution[1]-55, 40, 40, 8, 8, 8, 8,
+                   self.game.switch_stonks,
+                   self.game.cheat_stonks,
+                   self.color_golden, self.color_blue,
+                   (Text("MN", 2, 7, self.font_small, self.color_blue),
                            Allignment.NONE)),
             # Cheat - Godmode
             Switch(self.game.screen_resolution[0]-55, self.game.screen_resolution[1]-55, 40, 40, 8, 8, 8, 8,
