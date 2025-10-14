@@ -211,11 +211,11 @@ class Player(CircleShape):
         return self.ship.type.value
     
     def switch_ship_model_to_next(self):
-        self.ship_model = (self.ship_model+1)%len(self.unlocked_ships)
+        self.ship_model = (self.ship_model+1) % len(self.unlocked_ships)
         self.ship.switch_model(self.unlocked_ships[self.ship_model])
     
     def switch_ship_model_to_previous(self):
-        self.ship_model = (self.ship_model-1)%len(self.unlocked_ships)
+        self.ship_model = (self.ship_model-1) % len(self.unlocked_ships)
         self.ship.switch_model(self.unlocked_ships[self.ship_model])
     
     ### Health

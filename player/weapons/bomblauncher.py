@@ -24,7 +24,7 @@ class BombLauncher(Weapon):
             case 1:
                 bomb = Bomb(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), pygame.Vector2(0, 0), 100)
             case 2:
-                bomb = Bomb(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), pygame.Vector2(0, 0), 100)
+                bomb = Bomb(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), pygame.Vector2(0, 0), 150)
             case 3:
-                bomb = Bomb(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), pygame.Vector2(0, 0), 100)
+                bomb = Bomb(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), pygame.Vector2(0, 0), 200)
                 

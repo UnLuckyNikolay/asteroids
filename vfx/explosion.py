@@ -23,6 +23,8 @@ class Explosion(CircleShape):
 
     def get_points_for_drawing(self, size_L, size_M, size_S):
         amount_of_points = int(self.radius / ASTEROID_MIN_RADIUS * 2 + 6 + random.randint(1, 4) * 2)
+        if amount_of_points % 2 == 1:
+            amount_of_points += 1
         points_L, points_M, points_S = [], [], []
         random_radius = self.radius * random.uniform(0.8, 1)
         point_far = True
