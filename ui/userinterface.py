@@ -13,7 +13,7 @@ from ui.sprites.healthbar import HealthBar
 from ui.sprites.leaderboards import Leaderboards
 from ui.sprites.symbol_fullscreen import SymbolFullscreen
 from gamestatemanager import GameStateManager
-from player.player import Player
+from player.player import Player, ShipPart
 
 
 class Menu(Enum):
@@ -200,38 +200,46 @@ class UserInterface(pygame.sprite.Sprite):
         # Space between elements - 15
         offset_x = int((self.game.screen_resolution[0] - 1280)/2)
         offset_y = int((self.game.screen_resolution[1] - 720)/2)
+        row_height = 51
         self.buttons_pause_menu = (
             # Model switching
-            Button(offset_x+290, offset_y+116, 36, 36, 6, 3, 3, 6, 
+            Button(offset_x+290, offset_y+65+row_height*1, 36, 36, 6, 3, 3, 6, 
                    self.player.switch_ship_model_to_previous,
                    lambda: True,
                    self.color_blue, self.color_gray,
                    (Text("<", 12, 5, self.font_small, self.color_blue),
                         Allignment.NONE)),
-            Button(offset_x+709, offset_y+116, 36, 36, 3, 6, 6, 3, 
+            Button(offset_x+709, offset_y+65+row_height*1, 36, 36, 3, 6, 6, 3, 
                    self.player.switch_ship_model_to_next,
                    lambda: True,
                    self.color_blue, self.color_gray,
                    (Text(">", 12, 5, self.font_small, self.color_blue),
                         Allignment.NONE)),
             # Heal
-            Button(offset_x+709, offset_y+167, 36, 36, 3, 6, 6, 3,
+            Button(offset_x+709, offset_y+65+row_height*2, 36, 36, 3, 6, 6, 3,
                    self.player.buy_heal,
                    self.player.can_heal,
                    self.color_green, self.color_gray,
                    (Text("/\\", 5, 5, self.font_small, self.color_green),
                         Allignment.NONE)),
-
-            # Upgrade weapons
-            Button(offset_x+1179, offset_y+167, 36, 36, 3, 6, 6, 3,
-                   lambda: self.player.buy_upgrade_weapon(0),
-                   lambda: self.player.can_upgrade_weapon(0),
+            # Magnet
+            Button(offset_x+709, offset_y+65+row_height*4, 36, 36, 3, 6, 6, 3,
+                   lambda: self.player.buy_upgrade(ShipPart.MAGNETRADIUS),
+                   lambda: self.player.can_buy_upgrade(ShipPart.MAGNETRADIUS),
                    self.color_green, self.color_gray,
                    (Text("/\\", 5, 5, self.font_small, self.color_green),
                         Allignment.NONE)),
-            Button(offset_x+1179, offset_y+269, 36, 36, 3, 6, 6, 3,
-                   lambda: self.player.buy_upgrade_weapon(1),
-                   lambda: self.player.can_upgrade_weapon(1),
+
+            # Upgrade weapons
+            Button(offset_x+1179, offset_y+65+row_height*2, 36, 36, 3, 6, 6, 3,
+                   lambda: self.player.buy_upgrade(ShipPart.WEAPON1),
+                   lambda: self.player.can_buy_upgrade(ShipPart.WEAPON1),
+                   self.color_green, self.color_gray,
+                   (Text("/\\", 5, 5, self.font_small, self.color_green),
+                        Allignment.NONE)),
+            Button(offset_x+1179, offset_y+65+row_height*4, 36, 36, 3, 6, 6, 3,
+                   lambda: self.player.buy_upgrade(ShipPart.WEAPON2),
+                   lambda: self.player.can_buy_upgrade(ShipPart.WEAPON2),
                    self.color_green, self.color_gray,
                    (Text("/\\", 5, 5, self.font_small, self.color_green),
                         Allignment.NONE)),
@@ -261,14 +269,24 @@ class UserInterface(pygame.sprite.Sprite):
                       (TextH("Model: {}", 12, 5, self.font_small, self.color_white,
                             self.player.get_ship_name),
                             Allignment.NONE)),
-            Container(offset_x+336, offset_y+116, 363, 36, 3, 3, 3, 3,
+            Container(offset_x+336, offset_y+65+row_height*1, 363, 36, 3, 3, 3, 3,
                       self.color_white,
                       (Text("Switch model", 12, 5, self.font_small, self.color_white),
                             Allignment.NONE)),
-            Container(offset_x+290, offset_y+167, 409, 36, 6, 3, 3, 6,
+            Container(offset_x+290, offset_y+65+row_height*2, 409, 36, 6, 3, 3, 6,
                       self.color_white,
                       (TextH("Heal: {}g", 12, 5, self.font_small, self.color_white,
                             self.player.get_price_heal),
+                            Allignment.NONE)),
+            Container(offset_x+290, offset_y+65+row_height*3, 455, 36, 6, 6, 6, 6,
+                      self.color_white,
+                      (TextH("Magnet.r{}", 12, 5, self.font_small, self.color_white,
+                            lambda: self.player.get_upgrade_level(ShipPart.MAGNETRADIUS)),
+                            Allignment.NONE)),
+            Container(offset_x+290, offset_y+65+row_height*4, 409, 36, 6, 3, 3, 6,
+                      self.color_white,
+                      (TextH("Radius: {}g", 12, 5, self.font_small, self.color_white,
+                            lambda: self.player.get_upgrade_price(ShipPart.MAGNETRADIUS)),
                             Allignment.NONE)),
 
             # Current stats
@@ -290,27 +308,27 @@ class UserInterface(pygame.sprite.Sprite):
                                 self.player.get_lives),
                                 Allignment.NONE)),
             # List - weapons
-            Container(offset_x+760, offset_y+116, 455, 36, 6, 6, 6, 6,
+            Container(offset_x+760, offset_y+65+row_height*1, 455, 36, 6, 6, 6, 6,
                       self.color_white,
                       (TextH("Weapon 1: {}.v{}", 12, 5, self.font_small, self.color_white,
                             self.player.weapons[0].get_name,
-                            self.player.weapons[0].get_level),
+                            lambda: self.player.get_upgrade_level(ShipPart.WEAPON1)),
                             Allignment.NONE)),
-            Container(offset_x+760, offset_y+167, 409, 36, 6, 3, 3, 6,
+            Container(offset_x+760, offset_y+65+row_height*2, 409, 36, 6, 3, 3, 6,
                       self.color_white,
                       (TextH("Projectiles: {}g", 12, 5, self.font_small, self.color_white,
-                            lambda: self.player.get_price_weapons(0)),
+                            lambda: self.player.get_upgrade_price(ShipPart.WEAPON1)),
                             Allignment.NONE)),
-            Container(offset_x+760, offset_y+218, 455, 36, 6, 6, 6, 6,
+            Container(offset_x+760, offset_y+65+row_height*3, 455, 36, 6, 6, 6, 6,
                       self.color_white,
                       (TextH("Weapon 2: {}.v{}", 12, 5, self.font_small, self.color_white,
                             self.player.weapons[1].get_name,
-                            self.player.weapons[1].get_level),
+                            lambda: self.player.get_upgrade_level(ShipPart.WEAPON2)),
                             Allignment.NONE)),
-            Container(offset_x+760, offset_y+269, 409, 36, 6, 3, 3, 6,
+            Container(offset_x+760, offset_y+65+row_height*4, 409, 36, 6, 3, 3, 6,
                       self.color_white,
                       (TextH("Radius: {}g", 12, 5, self.font_small, self.color_white,
-                            lambda: self.player.get_price_weapons(1)),
+                            lambda: self.player.get_upgrade_price(ShipPart.WEAPON2)),
                             Allignment.NONE)),
         )
 

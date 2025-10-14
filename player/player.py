@@ -12,7 +12,7 @@ from ui.sprites.ship import Ship, ShipType
 class ShipPart(Enum):
     WEAPON1 = "Weapon 1"
     WEAPON2 = "Weapon 2"
-    MAGNET = "Magnet"
+    MAGNETRADIUS = "Magnet Radius"
 
 class Player(CircleShape):
     layer = 50 # pyright: ignore
@@ -195,6 +195,12 @@ class Player(CircleShape):
     
     def get_money(self):
         return self.money
+
+    def get_current_weapon_name(self):
+        return self.weapon.get_name()
+    
+    def get_current_weapon_level(self):
+        return self.weapon.get_level()
     
     ### Ship
 
@@ -232,33 +238,34 @@ class Player(CircleShape):
     
     ### Upgrades
 
-    def get_level(self, ship_part : ShipPart):
+    def get_upgrade_level(self, ship_part : ShipPart) -> int:
         match ship_part:
             case ShipPart.WEAPON1:
                 return self.weapons[0].get_level()
             case ShipPart.WEAPON2:
                 return self.weapons[1].get_level()
-            case ShipPart.MAGNET:
-                return self.magnet.level
-    
-    def get_current_weapon_name(self):
-        return self.weapon.get_name()
-    
-    def get_current_weapon_level(self):
-        return self.weapon.get_level()
-
-    def get_price_weapons(self, weapon_num):
-        match self.weapons[weapon_num].get_level():
+            case ShipPart.MAGNETRADIUS:
+                return self.magnet.radius_level
+            
+    def get_upgrade_price(self, ship_part : ShipPart) -> int:
+        level = self.get_upgrade_level(ship_part)
+        match level:
             case 1:
                 return 15
             case 2:
                 return 50
             case _:
                 return 999999
+            
+    def can_buy_upgrade(self, ship_part : ShipPart):
+        return (self.money >= self.get_upgrade_price(ship_part))
     
-    def can_upgrade_weapon(self, weapon_num):
-        return (self.money >= self.get_price_weapons(weapon_num))
-    
-    def buy_upgrade_weapon(self, weapon_num):
-        self.money = self.money - self.get_price_weapons(weapon_num)
-        self.weapons[weapon_num].upgrade()
+    def buy_upgrade(self, ship_part : ShipPart):
+        self.money -= self.get_upgrade_price(ship_part)
+        match ship_part:
+            case ShipPart.WEAPON1:
+                self.weapons[0].upgrade()
+            case ShipPart.WEAPON2:
+                self.weapons[1].upgrade()
+            case ShipPart.MAGNETRADIUS:
+                self.magnet.upgrade_radius()
