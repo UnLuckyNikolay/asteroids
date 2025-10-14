@@ -47,7 +47,7 @@ class AsteroidField(pygame.sprite.Sprite):
 
         spawn_time = self.spawn_time*self.spawn_time_mp
 
-        if self.time_passed_for_spawns > spawn_time:
+        while self.time_passed_for_spawns > spawn_time:
             self.time_passed_for_spawns -= spawn_time
 
             edge = random.choice(self.edges)
@@ -58,7 +58,7 @@ class AsteroidField(pygame.sprite.Sprite):
             kind = random.randint(1, ASTEROID_KINDS)
             self.__spawn(ASTEROID_MIN_RADIUS * kind, position, velocity, speed)
             
-        if self.time_passed_for_difficulty >= 15:
+        while self.time_passed_for_difficulty >= 15:
             self.time_passed_for_difficulty -= 15
             self.spawn_time_mp *= DIFFICULTY_INCREASE_MP
 
