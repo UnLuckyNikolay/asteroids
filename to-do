@@ -5,17 +5,33 @@ FIXES/TWEAKS:
 +++ AsteroidField doesn't scale with window size change. Asteroid deletion does tho
 +++ BombLauncher - Explosion isn't properly scaled with level
 +++ Check loot layer
-Rename and move UserInterface class
+Rename and move UserInterface class (possibly to GameStateManager), rename GameStateManager to RoundStateManager
 Upgrade movement to properly handle turning of vectors, something is broken when turning without moving
+Update screenshots in README
+Check how to add support for different keyboard layouts
+Change how max level upgrades are displayed (will need new buttons)
+Add minimum asteroid price
+Increase alpha of background of the pause menu (might need new buttons)
 
 IDEAS:
-Redo buttons, rename containers (planes maybe), add `hidden` option to them
+Redo buttons, rename containers (`planes` maybe), add `hidden` option to them
 Revisit visible naming scheme for ship parts
-Add ship recolors (will need new buttons)
+Add ship recolors (might need new buttons)
+More ship skins
+More weapons
 Show current timer/difficulty modifier
 Additional weapon upgrades (short fuse for the Bomb Launcher, will need naming scheme revisited)
+Profiles
+Persistent upgrades (will need profiles)
+Saved name/ship settings (will need profiles)
+Graphics/color adjustments for the leaderboards for top places
+Bubble (or any other different) explosion vfx for bombs
 
-DISTANT IDEAS:
-Enemy ships
+DISTANT/POSSIBLE IDEAS:
+Difficulty selection
+Game modes (Classic with only normal asteroids and white/black graphics)
+Add amount limit to certain asteroids (mainly Homing)
+Enemy ships/bosses
+Achievements (will need profiles)
 2 leaderboards instead (one for points, one for gold)
-Grahics/color adjustments for the leaderboards
+Better asteroid sprite
