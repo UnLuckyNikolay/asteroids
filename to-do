@@ -1,0 +1,21 @@
+For brainstorming
+
+FIXES/TWEAKS:
++++ Buttons pressed on button down, should be button up
++++ AsteroidField doesn't scale with window size change. Asteroid deletion does tho
++++ BombLauncher - Explosion isn't properly scaled with level
++++ Check loot layer
+Rename and move UserInterface class
+Upgrade movement to properly handle turning of vectors, something is broken when turning without moving
+
+IDEAS:
+Redo buttons, rename containers (planes maybe), add `hidden` option to them
+Revisit visible naming scheme for ship parts
+Add ship recolors (will need new buttons)
+Show current timer/difficulty modifier
+Additional weapon upgrades (short fuse for the Bomb Launcher, will need naming scheme revisited)
+
+DISTANT IDEAS:
+Enemy ships
+2 leaderboards instead (one for points, one for gold)
+Grahics/color adjustments for the leaderboards
