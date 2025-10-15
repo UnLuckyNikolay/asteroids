@@ -6,7 +6,7 @@ from shapes.circleshape import CircleShape
 from player.weapons.plasmagun import PlasmaGun
 from player.weapons.bomblauncher import BombLauncher
 from player.ship_parts.magnet import Magnet
-from ui.sprites.ship import Ship, ShipType
+from player.ship import Ship, ShipType
 
 
 # New upgrades should be added to methods get_upgrade_level and buy_upgrade
@@ -35,6 +35,7 @@ class Player(CircleShape):
         self.timer_invul = 0
         self.is_invul = False
         self.is_alive = True
+        self.is_accelerating = False
 
         self.unlocked_ships = [
             ShipType.POLY,
@@ -101,7 +102,8 @@ class Player(CircleShape):
             screen, 
             self.position,
             self.rotation+180,
-            self.magnet.radius, 
+            self.magnet.radius,
+            self.is_accelerating,
             self.timer_invul
         )
 
@@ -127,6 +129,7 @@ class Player(CircleShape):
         return self.weapon.attempt_shot(self.position, self.rotation, time_since_last_shot)
 
     def update(self, dt):
+        self.ship.update(dt) # For animations
         self.last_dt = dt
         keys = pygame.key.get_pressed()
         self.time_since_last_shot += dt
@@ -148,12 +151,15 @@ class Player(CircleShape):
         if self.speed != 0:
             self.move(dt)
         if keys[pygame.K_w] and not keys[pygame.K_s]:
+            self.is_accelerating = True
             self.rotation_inertia = self.rotation
             self.speed += PLAYER_ACCELERATION
         elif keys[pygame.K_s] and not keys[pygame.K_w]:
+            self.is_accelerating = False
             self.rotation_inertia = self.rotation
             self.speed -= PLAYER_ACCELERATION
         else:   # Deceleration
+            self.is_accelerating = False
             if self.speed > 0:
                 self.speed -= int(PLAYER_ACCELERATION / 2)
             elif self.speed < 0:
