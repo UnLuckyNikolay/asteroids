@@ -1,37 +1,41 @@
 For brainstorming
 
 FIXES/TWEAKS:
-+++ Buttons pressed on button down, should be button up
-+++ AsteroidField doesn't scale with window size change. Asteroid deletion does tho
-+++ BombLauncher - Explosion isn't properly scaled with level
-+++ Check loot layer
-Rename and move UserInterface class (possibly to GameStateManager), rename GameStateManager to RoundStateManager
-Upgrade movement to properly handle turning of vectors, something is broken when turning without moving
-Update screenshots in README
-Check how to add support for different keyboard layouts
-Change how max level upgrades are displayed (will need new buttons)
-Add minimum asteroid price
-Increase alpha of background of the pause menu (might need new buttons)
+[X] Buttons pressed on button down, should be button up
+[X] AsteroidField doesn't scale with window size change. Asteroid deletion does tho
+[X] BombLauncher - Explosion isn't properly scaled with level
+[X] Check loot layer
+[ ] Rename and move UserInterface class (possibly to GameStateManager), rename GameStateManager to RoundStateManager
+[ ] Upgrade movement to properly handle turning of vectors, something is broken when turning without moving
+[ ] Update screenshots in README
+[ ] Check how to add support for different keyboard layouts
+[ ] Change how max level upgrades are displayed (will need new buttons)
+[ ] Add minimum asteroid price
+[ ] Increase alpha of background of the pause menu (might need new buttons)
+[ ] Redo ship parts and engine (as classes) to add ability to draw different shapes and make it more readable
+    [X] Have classes for parts and engines with draw methods, and lists of parts and engines to draw each from
+    [ ] Add Circle part
 
 IDEAS:
-Redo buttons, rename containers (`planes` maybe), add `hidden` option to them
-Revisit visible naming scheme for ship parts
-Add ship recolors (might need new buttons)
-More ship skins
-More weapons
-Show current timer/difficulty modifier
-Additional weapon upgrades (short fuse for the Bomb Launcher, will need naming scheme revisited)
-Profiles
-Persistent upgrades (will need profiles)
-Saved name/ship settings (will need profiles)
-Graphics/color adjustments for the leaderboards for top places
-Bubble (or any other different) explosion vfx for bombs
+[ ] Redo buttons, rename containers (`planes` maybe), add `hidden` option to them
+[ ] Revisit visible naming scheme for ship parts
+[ ] Add ship recolors (might need new buttons)
+[ ] More ship skins
+    [ ] UFO - will need new parts and 2 engines
+[ ] More weapons
+[ ] Show current timer/difficulty modifier
+[ ] Additional weapon upgrades (short fuse for the Bomb Launcher, will need naming scheme revisited)
+[ ] Profiles
+[ ] Saved name/ship settings (will need profiles)
+[ ] Graphics/color adjustments for the leaderboards for top places
+[ ] Bubble (or any other different) explosion vfx for bombs
 
 DISTANT/POSSIBLE IDEAS:
-Difficulty selection
-Game modes (Classic with only normal asteroids and white/black graphics)
-Add amount limit to certain asteroids (mainly Homing)
-Enemy ships/bosses
-Achievements (will need profiles)
-2 leaderboards instead (one for points, one for gold)
-Better asteroid sprite
+[ ] Difficulty selection
+[ ] Persistent upgrades (will need profiles)
+[ ] Game modes (Classic with only normal asteroids and white/black graphics)
+[ ] Add amount limit to certain asteroids (mainly Homing)
+[ ] Enemy ships/bosses
+[ ] Achievements (will need profiles)
+[ ] 2 leaderboards instead (one for points, one for gold)
+[ ] Better asteroid sprite

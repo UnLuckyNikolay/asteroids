@@ -181,8 +181,6 @@ class Player(CircleShape):
             if self.timer_invul <= 0:
                 self.timer_invul = 0
                 self.is_invul = False
-                self.color_outline = list(PLAYER_COLOR_OUTLINE)
-                self.color_fill = list(PLAYER_COLOR_FILL)
 
     def take_damage_and_check_if_alive(self, gsm) -> bool:
         if self.cheat_godmode:
