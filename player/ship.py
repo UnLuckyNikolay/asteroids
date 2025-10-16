@@ -9,6 +9,7 @@ class ShipType(Enum):
     POLY2BP = "Poly.v2:Bp"
     POLY2 = "Poly.v2"
     POLY3 = "Poly.v3"
+    UFO = "UFO.v1"
 
 class Ship():
     def __init__(self, type : ShipType, hitbox_radius, show_hitbox):
@@ -29,13 +30,15 @@ class Ship():
         gray_light = (150, 150, 170)
         gray_mid = (119, 119, 132)
         gray_dark = (90, 90, 103)
+        gray_very_dark = (45, 45, 45)
         black = (0, 0, 0)
 
         glass_light = (90, 120, 150)
         glass_mid = (72, 100, 128)
         glass_dark = (50, 73, 96)
 
-        blue_energy = (40, 170, 255)
+        energy_blue = (40, 170, 255)
+        energy_green = (40, 255, 50)
 
         blue_bp = (20, 100, 200)
 
@@ -46,8 +49,6 @@ class Ship():
             PartPolygon([(0, -20), (-10, 15), (10, 15)], black, white),
         ]
 
-        self.engine_anchor_poly2bp = (0, 20)
-        self.engine_colors_poly2bp = [white, blue_bp]
         self.parts_poly2bp = [
             PartEngineVfx((0, 20), blue_bp, white),
 
@@ -62,10 +63,8 @@ class Ship():
             PartPolygon([(-5, 12), (5, 12), (8, 20), (-8, 20)], blue_bp, white), # Engine
         ]
 
-        self.engine_anchor_poly2 = (0, 20)
-        self.engine_colors_poly2 = [blue_energy, white]
         self.parts_poly2 = [
-            PartEngineVfx((0, 20), white, blue_energy),
+            PartEngineVfx((0, 20), white, energy_blue),
 
             PartPolygon([(0, -18), (0, -23)], gray_dark), # Guns
             PartPolygon([(20, -4), (20, -9)], gray_dark),
@@ -78,10 +77,8 @@ class Ship():
             PartPolygon([(-5, 12), (5, 12), (8, 20), (-8, 20)], gray_light, gray_dark), # Engine
         ]
 
-        self.engine_anchor_poly3 = (0, 20)
-        self.engine_colors_poly3 = [blue_energy, white]
         self.parts_poly3 = [
-            PartEngineVfx((0, 20), white, blue_energy),
+            PartEngineVfx((0, 20), white, energy_blue),
 
             PartPolygon([(20, -4), (20, -9)], gray_dark), # Guns
             PartPolygon([(-20, -4), (-20, -9)], gray_dark),
@@ -98,6 +95,22 @@ class Ship():
             PartPolygon([(-2, -16), (-5, 1), (-3, 3), (3, 3), (5, 1), (2, -16)], glass_dark), # Window
             PartPolygon([(-2, -16), (-1, -15), (1, -15), (2, -16)], glass_mid),
             PartPolygon([(-1, -15), (1, -15), (3, 3), (0, 4), (-3, 3)], glass_light),
+        ]
+
+        self.parts_ufo = [
+            PartEngineVfx((8, 21), white, energy_green),
+            PartEngineVfx((-8, 21), white, energy_green),
+
+            PartCircle((0, 0), 22, gray_mid),
+            PartCircle((0, 0), 19, energy_green),
+            PartCircle((0, 0), 18, gray_mid),
+            PartCircle((0, 0), 16, gray_light),
+            PartCircle((0, 0), 10, gray_mid),
+            PartCircle((0, 0), 8, energy_blue),
+            PartPolygon([(-7, 7), (-7, 6), (-1, 0), (-7, -6), (-6, -7), (0, -1), (6, -7), (7, -6), (1, 0), (7, 6), (7, 7), (0, 9)], gray_mid),
+            #PartPolygon([(3, 0), (2, 2), (0, 3), (-2, 2), (-3, 0), (-2, -2), (0, -3), (2, -2)], gray_dark),
+            PartCircle((0, 0), 5, gray_mid),
+            PartCircle((0, 0), 3, gray_light),
         ]
         
         self.switch_model(self.type)
@@ -152,8 +165,10 @@ class Ship():
                 return self.parts_poly2
             case ShipType.POLY3:
                 return self.parts_poly3
+            case ShipType.UFO:
+                return self.parts_ufo
             case _:
-                print(f"Error: Missing `{type}` in ship.__get_parts")
+                print(f"> Error: Missing `{type}` in ship.__get_parts")
                 return None, None, None # pyright: ignore[reportReturnType]
 
 
@@ -194,23 +209,21 @@ class PartPolygon():
                 pygame.draw.polygon(screen, self.color_outline, dots, 2)
 
 
-class PartCircle(): # FINISH
+class PartCircle():
     def __init__(self, 
                     center : tuple[int, int],
                     radius : int,
-                    color_fill : tuple[int, int, int],
-                    color_outline : tuple[int, int, int] | None = None
+                    color_fill : tuple[int, int, int]
     ):
         self.center = center
         self.radius = radius
         self.color_fill = color_fill
-        self.color_outline = color_outline
 
     def draw_rotated(self, screen, position : pygame.Vector2, rotation : int, alpha : int, is_accelerating : bool, current_frame):
-        pass
+        pygame.gfxdraw.filled_circle(screen, int(self.center[0]+position[0]), int(self.center[1]+position[1]), self.radius, (*self.color_fill, alpha))
         
     def draw_scaled(self, screen, x, y, multiplier):
-        pass
+        pygame.gfxdraw.filled_circle(screen, int(self.center[0]+x), int(self.center[1]+y), self.radius*multiplier, self.color_fill)
 
 
 class PartEngineVfx():

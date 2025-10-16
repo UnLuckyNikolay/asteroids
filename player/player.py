@@ -42,6 +42,7 @@ class Player(CircleShape):
             ShipType.POLY2BP,
             ShipType.POLY2,
             ShipType.POLY3,
+            ShipType.UFO,
         ]
         self.ship_model = 3
         self.ship = Ship(self.unlocked_ships[self.ship_model], self.radius, cheat_hitbox)
