@@ -52,9 +52,9 @@ class Ship():
         self.parts_poly2bp = [
             PartEngineVfx((0, 20), blue_bp, white),
 
-            PartPolygon([(0, -18), (0, -23)], white), # Guns
-            PartPolygon([(20, -4), (20, -9)], white),
-            PartPolygon([(-20, -4), (-20, -9)], white),
+            PartLine((0, -18), (0, -23), 2, white), # Guns
+            PartLine((20, -4), (20, -9), 2, white),
+            PartLine((-20, -4), (-20, -9), 2, white),
 
             PartPolygon([(-25, -4), (25, -4), (22, 5), (0, 11), (-22, 5)], blue_bp, white), # Wings
             PartPolygon([(7, 0), (-7, 0), (-4, -18), (4, -18)], blue_bp, white), # Cockpit
@@ -66,9 +66,9 @@ class Ship():
         self.parts_poly2 = [
             PartEngineVfx((0, 20), white, energy_blue),
 
-            PartPolygon([(0, -18), (0, -23)], gray_dark), # Guns
-            PartPolygon([(20, -4), (20, -9)], gray_dark),
-            PartPolygon([(-20, -4), (-20, -9)], gray_dark),
+            PartLine((0, -18), (0, -23), 2, gray_dark), # Guns
+            PartLine((20, -4), (20, -9), 2, gray_dark),
+            PartLine((-20, -4), (-20, -9), 2, gray_dark),
 
             PartPolygon([(-25, -4), (25, -4), (22, 5), (0, 11), (-22, 5)], gray_light, gray_dark), # Wings
             PartPolygon([(7, 0), (-7, 0), (-4, -18), (4, -18)], gray_light, gray_dark), # Cockpit
@@ -80,9 +80,9 @@ class Ship():
         self.parts_poly3 = [
             PartEngineVfx((0, 20), white, energy_blue),
 
-            PartPolygon([(20, -4), (20, -9)], gray_dark), # Guns
-            PartPolygon([(-20, -4), (-20, -9)], gray_dark),
-            PartPolygon([(0, -18), (0, -23)], gray_dark),
+            PartLine((20, -4), (20, -9), 2, gray_dark), # Guns
+            PartLine((-20, -4), (-20, -9), 2, gray_dark),
+            PartLine((0, -18), (0, -23), 2, gray_dark),
 
             PartPolygon([(-25, -4), (0, -8), (25, -4), (29, 7), (22, 3), (-22, 3), (-29, 7)], gray_light), # Wings
             PartPolygon([(-23, 1), (23, 1), (29, 7), (22, 3), (-22, 3), (-29, 7)], gray_mid),
@@ -98,13 +98,34 @@ class Ship():
         ]
 
         self.parts_ufo = [
-            PartEngineVfx((8, 21), white, energy_green),
-            PartEngineVfx((-8, 21), white, energy_green),
+            PartEngineVfx((8, 20), white, energy_green),
+            PartEngineVfx((-8, 20), white, energy_green),
 
-            PartCircle((0, 0), 22, gray_mid),
-            PartCircle((0, 0), 19, energy_green),
-            PartCircle((0, 0), 18, gray_mid),
+            PartCircle((0, 0), 22, gray_dark),
+            PartCircle((0, 0), 21, gray_mid),
+            PartCircle((0, -19), 2, energy_green),
+            PartCircle((16, -10), 2, energy_green),
+            PartCircle((-16, -10), 2, energy_green),
+            #PartCircle((13, -14), 2, energy_green),
+            #PartCircle((-13, -14), 2, energy_green),
+            PartCircle((0, 0), 19, gray_mid),
+            PartLine((17, 0), (21, 0), 1, gray_dark),
+            PartLine(*rotate_part([(17, 0), (21, 0)], pygame.Vector2(0, 0), 60), 1, gray_dark), # pyright: ignore[reportCallIssue]
+            PartLine(*rotate_part([(17, 0), (21, 0)], pygame.Vector2(0, 0), 120), 1, gray_dark), # pyright: ignore[reportCallIssue]
+            PartLine(*rotate_part([(17, 0), (21, 0)], pygame.Vector2(0, 0), 180), 1, gray_dark), # pyright: ignore[reportCallIssue]
+            PartLine(*rotate_part([(17, 0), (21, 0)], pygame.Vector2(0, 0), 240), 1, gray_dark), # pyright: ignore[reportCallIssue]
+            PartLine(*rotate_part([(17, 0), (21, 0)], pygame.Vector2(0, 0), 300), 1, gray_dark), # pyright: ignore[reportCallIssue]
+
+            PartCircle((0, 0), 17, gray_dark),
             PartCircle((0, 0), 16, gray_light),
+            PartLine(*rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 30), 1, gray_dark), # pyright: ignore[reportCallIssue]
+            PartLine(*rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 90), 1, gray_dark), # pyright: ignore[reportCallIssue]
+            PartLine(*rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 150), 1, gray_dark), # pyright: ignore[reportCallIssue]
+            PartLine(*rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 210), 1, gray_dark), # pyright: ignore[reportCallIssue]
+            PartLine(*rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 270), 1, gray_dark), # pyright: ignore[reportCallIssue]
+            PartLine(*rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 330), 1, gray_dark), # pyright: ignore[reportCallIssue]
+
+            PartCircle((0, 0), 11, gray_dark),
             PartCircle((0, 0), 10, gray_mid),
             PartCircle((0, 0), 8, energy_blue),
             PartPolygon([(-7, 7), (-7, 6), (-1, 0), (-7, -6), (-6, -7), (0, -1), (6, -7), (7, -6), (1, 0), (7, 6), (7, 7), (0, 9)], gray_mid),
@@ -172,6 +193,35 @@ class Ship():
                 return None, None, None # pyright: ignore[reportReturnType]
 
 
+class PartLine():
+    def __init__(self, 
+                    start : tuple[int, int],
+                    end : tuple[int, int],
+                    thickness : int,
+                    color : tuple[int, int, int]
+    ):
+        """
+        Outline is optional and is not affected by alpha.
+        
+        Having 2 dots makes a line with a fill color, outline is ignored.
+        """
+
+        self.start = start
+        self.end = end
+        self.thickness = thickness
+        self.color = color
+
+    def draw_rotated(self, screen, position : pygame.Vector2, rotation : int, alpha : int, is_accelerating : bool, current_frame):
+        dots = rotate_part([self.start, self.end], position, rotation)
+
+        pygame.draw.line(screen, (*self.color, alpha), dots[0], dots[1], self.thickness)
+        
+    def draw_scaled(self, screen, x, y, multiplier):
+        dots = move_and_scale_part([self.start, self.end], (x, y), multiplier)
+
+        pygame.draw.line(screen, self.color, dots[0], dots[1], self.thickness*multiplier)
+
+
 class PartPolygon():
     def __init__(self, 
                     dots : list[tuple[int, int]],
@@ -191,22 +241,16 @@ class PartPolygon():
     def draw_rotated(self, screen, position : pygame.Vector2, rotation : int, alpha : int, is_accelerating : bool, current_frame):
         dots = rotate_part(self.dots, position, rotation)
 
-        if len(dots) == 2:
-            pygame.draw.line(screen, (*self.color_fill, alpha), dots[0], dots[1], 2)
-        else:
-            pygame.gfxdraw.filled_polygon(screen, dots, (*self.color_fill, alpha))
-            if self.color_outline != None:
-                pygame.draw.polygon(screen, (*self.color_outline, alpha), dots, 2)
+        pygame.gfxdraw.filled_polygon(screen, dots, (*self.color_fill, alpha))
+        if self.color_outline != None:
+            pygame.draw.polygon(screen, (*self.color_outline, alpha), dots, 2)
         
     def draw_scaled(self, screen, x, y, multiplier):
         dots = move_and_scale_part(self.dots, (x, y), multiplier)
 
-        if len(dots) == 2:
-            pygame.draw.line(screen, self.color_fill, dots[0], dots[1], 2)
-        else:
-            pygame.gfxdraw.filled_polygon(screen, dots, self.color_fill)
-            if self.color_outline != None:
-                pygame.draw.polygon(screen, self.color_outline, dots, 2)
+        pygame.gfxdraw.filled_polygon(screen, dots, self.color_fill)
+        if self.color_outline != None:
+            pygame.draw.polygon(screen, self.color_outline, dots, 2)
 
 
 class PartCircle():
@@ -220,10 +264,14 @@ class PartCircle():
         self.color_fill = color_fill
 
     def draw_rotated(self, screen, position : pygame.Vector2, rotation : int, alpha : int, is_accelerating : bool, current_frame):
-        pygame.gfxdraw.filled_circle(screen, int(self.center[0]+position[0]), int(self.center[1]+position[1]), self.radius, (*self.color_fill, alpha))
+        center = rotate_part([self.center], position, rotation)[0]
+
+        pygame.gfxdraw.filled_circle(screen, *center, self.radius, (*self.color_fill, alpha))
         
     def draw_scaled(self, screen, x, y, multiplier):
-        pygame.gfxdraw.filled_circle(screen, int(self.center[0]+x), int(self.center[1]+y), self.radius*multiplier, self.color_fill)
+        center = (int(self.center[0]*multiplier+x), int(self.center[1]*multiplier+y))
+
+        pygame.gfxdraw.filled_circle(screen, *center, self.radius*multiplier, self.color_fill)
 
 
 class PartEngineVfx():
@@ -258,7 +306,7 @@ class PartEngineVfx():
         return # Engine VFX isn't drawn in menus
     
 
-def rotate_part(part : list[tuple[int, int]], position : pygame.Vector2, rotation : float):
+def rotate_part(part : list[tuple[int, int]], position : pygame.Vector2, rotation : float) -> list[tuple[int, int]]:
     """Returns a rotated copy of a part."""
 
     rotated_part = []
@@ -267,7 +315,7 @@ def rotate_part(part : list[tuple[int, int]], position : pygame.Vector2, rotatio
         rotated_part.append((int(position.x + dot_rotated.x), int(position.y + dot_rotated.y)))
     return rotated_part
 
-def move_and_scale_part(part, move_xy : tuple[int, int], multiplier : int):
+def move_and_scale_part(part : list[tuple[int, int]], move_xy : tuple[int, int], multiplier : int) -> list[tuple[int, int]]:
     """Returns a moved and scaled copy of a part."""
 
     new_part = []
@@ -275,7 +323,7 @@ def move_and_scale_part(part, move_xy : tuple[int, int], multiplier : int):
         new_part.append((dot[0]*multiplier+move_xy[0], dot[1]*multiplier+move_xy[1]))
     return new_part
 
-def get_moved_part(part : list[tuple[int, int]], move_xy : tuple[int, int]) -> list:
+def get_moved_part(part : list[tuple[int, int]], move_xy : tuple[int, int]) -> list[tuple[int, int]]:
     moved_part = []
     for dot in part:
         moved_part.append((dot[0]+move_xy[0], dot[1]+move_xy[1]))
