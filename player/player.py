@@ -29,6 +29,11 @@ class Player(CircleShape):
         self.__turning_speed = 0
         self.last_dt = 0
 
+        # For controls in game.handle_event_for_ship_controls()
+        self.state_movement : int = 0 # -1 - going backwards, 0 - nothing, 1 - going forward
+        self.state_rotation : int = 0 # -1 - rotating left, 0 - nothing, 1 - rotating right
+        self.is_shooting : bool = False
+
         self.game = game
         self.cheat_godmode = cheat_godmode
 
@@ -132,49 +137,50 @@ class Player(CircleShape):
     def update(self, dt):
         self.ship.update(dt) # For animations
         self.last_dt = dt
-        keys = pygame.key.get_pressed()
         self.time_since_last_shot += dt
 
         # Turning
         if self.turning_speed != 0:
             self.rotate(dt)
-        if keys[pygame.K_d] and not keys[pygame.K_a]:
-            self.turning_speed += PLAYER_TURNING_ACCELERATION
-        elif keys[pygame.K_a] and not keys[pygame.K_d]:
-            self.turning_speed -= PLAYER_TURNING_ACCELERATION
-        else:   # Deceleration
-            if self.turning_speed > 0:
-                self.turning_speed -= int(PLAYER_TURNING_ACCELERATION / 2)
-            elif self.turning_speed < 0:
-                self.turning_speed += int(PLAYER_TURNING_ACCELERATION / 2)
+        match self.state_rotation:
+            case 1:
+                self.turning_speed += PLAYER_TURNING_ACCELERATION
+            case -1:
+                self.turning_speed -= PLAYER_TURNING_ACCELERATION
+            case 0: # Deceleration
+                if self.turning_speed > 0:
+                    self.turning_speed -= int(PLAYER_TURNING_ACCELERATION / 2)
+                elif self.turning_speed < 0:
+                    self.turning_speed += int(PLAYER_TURNING_ACCELERATION / 2)
+            case _:
+                print("Error: player.state_rotation went wild")
 
         # Movement
         if self.speed != 0:
             self.move(dt)
-        if keys[pygame.K_w] and not keys[pygame.K_s]:
-            self.is_accelerating = True
-            self.rotation_inertia = self.rotation
-            self.speed += PLAYER_ACCELERATION
-        elif keys[pygame.K_s] and not keys[pygame.K_w]:
-            self.is_accelerating = False
-            self.rotation_inertia = self.rotation
-            self.speed -= PLAYER_ACCELERATION
-        else:   # Deceleration
-            self.is_accelerating = False
-            if self.speed > 0:
-                self.speed -= int(PLAYER_ACCELERATION / 2)
-            elif self.speed < 0:
-                self.speed += int(PLAYER_ACCELERATION / 2)
+        match self.state_movement:
+            case 1:
+                self.is_accelerating = True
+                self.rotation_inertia = self.rotation
+                self.speed += PLAYER_ACCELERATION
+            case -1:
+                self.is_accelerating = False
+                self.rotation_inertia = self.rotation
+                self.speed -= PLAYER_ACCELERATION
+            case 0: # Deceleration
+                self.is_accelerating = False
+                if self.speed > 0:
+                    self.speed -= int(PLAYER_ACCELERATION / 2)
+                elif self.speed < 0:
+                    self.speed += int(PLAYER_ACCELERATION / 2)
+            case _:
+                print("Error: player.state_movement went wild")
 
-        # Weapon change
-        if (keys[pygame.K_1] or keys[pygame.K_KP1]):
-            self.weapon = self.weapons[0]
-        elif (keys[pygame.K_2] or keys[pygame.K_KP2]):
-            self.weapon = self.weapons[1]
-
-        if keys[pygame.K_SPACE] and self.attempt_shot(self.time_since_last_shot):
+        # Shooting
+        if self.is_shooting and self.attempt_shot(self.time_since_last_shot):
             self.time_since_last_shot = 0
 
+        # Invulnerability timer
         if self.is_invul:
             if self.timer_invul > 0:
                 self.timer_invul -= dt

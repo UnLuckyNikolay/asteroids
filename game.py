@@ -101,14 +101,16 @@ class Game():
                 if event.type == pygame.QUIT:
                     self.is_running = False
                     return
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
+                elif event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                         if not self.is_paused:
                             self.is_paused = True
                             self.ui.switch_menu(Menu.PAUSE_MENU)
                         else:
                             self.is_paused = False
                             self.ui.switch_menu(Menu.HUD)
+                    else:
+                        self.handle_event_for_ship_controls(event)
                 else:
                     self.handle_event(event)
 
@@ -176,8 +178,52 @@ class Game():
 
     ### Helpers
 
+    def handle_event_for_ship_controls(self, event : pygame.event.Event):
+        """Used for handling inputs for controlling the ship during gameplay and pause."""
+
+        if self.player == None:
+            return
+
+        match event.scancode:
+            # Movement
+            case 26: # W
+                if event.type == pygame.KEYDOWN:
+                    self.player.state_movement += 1
+                if event.type == pygame.KEYUP:
+                    self.player.state_movement -= 1
+            case 22: # S
+                if event.type == pygame.KEYDOWN:
+                    self.player.state_movement -= 1
+                if event.type == pygame.KEYUP:
+                    self.player.state_movement += 1
+            # Rotation
+            case 4: # A
+                if event.type == pygame.KEYDOWN:
+                    self.player.state_rotation -= 1
+                if event.type == pygame.KEYUP:
+                    self.player.state_rotation += 1
+            case 7: # D
+                if event.type == pygame.KEYDOWN:
+                    self.player.state_rotation += 1
+                if event.type == pygame.KEYUP:
+                    self.player.state_rotation -= 1
+            # Shooting
+            case 44: # Space
+                if event.type == pygame.KEYDOWN:
+                    self.player.is_shooting = True
+                if event.type == pygame.KEYUP:
+                    self.player.is_shooting = False
+            # Weapon switching
+            case 30 | 89: # 1 | Keypad1
+                if event.type == pygame.KEYDOWN and not self.is_paused:
+                    self.player.weapon = self.player.weapons[0]
+            case 31 | 90: # 2 | Keypad2
+                if event.type == pygame.KEYDOWN and not self.is_paused:
+                    self.player.weapon = self.player.weapons[1]
+
     def handle_event(self, event : pygame.event.Event):
-        """Used for handling events in all menus"""
+        """Used for handling events in all menus."""
+
         # Returns to fullscreen after Alt-tabing/loosing focus
         if event.type == pygame.WINDOWFOCUSGAINED and self.is_fullscreen:
             self.__switch_to_fullscreen()
@@ -198,7 +244,8 @@ class Game():
             #print(event)
     
     def redraw_objects_and_ui(self) -> float:
-        """Updates the screen and returns delta time"""
+        """Updates the screen and returns delta time."""
+
         for object in sorted(list(self.drawable), key = lambda object: object.layer):
             object.draw(self.screen)
 

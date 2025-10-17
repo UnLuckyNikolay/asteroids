@@ -8,33 +8,37 @@ FIXES/TWEAKS:
 [ ] Rename and move UserInterface class (possibly to GameStateManager), rename GameStateManager to RoundStateManager
 [ ] Upgrade movement to properly handle turning of vectors, something is broken when turning without moving
 [ ] Update screenshots in README
-[ ] Check how to add support for different keyboard layouts
+[X] Check how to add support for different keyboard layouts
 [ ] Change how max level upgrades are displayed (will need new buttons)
 [ ] Add minimum asteroid price
 [ ] Increase alpha of background of the pause menu (might need new buttons)
-[X] Redo ship parts and engine (as classes) to add ability to draw different shapes and make it more readable
+[X] Redo ship parts and engine (as classes) to add ability to draw different shapes and make it more readable:
     [X] Have classes for parts and engines with draw methods, and lists of parts and engines to draw each from
+    [X] Add Line part
     [X] Add Circle part
 
 IDEAS:
 [ ] Redo buttons, rename containers (`planes` maybe), add `hidden` option to them
 [ ] Revisit visible naming scheme for ship parts
 [ ] Add ship recolors (might need new buttons)
-[ ] More ship skins
+[ ] More ship skins:
     [X] UFO - will need new parts and 2 engines
 [ ] More weapons
 [ ] Show current timer/difficulty modifier
-[ ] Additional weapon upgrades (short fuse for the Bomb Launcher, will need naming scheme revisited)
+[ ] Additional weapon upgrades:
+    [ ] Short fuse for the Bomb Launcher
+    [ ] Faster fire rate for Plasma Gun
 [ ] Profiles
 [ ] Saved name/ship settings (will need profiles)
 [ ] Graphics/color adjustments for the leaderboards for top places
-[ ] Bubble (or any other different) explosion vfx for bombs
+[ ] Bubble explosion vfx for bombs
+[ ] Add amount limit to certain asteroids (mainly Homing)
 
 DISTANT/POSSIBLE IDEAS:
-[ ] Difficulty selection
+[ ] Temporary boosts as loot
+[ ] Difficulty selection (speed of difficulty ramp-up, max amount of special asteroids)
 [ ] Persistent upgrades (will need profiles)
 [ ] Game modes (Classic with only normal asteroids and white/black graphics)
-[ ] Add amount limit to certain asteroids (mainly Homing)
 [ ] Enemy ships/bosses
 [ ] Achievements (will need profiles)
 [ ] 2 leaderboards instead (one for points, one for gold)
