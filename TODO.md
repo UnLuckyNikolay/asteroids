@@ -12,6 +12,7 @@ FIXES/TWEAKS:
 - [ ] Tweak containers and buttons
     - [x] Press on button up instead of down
     - [x] Refactor containers and buttons
+    - [x] Track hovered button
     - [ ] Add descriptions while hovering
 - [x] Change how max level upgrades are displayed (will need new buttons)
 - [x] Revisit visible naming scheme for ship parts

@@ -36,6 +36,7 @@ class UserInterface(pygame.sprite.Sprite):
         self.player : Player = None
 
         self.__current_menu : Menu = Menu.MAIN_MENU
+        self.__hovered_button : Button | Switch | None = None
 
         # Getting the font
         font_path = "./fonts/anita-semi-square.normaali.ttf" #"../../fonts/anita-semi-square.normaali.ttf"
@@ -67,7 +68,6 @@ class UserInterface(pygame.sprite.Sprite):
 
         self.initialize_current_menu()
 
-    
     def start_round(self, gsm, player):
         self.gsm = gsm
         self.player = player
@@ -75,6 +75,9 @@ class UserInterface(pygame.sprite.Sprite):
 
     def switch_menu(self, menu : Menu):
         self.__current_menu = menu
+        if self.__hovered_button != None and self.__hovered_button._is_hovered:
+            self.__hovered_button.switch_hovered_state()
+        self.__hovered_button = None
         self.initialize_current_menu()
 
     def initialize_current_menu(self):
@@ -92,39 +95,50 @@ class UserInterface(pygame.sprite.Sprite):
             case _:
                 print(f"> Error: missing menu {self.__current_menu.value} in UserInterface.initialize_current_menu")
 
-    def check_click(self, position):
+    def check_hovered_button(self):
         """Checks mouse position against all the buttons in the current menus and tries to run the button function."""
 
-        match self.__current_menu:
-            case Menu.MAIN_MENU:
-                for button in self.__buttons_main_menu:
-                    if button.check_click(position):
-                        button.run_if_possible()
-                        return
-            
-            case Menu.LEADERBOARDS:
-                for button in self.__buttons_leaderboards:
-                    if button.check_click(position):
-                        button.run_if_possible()
-                        return
-            
-            case Menu.HUD:
-                pass # No buttons planned for HUD
-            
-            case Menu.PAUSE_MENU:
-                for button in self.__buttons_pause_menu:
-                    if button.check_click(position):
-                        button.run_if_possible()
-                        return
-            
-            case Menu.NAME_CHECK:
-                for button in self.__buttons_name_check:
-                    if button.check_click(position):
-                        button.run_if_possible()
-                        return
+        position = pygame.mouse.get_pos()
 
-            case _:
-                print("How are you here? This menu shouldn't have BUTTONS!")
+        if self.__hovered_button == None:
+
+            # Getting button list
+            match self.__current_menu:
+                case Menu.MAIN_MENU:
+                    button_list = self.__buttons_main_menu
+                case Menu.LEADERBOARDS:
+                    button_list = self.__buttons_leaderboards
+                case Menu.HUD:
+                    return # No buttons currently planned for HUD
+                case Menu.PAUSE_MENU:
+                    button_list = self.__buttons_pause_menu
+                case Menu.NAME_CHECK:
+                    button_list = self.__buttons_name_check
+                case _:
+                    print(f"Error: menu `{self.__current_menu.value}` missing in userinterface.check_hovered_button")
+
+            # Check for a button hover
+            for i in range(len(button_list)):
+                if button_list[i].check_cursor_hover(position):
+                    self.__hovered_button = button_list[i]
+                    self.__hovered_button.switch_hovered_state()
+                    return
+        
+        # Check if cursor moved off the button
+        elif (
+            position[0] < self.__hovered_button._position[0] or
+            position[0] > self.__hovered_button._position[0] + self.__hovered_button._size[0] or
+            position[1] < self.__hovered_button._position[1] or
+            position[1] > self.__hovered_button._position[1] + self.__hovered_button._size[1]
+        ):
+            self.__hovered_button.switch_hovered_state()
+            self.__hovered_button = None
+
+    def try_button_press(self):
+        if self.__hovered_button == None:
+            return
+        
+        self.__hovered_button.run_if_possible()
 
     def check_score(self, new_score):
         is_updated = False

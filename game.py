@@ -38,27 +38,28 @@ class Game():
         self.cheat_stonks = False
         self.cheat_hitbox = False
 
-        self.updatable = pygame.sprite.Group()   # This group is cleaned (object.kill()) after each round
+        self.updatable = pygame.sprite.Group()   # Must have method .update(delta)
         self.drawable = pygame.sprite.Group()
         self.asteroids = pygame.sprite.Group()            # Used for colision detection
         self.loot = pygame.sprite.Group()                 # ^ + magnet
         self.projectiles = pygame.sprite.Group()          # ^
         self.explosion_hitboxes = pygame.sprite.Group()   # ^
         self.moving_objects = pygame.sprite.Group()       # Used to destroy objects that are off-screen
+        self.cleanup = pygame.sprite.Group()   # This group is cleaned (object.kill()) after each round
 
         UserInterface.containers = (self.drawable)
 
         StarField.containers = (self.drawable)
-        Explosion.containers = (self.updatable, self.drawable)
+        Explosion.containers = (self.updatable, self.drawable, self.cleanup)
 
-        Player.containers = (self.updatable, self.drawable)
-        ProjectilePlasma.containers = (self.projectiles, self.updatable, self.drawable, self.moving_objects)
-        Bomb.containers = (self.drawable, self.updatable)
-        BombExplosion.containers = (self.explosion_hitboxes)
+        Player.containers = (self.updatable, self.drawable, self.cleanup)
+        ProjectilePlasma.containers = (self.projectiles, self.updatable, self.drawable, self.moving_objects, self.cleanup)
+        Bomb.containers = (self.drawable, self.updatable, self.cleanup)
+        BombExplosion.containers = (self.explosion_hitboxes, self.cleanup)
 
         AsteroidField.containers = (self.updatable)
-        Asteroid.containers = (self.asteroids, self.updatable, self.drawable, self.moving_objects)
-        Ore.containers = (self.loot, self.updatable, self.drawable, self.moving_objects)
+        Asteroid.containers = (self.asteroids, self.updatable, self.drawable, self.moving_objects, self.cleanup)
+        Ore.containers = (self.loot, self.updatable, self.drawable, self.moving_objects, self.cleanup)
 
         # Layers for drawable
         # 0 - StarField
@@ -173,7 +174,7 @@ class Game():
         self.ui.player = None
         self.ui.gsm = None
 
-        for object in self.updatable:
+        for object in self.cleanup:
             object.kill()
 
     ### Helpers
@@ -235,10 +236,10 @@ class Game():
         # Returns to fullscreen after Alt-tabing/loosing focus
         if event.type == pygame.WINDOWFOCUSGAINED and self.is_fullscreen:
             self.__switch_to_fullscreen()
-        # Checks button press
+        # Try button press
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == pygame.BUTTON_LEFT:
-                self.ui.check_click(pygame.mouse.get_pos())
+                self.ui.try_button_press()
         # Window resizing
         elif event.type == pygame.WINDOWRESIZED and self.is_fullscreen == False:
             self.is_window_resized = True
@@ -252,13 +253,18 @@ class Game():
             #print(event)
     
     def redraw_objects_and_ui(self) -> float:
-        """Updates the screen and returns delta time."""
+        """
+        Updates and redraws the screen, returns delta time.
+        
+        Also used for updating UI.
+        """
 
+        self.ui.check_hovered_button()
         for object in sorted(list(self.drawable), key = lambda object: object.layer):
             object.draw(self.screen)
 
         pygame.display.flip()
-        return self.clock.tick(60) / 1000
+        return self.clock.tick(FPS) / 1000
     
     def check_if_object_is_off_screen(self, object) -> bool:
         offset = 100

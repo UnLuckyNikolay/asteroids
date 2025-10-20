@@ -18,8 +18,10 @@ class Container(pygame.sprite.Sprite):
         self._position = position
         self._size = size
         self._corners = corners
+
         self._color_outline = (200, 200, 200, 255)
         self._color_fill = (75, 75, 75, 100)
+        
         self._elements : list[tuple[Any, Allignment]] = []
 
     def draw(self, screen):
@@ -44,13 +46,8 @@ class Container(pygame.sprite.Sprite):
         self._color_fill = color
 
     def set_outline_color(self, color : tuple[int, int, int, int]):
-        """
-        Default values:
+        """Default value - white (200, 200, 200, 255)."""
 
-        Container - white (200, 200, 200, 255)
-
-        Buttons - blue (100, 200, 255, 255)
-        """
         self._color_outline = color
 
     def set_corners(self, topleft : int, topright : int, bottomright : int, bottomleft : int):
@@ -65,3 +62,10 @@ class Container(pygame.sprite.Sprite):
                 return self._position
             case Allignment.CENTER:
                 return (int(self._position[0] + self._size[0] / 2), int(self._position[1] + self._size[1] / 2))
+            
+    def _get_divided_color_tuple(self, color : tuple[int, int, int, int], divider : int | float, alpha_override : int | None = None) -> tuple[int, int, int, int]:
+        """Returns a new tuple with all color values divided and rounded down. Alpha is not divided but can be overridden."""
+
+        if alpha_override != None:
+            return (int(color[0]/divider), int(color[1]/divider), int(color[2]/divider), alpha_override)
+        return (int(color[0]/divider), int(color[1]/divider), int(color[2]/divider), color[3])

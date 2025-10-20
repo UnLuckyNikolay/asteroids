@@ -19,15 +19,22 @@ class Button(Container):
             size,
             corners,
         )
-        self._color_outline = (100, 200, 255, 255)
+        self.set_outline_color((100, 200, 255, 255))
         self._color_outline_inactive = (100, 100, 100, 255)
+        self._color_fill_hover = self._get_divided_color_tuple(self._color_outline, 2, 150)
+        self._is_hovered = False
+
         self._key_func = key_func
         self._condition_func = condition_func
 
     def draw(self, screen):
+        is_possible = self._condition_func()
         points = get_points(self._position, self._size, self._corners)
-        pygame.gfxdraw.filled_polygon(screen, points, self._color_fill)
-        if self._condition_func():
+        if self._is_hovered and is_possible:
+            pygame.gfxdraw.filled_polygon(screen, points, self._color_fill_hover)
+        else:
+            pygame.gfxdraw.filled_polygon(screen, points, self._color_fill)
+        if is_possible:
             pygame.draw.polygon(screen, self._color_outline, points, 3)
         else:
             pygame.draw.polygon(screen, self._color_outline_inactive, points, 3)
@@ -42,12 +49,21 @@ class Button(Container):
             else:
                 element = tuple[0]
 
-            if (isinstance(element, Text) or isinstance(element, SimpleSprite)) and not self._condition_func():
+            if (isinstance(element, Text) or isinstance(element, SimpleSprite)) and not is_possible:
                 element.draw(screen, *pos, self._color_outline_inactive) # pyright: ignore[reportAttributeAccessIssue]
             else:
                 element.draw(screen, *pos) # pyright: ignore[reportAttributeAccessIssue]
+
+    def set_outline_color(self, color : tuple[int, int, int, int]):
+        """Default value - blue (100, 200, 255, 255)."""
+
+        self._color_outline = color
+        self._color_fill_hover = self._get_divided_color_tuple(self._color_outline, 2, 150)
+
+    def switch_hovered_state(self):
+        self._is_hovered = False if self._is_hovered else True
     
-    def check_click(self, position):
+    def check_cursor_hover(self, position):
         if (position[0] > self._position[0] and
             position[0] < self._position[0] + self._size[0] and
             position[1] > self._position[1] and
