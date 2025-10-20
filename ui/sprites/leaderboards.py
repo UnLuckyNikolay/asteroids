@@ -29,7 +29,7 @@ class Leaderboards():
             c_next_board.set_outline_color(color)
             c_next_board.set_fill_color((int(color[0]/3), int(color[1]/3), int(color[2]/3), 100))
             c_next_board.add_element(
-                TextF("{} - {}", 13, 8, self.font, color,
+                TextF("{} - {}", (13, 8), self.font, color,
                       self.scores[i]['score'],
                       self.scores[i]['name'])
             )

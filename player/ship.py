@@ -167,11 +167,11 @@ class Ship():
         for part in self.current_parts:
             part.draw_rotated(screen, position, rotation, self.alpha, is_accelerating, self.engine_vfx_current_frame)
 
-    def draw(self, screen, x, y, multiplier=2):
+    def draw(self, screen, position : tuple[int, int], multiplier=2):
         """Used to draw ships in menus."""
 
         for part in self.current_parts:
-            part.draw_scaled(screen, x, y, multiplier)
+            part.draw_scaled(screen, *position, multiplier)
 
     
     def __get_parts(self, type) -> list:

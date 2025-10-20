@@ -7,10 +7,10 @@ class SymbolFullscreen(SimpleSprite):
     def __init__(self, local_x, local_y, color):
         super().__init__(local_x, local_y, color)
     
-    def draw(self, screen, x, y, color_override=None):
+    def draw(self, screen, position : tuple[int, int], color_override : tuple[int, int, int, int] | None = None):
         color = color_override if color_override != None else self.color
-        x = x + self.x
-        y = y + self.y
+        x = position[0] + self.x
+        y = position[1] + self.y
 
         pygame.draw.lines(screen, color, False, [(x-5, y-10), (x, y-15), (x+5, y-10)], width=3)
         pygame.draw.lines(screen, color, False, [(x-5, y+10), (x, y+15), (x+5, y+10)], width=3)

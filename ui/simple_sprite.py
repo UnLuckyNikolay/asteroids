@@ -7,6 +7,6 @@ class SimpleSprite():
         self.color = color
     
     @abstractmethod
-    def draw(self, screen, x, y, color_override=None):
+    def draw(self, screen, position : tuple[int, int], color_override : tuple[int, int, int, int] | None = None):
         pass
     

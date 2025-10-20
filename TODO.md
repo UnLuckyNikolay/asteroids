@@ -9,11 +9,11 @@ FIXES/TWEAKS:
     - [x] Add Line part
     - [x] Add Circle part
 - [x] Check how to add support for different keyboard layouts
-- [ ] Tweak containers and buttons
+- [x] Tweak containers and buttons
     - [x] Press on button up instead of down
     - [x] Refactor containers and buttons
     - [x] Track hovered button
-    - [ ] Add descriptions while hovering
+    - [x] Add descriptions while hovering
 - [x] Change how max level upgrades are displayed (will need new buttons)
 - [x] Revisit visible naming scheme for ship parts
 - [ ] Rename and move UserInterface class (possibly to GameStateManager), rename GameStateManager to RoundStateManager
@@ -39,6 +39,7 @@ IDEAS:
 
 DISTANT/POSSIBLE IDEAS:
 - [ ] Sounds
+- [ ] Music
 - [ ] Temporary boosts as loot
 - [ ] Difficulty selection (speed of difficulty ramp-up, max amount of special asteroids)
 - [ ] Persistent upgrades (will need profiles)

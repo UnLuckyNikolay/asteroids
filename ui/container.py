@@ -39,7 +39,7 @@ class Container(pygame.sprite.Sprite):
             else:
                 element = tuple[0]
 
-            element.draw(screen, *pos) # pyright: ignore[reportAttributeAccessIssue]
+            element.draw(screen, pos) # pyright: ignore[reportAttributeAccessIssue]
 
     def set_fill_color(self, color : tuple[int, int, int, int]):
         """Default value - dark grey (75, 75, 75, 100)"""

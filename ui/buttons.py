@@ -4,13 +4,14 @@ from typing import Callable
 from ui.container import Container
 from ui.text import Text
 from ui.simple_sprite import SimpleSprite
-from ui.helpers import get_points
+from ui.helpers import get_points, draw_polygon
 
 class _ButtonBase(Container):
-    def __init__(self,
-                 position, 
-                 size, 
-                 corners : tuple[int, int, int, int],
+    def __init__(
+            self,
+            position : tuple[int, int], 
+            size : tuple[int, int], 
+            corners : tuple[int, int, int, int],
     ):
         super().__init__(
             position, 
@@ -18,6 +19,7 @@ class _ButtonBase(Container):
             corners,
         )
         self._is_hovered = False
+        self._description : Text | None = None
         
     def switch_hovered_state(self):
         self._is_hovered = False if self._is_hovered else True
@@ -31,13 +33,44 @@ class _ButtonBase(Container):
         else:
             return False
 
+    def draw_description(self, screen, screen_res : tuple[int, int]):
+        if self._description == None:
+            return
+        
+        cursor_position = pygame.mouse.get_pos()
+        width = self._description.get_width()
+        if screen_res[0]-cursor_position[0]+20 < width:
+            draw_polygon(screen, (cursor_position[0]-14-width, cursor_position[1]-25), (width+6, 17), (0, 4, 0, 4), (50, 50, 50, 200))
+            pygame.draw.aalines(
+                screen, (240, 240, 240, 255), False, 
+                [cursor_position, 
+                 (cursor_position[0]-8, cursor_position[1]-8), 
+                 (cursor_position[0]-10-width, cursor_position[1]-8), 
+                 (cursor_position[0]-14-width, cursor_position[1]-12)]
+            )
+            self._description.draw(screen, (cursor_position[0]-11-width, cursor_position[1]-25))
+        else:
+            draw_polygon(screen, (cursor_position[0]+8, cursor_position[1]-25), (width+6, 17), (4, 0, 4, 0), (50, 50, 50, 200))
+            pygame.draw.aalines(
+                screen, (240, 240, 240, 255), False, 
+                [cursor_position, 
+                 (cursor_position[0]+8, cursor_position[1]-8), 
+                 (cursor_position[0]+10+width, cursor_position[1]-8), 
+                 (cursor_position[0]+14+width, cursor_position[1]-12)]
+            )
+            self._description.draw(screen, (cursor_position[0]+11, cursor_position[1]-25))
+
+    def add_description(self, text : Text):
+        self._description = text
+
 class Button(_ButtonBase):
-    def __init__(self,
-                 position, 
-                 size, 
-                 corners : tuple[int, int, int, int],
-                 key_func : Callable, 
-                 condition_func : Callable = lambda: True,
+    def __init__(
+            self,
+            position : tuple[int, int], 
+            size : tuple[int, int], 
+            corners : tuple[int, int, int, int],
+            key_func : Callable, 
+            condition_func : Callable = lambda: True,
     ):
         super().__init__(
             position, 
@@ -74,9 +107,9 @@ class Button(_ButtonBase):
                 element = tuple[0]
 
             if (isinstance(element, Text) or isinstance(element, SimpleSprite)) and not is_possible:
-                element.draw(screen, *pos, self._color_outline_inactive) # pyright: ignore[reportAttributeAccessIssue]
+                element.draw(screen, pos, self._color_outline_inactive) # pyright: ignore[reportAttributeAccessIssue]
             else:
-                element.draw(screen, *pos) # pyright: ignore[reportAttributeAccessIssue]
+                element.draw(screen, pos) # pyright: ignore[reportAttributeAccessIssue]
 
     def run_if_possible(self) -> bool:
         if self._condition_func():
@@ -95,12 +128,13 @@ class Button(_ButtonBase):
         self._color_outline_inactive = color
 
 class Switch(_ButtonBase):
-    def __init__(self,
-                 position, 
-                 size, 
-                 corners : tuple[int, int, int, int],
-                 key_func : Callable, 
-                 is_active : bool,
+    def __init__(
+            self,
+            position : tuple[int, int], 
+            size : tuple[int, int], 
+            corners : tuple[int, int, int, int],
+            key_func : Callable, 
+            is_active : bool,
     ):
         super().__init__(
             position, 
@@ -139,9 +173,9 @@ class Switch(_ButtonBase):
                 element = tuple[0]
 
             if (isinstance(element, Text) or isinstance(element, SimpleSprite)) and self._is_active:
-                element.draw(screen, *pos, self._color_outline_active) # pyright: ignore[reportAttributeAccessIssue]
+                element.draw(screen, pos, self._color_outline_active) # pyright: ignore[reportAttributeAccessIssue]
             else:
-                element.draw(screen, *pos) # pyright: ignore[reportAttributeAccessIssue]
+                element.draw(screen, pos) # pyright: ignore[reportAttributeAccessIssue]
     
     def run_if_possible(self) -> bool:
         self._key_func()
