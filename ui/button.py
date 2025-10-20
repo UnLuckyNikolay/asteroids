@@ -7,47 +7,33 @@ from ui.simple_sprite import SimpleSprite
 from ui.helpers import get_points
 
 class Button(Container):
-    layer = 100 # pyright: ignore
     def __init__(self,
-                 x, y, 
-                 width, height,
-                 corner_topleft, corner_topright, corner_bottomright, corner_bottomleft, 
+                 position, 
+                 size, 
+                 corners : tuple[int, int, int, int],
                  key_func : Callable, 
-                 condition_func : Callable,
-                 color,
-                 color_inactive,
-                 *tuples_element_allignment : tuple[Any, Allignment]
+                 condition_func : Callable = lambda: True,
     ):
         super().__init__(
-            x, y, 
-            width, height, 
-            corner_topleft, corner_topright, corner_bottomright, corner_bottomleft, 
-            color,
-            *tuples_element_allignment
+            position, 
+            size,
+            corners,
         )
-        self.color_inactive = color_inactive
-        self.key_func = key_func
-        self.condition_func = condition_func
+        self.__color_outline = (100, 200, 255, 255)
+        self.__color_outline_inactive = (100, 100, 100, 255)
+        self.__key_func = key_func
+        self.__condition_func = condition_func
 
     def draw(self, screen):
-        points = get_points(self.x, self.y, 
-                            self.height, self.width, 
-                            self.corner_topleft, self.corner_topright, 
-                            self.corner_bottomright, self.corner_bottomleft)
-        pygame.gfxdraw.filled_polygon(screen, points, (75, 75, 75, 100))
-        if self.condition_func():
-            pygame.draw.polygon(screen, self.color, points, 3)
+        points = get_points(self.__position, self.__size, self.__corners)
+        pygame.gfxdraw.filled_polygon(screen, points, self.__color_fill)
+        if self.__condition_func():
+            pygame.draw.polygon(screen, self.__color_outline, points, 3)
         else:
-            pygame.draw.polygon(screen, self.color_inactive, points, 3)
+            pygame.draw.polygon(screen, self.__color_outline_inactive, points, 3)
 
-        for tuple in self.tuples:
-            match tuple[1]:
-                case Allignment.NONE:
-                    x = self.x
-                    y = self.y
-                case Allignment.CENTER:
-                    x = self.x + self.width / 2
-                    y = self.y + self.height / 2
+        for tuple in self.__elements:
+            pos = self.__get_alligned_position(tuple[1])
 
             if callable(tuple[0]):
                 element = tuple[0]()
@@ -56,22 +42,25 @@ class Button(Container):
             else:
                 element = tuple[0]
 
-            if (isinstance(element, Text) or isinstance(element, SimpleSprite)) and not self.condition_func():
-                element.draw(screen, x, y, self.color_inactive) # pyright: ignore[reportAttributeAccessIssue]
+            if (isinstance(element, Text) or isinstance(element, SimpleSprite)) and not self.__condition_func():
+                element.draw(screen, *pos, self.__color_outline_inactive) # pyright: ignore[reportAttributeAccessIssue]
             else:
-                element.draw(screen, x, y) # pyright: ignore[reportAttributeAccessIssue]
+                element.draw(screen, *pos) # pyright: ignore[reportAttributeAccessIssue]
     
     def check_click(self, position):
-        if (position[0] > self.x and
-            position[0] < self.x + self.width and
-            position[1] > self.y and
-            position[1] < self.y + self.height):
+        if (position[0] > self.__position[0] and
+            position[0] < self.__position[0] + self.__size[0] and
+            position[1] > self.__position[1] and
+            position[1] < self.__position[1] + self.__size[1]):
             return True
         else:
             return False
 
     def run_if_possible(self) -> bool:
-        if self.condition_func():
-            self.key_func()
+        if self.__condition_func():
+            self.__key_func()
             return True
         return False
+
+    def set_inactive_outline_color(self, color : tuple[int, int, int, int]):
+        self.__color_outline_inactive = color

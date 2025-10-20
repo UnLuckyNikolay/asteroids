@@ -12,13 +12,13 @@ FIXES/TWEAKS:
 [ ] Change how max level upgrades are displayed (will need new buttons)
 [ ] Add minimum asteroid price
 [ ] Increase alpha of background of the pause menu (might need new buttons)
+[ ] Redo buttons
 [X] Redo ship parts and engine (as classes) to add ability to draw different shapes and make it more readable:
     [X] Have classes for parts and engines with draw methods, and lists of parts and engines to draw each from
     [X] Add Line part
     [X] Add Circle part
 
 IDEAS:
-[ ] Redo buttons, rename containers (`planes` maybe), add `hidden` option to them
 [ ] Revisit visible naming scheme for ship parts
 [ ] Add ship recolors (might need new buttons)
 [ ] More ship skins:

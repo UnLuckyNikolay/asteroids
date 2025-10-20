@@ -7,47 +7,33 @@ from ui.simple_sprite import SimpleSprite
 from ui.helpers import get_points
 
 class Switch(Container):
-    layer = 100 # pyright: ignore
     def __init__(self,
-                 x, y, 
-                 width, height,
-                 corner_topleft, corner_topright, corner_bottomright, corner_bottomleft, 
+                 position, 
+                 size, 
+                 corners : tuple[int, int, int, int],
                  key_func : Callable, 
-                 is_active,
-                 color,
-                 color_inactive,
-                 *tuples_element_allignment : tuple[Any, Allignment]
+                 is_active : bool,
     ):
         super().__init__(
-            x, y, 
-            width, height, 
-            corner_topleft, corner_topright, corner_bottomright, corner_bottomleft, 
-            color,
-            *tuples_element_allignment
+            position, 
+            size,
+            corners,
         )
-        self.color_inactive = color_inactive
-        self.key_func = key_func
-        self.is_active = is_active
+        self.__color_outline = (100, 200, 255, 255)
+        self.__color_outline_active = (0, 255, 0, 255)
+        self.__key_func = key_func
+        self.__is_active = is_active
 
     def draw(self, screen):
-        points = get_points(self.x, self.y, 
-                            self.height, self.width, 
-                            self.corner_topleft, self.corner_topright, 
-                            self.corner_bottomright, self.corner_bottomleft)
-        pygame.gfxdraw.filled_polygon(screen, points, (75, 75, 75, 100))
-        if self.is_active:
-            pygame.draw.polygon(screen, self.color, points, 3)
+        points = get_points(self.__position, self.__size, self.__corners)
+        pygame.gfxdraw.filled_polygon(screen, points, self.__color_fill)
+        if self.__is_active:
+            pygame.draw.polygon(screen, self.__color_outline_active, points, 3)
         else:
-            pygame.draw.polygon(screen, self.color_inactive, points, 3)
+            pygame.draw.polygon(screen, self.__color_outline, points, 3)
 
-        for tuple in self.tuples:
-            match tuple[1]:
-                case Allignment.NONE:
-                    x = self.x
-                    y = self.y
-                case Allignment.CENTER:
-                    x = self.x + self.width / 2
-                    y = self.y + self.height / 2
+        for tuple in self.__elements:
+            pos = self.__get_alligned_position(tuple[1])
 
             if callable(tuple[0]):
                 element = tuple[0]()
@@ -56,21 +42,24 @@ class Switch(Container):
             else:
                 element = tuple[0]
 
-            if (isinstance(element, Text) or isinstance(element, SimpleSprite)) and self.is_active:
-                element.draw(screen, x, y, self.color) # pyright: ignore[reportAttributeAccessIssue]
+            if (isinstance(element, Text) or isinstance(element, SimpleSprite)) and self.__is_active:
+                element.draw(screen, *pos, self.__color_outline_active) # pyright: ignore[reportAttributeAccessIssue]
             else:
-                element.draw(screen, x, y) # pyright: ignore[reportAttributeAccessIssue]
+                element.draw(screen, *pos) # pyright: ignore[reportAttributeAccessIssue]
     
     def check_click(self, position):
-        if (position[0] > self.x and
-            position[0] < self.x + self.width and
-            position[1] > self.y and
-            position[1] < self.y + self.height):
+        if (position[0] > self.__position[0] and
+            position[0] < self.__position[0] + self.__size[0] and
+            position[1] > self.__position[1] and
+            position[1] < self.__position[1] + self.__size[1]):
             return True
         else:
             return False
 
     def run_if_possible(self) -> bool:
-        self.key_func()
-        self.is_active = False if self.is_active else True            
+        self.__key_func()
+        self.__is_active = False if self.__is_active else True            
         return True
+
+    def set_active_outline_color(self, color : tuple[int, int, int, int]):
+        self.__color_outline_active = color

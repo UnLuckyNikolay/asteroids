@@ -10,42 +10,25 @@ class Allignment(Enum):
     CENTER = 1
 
 class Container(pygame.sprite.Sprite):
-    layer = 100 # pyright: ignore
     def __init__(self, 
-                 x, y, 
-                 width, height,
-                 corner_topleft, corner_topright, 
-                 corner_bottomright, corner_bottomleft, 
-                 color,
-                 *tuples_element_allignment : tuple[Any, Allignment]
+                 position : tuple[int, int],
+                 size : tuple[int, int],
+                 corners : tuple[int, int, int, int],
     ):
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.corner_topleft = corner_topleft
-        self.corner_topright = corner_topright
-        self.corner_bottomright = corner_bottomright
-        self.corner_bottomleft = corner_bottomleft
-        self.color = color
-        self.tuples = tuples_element_allignment
+        self.__position = position
+        self.__size = size
+        self.__corners : tuple[int, int, int, int] = (0, 0, 0, 0)
+        self.__color_outline = (200, 200, 200, 255)
+        self.__color_fill = (75, 75, 75, 100)
+        self.__elements : list[tuple[Any, Allignment]] = []
 
     def draw(self, screen):
-        points = get_points(self.x, self.y, 
-                            self.height, self.width, 
-                            self.corner_topleft, self.corner_topright, 
-                            self.corner_bottomright, self.corner_bottomleft)
-        pygame.gfxdraw.filled_polygon(screen, points, (75, 75, 75, 100))
-        pygame.draw.polygon(screen, self.color, points, 3)
+        points = get_points(self.__position, self.__size, self.__corners)
+        pygame.gfxdraw.filled_polygon(screen, points, self.__color_fill)
+        pygame.draw.polygon(screen, self.__color_outline, points, 3)
 
-        for tuple in self.tuples:
-            match tuple[1]:
-                case Allignment.NONE:
-                    x = self.x
-                    y = self.y
-                case Allignment.CENTER:
-                    x = self.x + self.width / 2
-                    y = self.y + self.height / 2
+        for tuple in self.__elements:
+            pos = self.__get_alligned_position(tuple[1])
 
             if callable(tuple[0]):
                 element = tuple[0]()
@@ -54,4 +37,23 @@ class Container(pygame.sprite.Sprite):
             else:
                 element = tuple[0]
 
-            element.draw(screen, x, y) # pyright: ignore[reportAttributeAccessIssue]
+            element.draw(screen, *pos) # pyright: ignore[reportAttributeAccessIssue]
+
+    def set_fill_color(self, color : tuple[int, int, int, int]):
+        self.__color_fill = color
+
+    def set_outline_color(self, color : tuple[int, int, int, int]):
+        self.__color_outline = color
+
+    def set_corners(self, topleft : int, topright : int, bottomright : int, bottomleft : int):
+        self.__corners = (topleft, topright, bottomright, bottomleft)
+
+    def add_element(self, element, allignment : Allignment = Allignment.NONE):
+        self.__elements.append((element, allignment))
+
+    def __get_alligned_position(self, allignment : Allignment) -> tuple[int, int]:
+        match allignment:
+            case Allignment.NONE:
+                return self.__position
+            case Allignment.CENTER:
+                return (int(self.__position[0] + self.__size[0] / 2), int(self.__position[1] + self.__size[1] / 2))

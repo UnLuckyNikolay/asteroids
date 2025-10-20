@@ -16,19 +16,19 @@ class HealthBar():
         lives = self.handler()
         match lives:
             case 3:
-                draw_polygon(screen, x+self.x, y+self.y, 26, 20, 2, 
-                             0, 0, 2, self.color_green)
-                draw_polygon(screen, x+self.x+24, y+self.y, 26, 20, 
-                             0, 0, 0, 0, self.color_green)
-                draw_polygon(screen, x+self.x+48, y+self.y, 26, 20, 
-                             0, self.corner_topright, self.corner_bottomright, 0, self.color_green)
+                draw_polygon(screen, (x+self.x, y+self.y), (26, 20), 
+                             (2, 0, 0, 2), self.color_green)
+                draw_polygon(screen, (x+self.x+24, y+self.y), (26, 20), 
+                             (0, 0, 0, 0), self.color_green)
+                draw_polygon(screen, (x+self.x+48, y+self.y), (26, 20), 
+                             (0, self.corner_topright, self.corner_bottomright, 0), self.color_green)
             case 2:
-                draw_polygon(screen, x+self.x, y+self.y, 26, 20, 
-                             2, 0, 0, 2, self.color_yellow)
-                draw_polygon(screen, x+self.x+24, y+self.y, 26, 20, 
-                             0, 2, 2, 0, self.color_yellow)
+                draw_polygon(screen, (x+self.x, y+self.y), (26, 20), 
+                             (2, 0, 0, 2), self.color_yellow)
+                draw_polygon(screen, (x+self.x+24, y+self.y), (26, 20), 
+                             (0, 2, 2, 0), self.color_yellow)
             case 1:
-                draw_polygon(screen, x+self.x, y+self.y, 26, 20, 
-                             2, 2, 2, 2, self.color_red)
+                draw_polygon(screen, (x+self.x, y+self.y), (26, 20), 
+                             (2, 2, 2, 2), self.color_red)
             case _:
                 return
