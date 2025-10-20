@@ -43,7 +43,7 @@ def draw_polygon(
         position : tuple[int, int],
         size : tuple[int, int],
         corners : tuple[int, int, int, int],
-        color : tuple[int, int, int] | tuple[int, int, int, int]
+        color : tuple[int, int, int, int]
     ):
     """Draws a filled quadrangular polygon with cut corners."""
 

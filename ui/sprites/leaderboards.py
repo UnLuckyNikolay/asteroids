@@ -13,14 +13,13 @@ class Leaderboards():
         containers = []
         
         for i in range(0, min(len(self.scores), LEADERBOARD_LENGTH)):
-            containers.append(
-                Container(self.x, self.y+65*i, 1080, 48, 15, 8, 15, 8,
-                          (200, 200, 200, 100),
-                          (TextF("{} - {}", 13, 8, self.font, (200, 200, 200, 100),
-                               self.scores[i]['score'],
-                               self.scores[i]['name']),
-                               Allignment.NONE))
+            c_next_board = Container((self.x, self.y+65*i), (1080, 48), (15, 8, 15, 8))
+            c_next_board.add_element(
+                TextF("{} - {}", 13, 8, self.font, (200, 200, 200, 100),
+                      self.scores[i]['score'],
+                      self.scores[i]['name'])
             )
+            containers.append(c_next_board)
         
         for container in containers:
             container.draw(screen)
