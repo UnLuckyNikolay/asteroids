@@ -13,15 +13,15 @@ FIXES/TWEAKS:
     - [x] Press on button up instead of down
     - [x] Refactor containers and buttons
     - [ ] Add descriptions while hovering
+- [x] Change how max level upgrades are displayed (will need new buttons)
+- [x] Revisit visible naming scheme for ship parts
 - [ ] Rename and move UserInterface class (possibly to GameStateManager), rename GameStateManager to RoundStateManager
 - [ ] Upgrade movement to properly handle turning of vectors, something is broken when turning without moving
 - [ ] Update screenshots in README
-- [ ] Change how max level upgrades are displayed (will need new buttons)
 - [ ] Add minimum asteroid price
 - [ ] Increase alpha of background of the pause menu (might need new buttons)
 
 IDEAS:
-- [ ] Revisit visible naming scheme for ship parts
 - [ ] Add ship recolors (might need new buttons)
 - [ ] More ship skins:
     - [x] UFO - will need new parts and 2 engines

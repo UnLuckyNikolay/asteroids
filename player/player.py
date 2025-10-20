@@ -10,13 +10,21 @@ from player.ship import Ship, ShipType
 
 
 # New upgrades should be added to methods get_upgrade_level and buy_upgrade
-class ShipPart(Enum):
+class ShipUpgrade(Enum):
     """List of player upgrades"""
 
-    WEAPON1 = "Weapon 1"
-    WEAPON2 = "Weapon 2"
-    MAGNETRADIUS = "Magnet Radius"
-    MAGNETSTRENGTH = "Magnet Strength"
+    PLASMAGUN_PROJECTILES = "Plasma Gun: Projectiles"
+    BOMBLAUNCHER_RADIUS = "Bomb Launcher: Radius"
+    MAGNET_RADIUS = "Magnet: Radius"
+    MAGNET_STRENGTH = "Magnet: Strength"
+
+# New parts should be added to get_part_level
+class ShipPart(Enum):
+    """List of player parts"""
+
+    PLASMAGUN = "Plasma Gun"
+    BOMBLAUNCHER = "Bomb Launcher"
+    MAGNET = "Magnet"
 
 class Player(CircleShape):
     layer = 50 # pyright: ignore
@@ -59,10 +67,9 @@ class Player(CircleShape):
         self.times_healed = 0
 
         self.time_since_last_shot = 0
-        self.weapons = []
-        self.weapons.append(PlasmaGun())
-        self.weapons.append(BombLauncher())
-        self.weapon = self.weapons[0]
+        self.weapon_plasmagun = (PlasmaGun())
+        self.weapon_bomblauncher = (BombLauncher())
+        self.weapon_current = self.weapon_plasmagun
 
         self.is_sus = False
         """True if cheats are enabled"""
@@ -132,7 +139,7 @@ class Player(CircleShape):
             self.position.y = -ASTEROID_MAX_RADIUS
 
     def attempt_shot(self, time_since_last_shot) -> bool:
-        return self.weapon.attempt_shot(self.position, self.rotation, time_since_last_shot)
+        return self.weapon_current.attempt_shot(self.position, self.rotation, time_since_last_shot)
 
     def update(self, dt):
         self.ship.update(dt) # For animations
@@ -152,8 +159,6 @@ class Player(CircleShape):
                     self.turning_speed -= int(PLAYER_TURNING_ACCELERATION / 2)
                 elif self.turning_speed < 0:
                     self.turning_speed += int(PLAYER_TURNING_ACCELERATION / 2)
-            case _:
-                print("Error: player.state_rotation went wild")
 
         # Movement
         if self.speed != 0:
@@ -173,8 +178,6 @@ class Player(CircleShape):
                     self.speed -= int(PLAYER_ACCELERATION / 2)
                 elif self.speed < 0:
                     self.speed += int(PLAYER_ACCELERATION / 2)
-            case _:
-                print("Error: player.state_movement went wild")
 
         # Shooting
         if self.is_shooting and self.attempt_shot(self.time_since_last_shot):
@@ -212,10 +215,10 @@ class Player(CircleShape):
         return self.money
 
     def get_current_weapon_name(self) -> str:
-        return self.weapon.get_name()
+        return self.weapon_current.get_name()
     
     def get_current_weapon_level(self) -> int:
-        return self.weapon.get_level()
+        return self.weapon_current.get_level()
     
     ### Ship
 
@@ -232,6 +235,15 @@ class Player(CircleShape):
     def switch_ship_model_to_previous(self):
         self.ship_model = (self.ship_model-1) % len(self.unlocked_ships)
         self.ship.switch_model(self.unlocked_ships[self.ship_model])
+
+    def get_part_level(self, part : ShipPart) -> int:
+        match part:
+            case ShipPart.PLASMAGUN:
+                return self.weapon_plasmagun._level
+            case ShipPart.BOMBLAUNCHER:
+                return self.weapon_bomblauncher._level
+            case ShipPart.MAGNET:
+                return self.magnet._level
     
     ### Health
     
@@ -253,18 +265,18 @@ class Player(CircleShape):
     
     ### Upgrades
 
-    def get_upgrade_level(self, ship_part : ShipPart) -> int:
+    def get_upgrade_level(self, ship_part : ShipUpgrade) -> int:
         match ship_part:
-            case ShipPart.WEAPON1:
-                return self.weapons[0].get_level()
-            case ShipPart.WEAPON2:
-                return self.weapons[1].get_level()
-            case ShipPart.MAGNETRADIUS:
-                return self.magnet.radius_level
-            case ShipPart.MAGNETSTRENGTH:
-                return self.magnet.strength_level
+            case ShipUpgrade.PLASMAGUN_PROJECTILES:
+                return self.weapon_plasmagun._level_projectiles
+            case ShipUpgrade.BOMBLAUNCHER_RADIUS:
+                return self.weapon_bomblauncher._level_radius
+            case ShipUpgrade.MAGNET_RADIUS:
+                return self.magnet._level_radius
+            case ShipUpgrade.MAGNET_STRENGTH:
+                return self.magnet._level_strength
             
-    def get_upgrade_price(self, ship_part : ShipPart) -> int:
+    def get_upgrade_price(self, ship_part : ShipUpgrade) -> int | None:
         level = self.get_upgrade_level(ship_part)
         match level:
             case 1:
@@ -272,19 +284,37 @@ class Player(CircleShape):
             case 2:
                 return 50
             case _:
-                return 999999
+                return None
             
-    def can_buy_upgrade(self, ship_part : ShipPart) -> bool:
-        return (self.money >= self.get_upgrade_price(ship_part))
+    def get_upgrade_price_as_text(self, ship_part : ShipUpgrade) -> str:
+        level = self.get_upgrade_level(ship_part)
+        match level:
+            case 1:
+                return "15g"
+            case 2:
+                return "50g"
+            case _:
+                return "MAX"
+            
+    def can_buy_upgrade(self, ship_part : ShipUpgrade) -> bool:
+        price = self.get_upgrade_price(ship_part)
+        return (
+            price is not None and
+            self.money >= price
+        )
     
-    def buy_upgrade(self, ship_part : ShipPart):
-        self.money -= self.get_upgrade_price(ship_part)
+    def buy_upgrade(self, ship_part : ShipUpgrade):
+        price = self.get_upgrade_price(ship_part)
+        if price == None:
+            return
+
+        self.money -= price
         match ship_part:
-            case ShipPart.WEAPON1:
-                self.weapons[0].upgrade()
-            case ShipPart.WEAPON2:
-                self.weapons[1].upgrade()
-            case ShipPart.MAGNETRADIUS:
+            case ShipUpgrade.PLASMAGUN_PROJECTILES:
+                self.weapon_plasmagun.upgrade_projectiles()
+            case ShipUpgrade.BOMBLAUNCHER_RADIUS:
+                self.weapon_bomblauncher.upgrade_radius()
+            case ShipUpgrade.MAGNET_RADIUS:
                 self.magnet.upgrade_radius()
-            case ShipPart.MAGNETSTRENGTH:
+            case ShipUpgrade.MAGNET_STRENGTH:
                 self.magnet.upgrade_strength()

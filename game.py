@@ -153,7 +153,7 @@ class Game():
                         self.player.collect_loot(loot.price)
                         loot.kill()
                     elif loot.check_colision(self.player.magnet):
-                        loot.home_towards(self.player.position, self.player.magnet.strength)
+                        loot.home_towards(self.player.position, self.player.magnet.get_strength())
 
                 self.dt = self.redraw_objects_and_ui()
 
@@ -191,22 +191,30 @@ class Game():
                     self.player.state_movement += 1
                 if event.type == pygame.KEYUP:
                     self.player.state_movement -= 1
+                    if self.player.state_movement > 0: # Checks in case WASD where pressed while starting the round
+                        self.player.state_movement = 0
             case 22: # S
                 if event.type == pygame.KEYDOWN:
                     self.player.state_movement -= 1
                 if event.type == pygame.KEYUP:
                     self.player.state_movement += 1
+                    if self.player.state_movement < 0:
+                        self.player.state_movement = 0
             # Rotation
             case 4: # A
                 if event.type == pygame.KEYDOWN:
                     self.player.state_rotation -= 1
                 if event.type == pygame.KEYUP:
                     self.player.state_rotation += 1
+                    if self.player.state_rotation < 0:
+                        self.player.state_rotation = 0
             case 7: # D
                 if event.type == pygame.KEYDOWN:
                     self.player.state_rotation += 1
                 if event.type == pygame.KEYUP:
                     self.player.state_rotation -= 1
+                    if self.player.state_rotation > 0:
+                        self.player.state_rotation = 0
             # Shooting
             case 44: # Space
                 if event.type == pygame.KEYDOWN:
@@ -216,10 +224,10 @@ class Game():
             # Weapon switching
             case 30 | 89: # 1 | Keypad1
                 if event.type == pygame.KEYDOWN and not self.is_paused:
-                    self.player.weapon = self.player.weapons[0]
+                    self.player.weapon_current = self.player.weapon_plasmagun
             case 31 | 90: # 2 | Keypad2
                 if event.type == pygame.KEYDOWN and not self.is_paused:
-                    self.player.weapon = self.player.weapons[1]
+                    self.player.weapon_current = self.player.weapon_bomblauncher
 
     def handle_event(self, event : pygame.event.Event):
         """Used for handling events in all menus."""

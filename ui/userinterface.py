@@ -13,7 +13,7 @@ from ui.sprites.healthbar import HealthBar
 from ui.sprites.leaderboards import Leaderboards
 from ui.sprites.symbol_fullscreen import SymbolFullscreen
 from gamestatemanager import GameStateManager
-from player.player import Player, ShipPart
+from player.player import Player, ShipUpgrade, ShipPart
 
 
 class Menu(Enum):
@@ -95,7 +95,6 @@ class UserInterface(pygame.sprite.Sprite):
     def check_click(self, position):
         """Checks mouse position against all the buttons in the current menus and tries to run the button function."""
 
-        print(f"Check for click in {self.__current_menu.value}")
         match self.__current_menu:
             case Menu.MAIN_MENU:
                 for button in self.__buttons_main_menu:
@@ -279,6 +278,7 @@ class UserInterface(pygame.sprite.Sprite):
             self.game.switch_hitbox,
             self.game.cheat_hitbox
         )
+        s_hitbox.set_active_outline_color(self.__color_golden)
         s_hitbox.add_element(
             Text("HB", 3, 7, self.__font_small, self.__color_blue)
         )
@@ -289,6 +289,7 @@ class UserInterface(pygame.sprite.Sprite):
             self.game.switch_stonks,
             self.game.cheat_stonks
         )
+        s_money.set_active_outline_color(self.__color_golden)
         s_money.add_element(
             Text("MN", 2, 7, self.__font_small, self.__color_blue)
         )
@@ -297,6 +298,7 @@ class UserInterface(pygame.sprite.Sprite):
         s_godmode = Switch((self.game.screen_resolution[0]-50, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
                            self.game.switch_godmode,
                            self.game.cheat_godmode)
+        s_godmode.set_active_outline_color(self.__color_golden)
         s_godmode.add_element(
             Text("GM", 2, 7, self.__font_small, self.__color_blue)
         )
@@ -426,27 +428,26 @@ class UserInterface(pygame.sprite.Sprite):
 
         c_heal = Container((offset_x+290, offset_y+65+row_height*2), (409, 36), (6, 3, 3, 6))
         c_heal.add_element(
-            TextH("Heal: {}g", 12, 5, self.__font_small, self.__color_white,
+            TextH("Heal: {}", 12, 5, self.__font_small, self.__color_white,
                   self.player.get_price_heal)
         )
         
         c_magnet = Container((offset_x+290, offset_y+65+row_height*3), (455, 36), (6, 6, 6, 6))
         c_magnet.add_element(
-            TextH("Magnet:r{}.s{}", 12, 5, self.__font_small, self.__color_white,
-                  lambda: self.player.get_upgrade_level(ShipPart.MAGNETRADIUS),
-                  lambda: self.player.get_upgrade_level(ShipPart.MAGNETSTRENGTH))
+            TextH("Magnet.v{}", 12, 5, self.__font_small, self.__color_white,
+                  lambda: self.player.get_part_level(ShipPart.MAGNET))
         )
         
         c_magnet_rad = Container((offset_x+290, offset_y+65+row_height*4), (409, 36), (6, 3, 3, 6))
         c_magnet_rad.add_element(
-            TextH("Radius: {}g", 12, 5, self.__font_small, self.__color_white,
-                  lambda: self.player.get_upgrade_price(ShipPart.MAGNETRADIUS))
+            TextH("Radius: {}", 12, 5, self.__font_small, self.__color_white,
+                  lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.MAGNET_RADIUS))
         )
         
         c_magnet_str = Container((offset_x+290, offset_y+65+row_height*5), (409, 36), (6, 3, 3, 6))
         c_magnet_str.add_element(
-            TextH("Strength: {}g", 12, 5, self.__font_small, self.__color_white,
-                  lambda: self.player.get_upgrade_price(ShipPart.MAGNETSTRENGTH))
+            TextH("Strength: {}", 12, 5, self.__font_small, self.__color_white,
+                  lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.MAGNET_STRENGTH))
         )
 
         # Current stats
@@ -475,27 +476,27 @@ class UserInterface(pygame.sprite.Sprite):
         c_weapon_1 = Container((offset_x+760, offset_y+65+row_height*1), (455, 36), (6, 6, 6, 6))
         c_weapon_1.add_element(
             TextH("Weapon 1: {}.v{}", 12, 5, self.__font_small, self.__color_white,
-                  self.player.weapons[0].get_name,
-                  lambda: self.player.get_upgrade_level(ShipPart.WEAPON1))
+                  self.player.weapon_plasmagun.get_name,
+                  lambda: self.player.get_part_level(ShipPart.PLASMAGUN))
         )
 
         c_weapon_1_proj = Container((offset_x+760, offset_y+65+row_height*2), (409, 36), (6, 3, 3, 6))
         c_weapon_1_proj.add_element(
-            TextH("Projectiles: {}g", 12, 5, self.__font_small, self.__color_white,
-                  lambda: self.player.get_upgrade_price(ShipPart.WEAPON1))
+            TextH("Projectiles: {}", 12, 5, self.__font_small, self.__color_white,
+                  lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.PLASMAGUN_PROJECTILES))
         )
         
         c_weapon_2 = Container((offset_x+760, offset_y+65+row_height*3), (455, 36), (6, 6, 6, 6))
         c_weapon_2.add_element(
             TextH("Weapon 2: {}.v{}", 12, 5, self.__font_small, self.__color_white,
-                  self.player.weapons[1].get_name,
-                  lambda: self.player.get_upgrade_level(ShipPart.WEAPON2))
+                  self.player.weapon_bomblauncher.get_name,
+                  lambda: self.player.get_part_level(ShipPart.BOMBLAUNCHER))
         )
         
         c_weapon_2_rad = Container((offset_x+760, offset_y+65+row_height*4), (409, 36), (6, 3, 3, 6))
         c_weapon_2_rad.add_element(
-            TextH("Radius: {}g", 12, 5, self.__font_small, self.__color_white,
-                  lambda: self.player.get_upgrade_price(ShipPart.WEAPON2))
+            TextH("Radius: {}", 12, 5, self.__font_small, self.__color_white,
+                  lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.BOMBLAUNCHER_RADIUS))
         )
 
         self.__containers_pause_menu.extend(
@@ -535,8 +536,8 @@ class UserInterface(pygame.sprite.Sprite):
         # Magnet
         b_magnet_rad = Button(
             (offset_x+709, offset_y+65+row_height*4), (36, 36), (3, 6, 6, 3),
-            lambda: self.player.buy_upgrade(ShipPart.MAGNETRADIUS),
-            lambda: self.player.can_buy_upgrade(ShipPart.MAGNETRADIUS)
+            lambda: self.player.buy_upgrade(ShipUpgrade.MAGNET_RADIUS),
+            lambda: self.player.can_buy_upgrade(ShipUpgrade.MAGNET_RADIUS)
         )
         b_magnet_rad.set_outline_color(self.__color_green)
         b_magnet_rad.add_element(
@@ -545,8 +546,8 @@ class UserInterface(pygame.sprite.Sprite):
 
         b_magnet_str = Button(
             (offset_x+709, offset_y+65+row_height*5), (36, 36), (3, 6, 6, 3),
-            lambda: self.player.buy_upgrade(ShipPart.MAGNETSTRENGTH),
-            lambda: self.player.can_buy_upgrade(ShipPart.MAGNETSTRENGTH)
+            lambda: self.player.buy_upgrade(ShipUpgrade.MAGNET_STRENGTH),
+            lambda: self.player.can_buy_upgrade(ShipUpgrade.MAGNET_STRENGTH)
         )
         b_magnet_str.set_outline_color(self.__color_green)
         b_magnet_str.add_element(
@@ -556,8 +557,8 @@ class UserInterface(pygame.sprite.Sprite):
         # Upgrade weapons
         b_weapon_1_up = Button(
             (offset_x+1179, offset_y+65+row_height*2), (36, 36), (3, 6, 6, 3),
-            lambda: self.player.buy_upgrade(ShipPart.WEAPON1),
-            lambda: self.player.can_buy_upgrade(ShipPart.WEAPON1)
+            lambda: self.player.buy_upgrade(ShipUpgrade.PLASMAGUN_PROJECTILES),
+            lambda: self.player.can_buy_upgrade(ShipUpgrade.PLASMAGUN_PROJECTILES)
         )
         b_weapon_1_up.set_outline_color(self.__color_green)
         b_weapon_1_up.add_element(
@@ -566,8 +567,8 @@ class UserInterface(pygame.sprite.Sprite):
         
         b_weapon_2_up = Button(
             (offset_x+1179, offset_y+65+row_height*4), (36, 36), (3, 6, 6, 3),
-            lambda: self.player.buy_upgrade(ShipPart.WEAPON2),
-            lambda: self.player.can_buy_upgrade(ShipPart.WEAPON2)
+            lambda: self.player.buy_upgrade(ShipUpgrade.BOMBLAUNCHER_RADIUS),
+            lambda: self.player.can_buy_upgrade(ShipUpgrade.BOMBLAUNCHER_RADIUS)
         )
         b_weapon_2_up.set_outline_color(self.__color_green)
         b_weapon_2_up.add_element(

@@ -6,24 +6,30 @@ from shapes.circleshape import CircleShape
 class Magnet(CircleShape):
     def __init__(self, position, radius):
         super().__init__(position, pygame.Vector2(0, 0), radius, create_copy_of_position=False)
-        self.radius_level : int = 1
-        self.strength_level : int = 1
-        self.strength : int = 4
+        self._level : int = 1
+        self._level_radius : int = 1
+        self._level_strength : int = 1
+        self._strength : int = 4
+
+    def get_strength(self):
+        return self._strength
 
     def upgrade_radius(self):
-        match self.radius_level:
+        self._level += 1
+        match self._level_radius:
             case 1:
-                self.radius_level = 2
+                self._level_radius = 2
                 self.radius = 175
             case 2:
-                self.radius_level = 3
+                self._level_radius = 3
                 self.radius = 250
 
     def upgrade_strength(self):
-        match self.strength_level:
+        self._level += 1
+        match self._level_strength:
             case 1:
-                self.strength_level = 2
-                self.strength = 7
+                self._level_strength = 2
+                self._strength = 7
             case 2:
-                self.strength_level = 3
-                self.strength = 10
+                self._level_strength = 3
+                self._strength = 10

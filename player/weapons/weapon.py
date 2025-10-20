@@ -3,14 +3,13 @@ from abc import ABC, abstractmethod
 
 
 class Weapon(pygame.sprite.Sprite):
-    def __init__(self, name, max_level):
+    def __init__(self, name):
         if hasattr(self, "containers"):
             super().__init__(self.containers) # pyright: ignore[reportAttributeAccessIssue]
         else:
             super().__init__()
-        self.__level = 1
-        self.__max_level = max_level
-        self.__name = name
+        self._level = 1
+        self._name = name
 
         
     @abstractmethod
@@ -18,13 +17,9 @@ class Weapon(pygame.sprite.Sprite):
         pass
 
 
-    def upgrade(self):
-        if self.__level < self.__max_level:
-            self.__level += 1
-
     def get_level(self):
-        return self.__level
+        return self._level
     
     def get_name(self):
-        return self.__name
+        return self._name
     
