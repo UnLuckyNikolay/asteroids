@@ -63,4 +63,5 @@ class Button(Container):
         return False
 
     def set_inactive_outline_color(self, color : tuple[int, int, int, int]):
+        """Default value - dark grey (100, 100, 100, 255)"""
         self._color_outline_inactive = color

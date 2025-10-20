@@ -58,7 +58,7 @@ class UserInterface(pygame.sprite.Sprite):
         self.__font_big = pygame.font.Font(font_path, 48)
 
         # Colors
-        self.__color_white = (200, 200, 200, 255)
+        self.__color_white = (240, 240, 240, 255)
         self.__color_gray = (100, 100, 100, 255)
         self.__color_blue = (100, 200, 255, 255)
         self.__color_red = (200, 0, 0, 255)

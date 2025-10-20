@@ -40,9 +40,17 @@ class Container(pygame.sprite.Sprite):
             element.draw(screen, *pos) # pyright: ignore[reportAttributeAccessIssue]
 
     def set_fill_color(self, color : tuple[int, int, int, int]):
+        """Default value - dark grey (75, 75, 75, 100)"""
         self._color_fill = color
 
     def set_outline_color(self, color : tuple[int, int, int, int]):
+        """
+        Default values:
+
+        Container - white (200, 200, 200, 255)
+
+        Buttons - blue (100, 200, 255, 255)
+        """
         self._color_outline = color
 
     def set_corners(self, topleft : int, topright : int, bottomright : int, bottomleft : int):

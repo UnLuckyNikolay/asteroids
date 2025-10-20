@@ -22,6 +22,7 @@ FIXES/TWEAKS:
 - [ ] Increase alpha of background of the pause menu (might need new buttons)
 
 IDEAS:
+- [x] Graphics/color adjustments for the leaderboards for top places
 - [ ] Add ship recolors (might need new buttons)
 - [ ] More ship skins:
     - [x] UFO - will need new parts and 2 engines
@@ -32,11 +33,11 @@ IDEAS:
     - [ ] Faster fire rate for Plasma Gun
 - [ ] Profiles
 - [ ] Saved name/ship settings (will need profiles)
-- [ ] Graphics/color adjustments for the leaderboards for top places
 - [ ] Bubble explosion vfx for bombs
 - [ ] Add amount limit to certain asteroids (mainly Homing)
 
 DISTANT/POSSIBLE IDEAS:
+- [ ] Sounds
 - [ ] Temporary boosts as loot
 - [ ] Difficulty selection (speed of difficulty ramp-up, max amount of special asteroids)
 - [ ] Persistent upgrades (will need profiles)

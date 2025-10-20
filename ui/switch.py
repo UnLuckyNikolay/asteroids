@@ -62,4 +62,5 @@ class Switch(Container):
         return True
 
     def set_active_outline_color(self, color : tuple[int, int, int, int]):
+        """Default value - green (0, 255, 0, 255)"""
         self._color_outline_active = color
