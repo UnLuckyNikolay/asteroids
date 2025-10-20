@@ -6,8 +6,7 @@ from enum import Enum
 from constants import *
 from json_helper.leaderboards.validator import ValidateLeaderboards
 from ui.container import Container, Allignment
-from ui.button import Button
-from ui.switch import Switch
+from ui.buttons import Button, Switch
 from ui.text import Text, TextH, TextF
 from ui.sprites.healthbar import HealthBar
 from ui.sprites.leaderboards import Leaderboards
@@ -180,7 +179,10 @@ class UserInterface(pygame.sprite.Sprite):
             case Menu.NAME_CHECK:
                 self.__draw_name_check(screen)
             case _:
-                print(f"> Error: missing menu {self.__current_menu.value} in UserInterface.draw")        
+                print(f"> Error: missing menu {self.__current_menu.value} in UserInterface.draw")
+
+        #if self.__hovered_button != None:
+
 
     def __draw_main_menu(self, screen):
         for container in self.__containers_main_menu:
