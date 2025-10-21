@@ -460,7 +460,7 @@ class UserInterface(pygame.sprite.Sprite):
         # <> Containers <>
 
         # Background
-        c_background = Container((offset_x+50, offset_y+50), (1180, 540), (20, 20, 8, 20))
+        c_background = Container((offset_x+50, offset_y+50), (1180, 540), (20, 20, 8, 15))
                 
         # Current ship
         c_ship = Container((offset_x+65, offset_y+65), (210, 210), (12, 6, 6, 6))
@@ -562,6 +562,21 @@ class UserInterface(pygame.sprite.Sprite):
         
         # <> Buttons <>
 
+        # Switch - Auto-Shoot
+        s_auto_shoot = Switch(
+            (offset_x+65, offset_y+535), (40, 40), (8, 8, 8, 8),
+            self.player.switch_auto_shoot,
+            self.player.is_auto_shooting
+        )
+        s_auto_shoot.add_description(
+            Text("Switch the auto-shoot on/off", (0, 0), self.__font_very_small, self.__color_white)
+        )
+        s_auto_shoot.set_active_outline_color(self.__color_green)
+        s_auto_shoot.add_element(
+            Text("AU", (1, 7), self.__font_small, self.__color_blue)
+        )
+        s_auto_shoot.set_active_outline_color = self.__color_green
+
         # Model switching
         b_model_left = Button(
             (offset_x+290, offset_y+65+row_height*1), (36, 36), (6, 3, 3, 6), 
@@ -646,7 +661,7 @@ class UserInterface(pygame.sprite.Sprite):
 
         self.__buttons_pause_menu.extend(
             [b_model_left, b_model_right, b_heal, b_magnet_rad, b_magnet_str,
-             b_weapon_1_up, b_weapon_2_up, b_end_run]
+             b_weapon_1_up, b_weapon_2_up, b_end_run, s_auto_shoot]
         )
 
     def __initialize_name_check(self):

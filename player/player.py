@@ -49,6 +49,7 @@ class Player(CircleShape):
         self.is_invul = False
         self.is_alive = True
         self.is_accelerating = False
+        self.is_auto_shooting = False
 
         self.unlocked_ships = [
             ShipType.POLY,
@@ -180,7 +181,10 @@ class Player(CircleShape):
                     self.speed += int(PLAYER_ACCELERATION / 2)
 
         # Shooting
-        if self.is_shooting and self.attempt_shot(self.time_since_last_shot):
+        if (
+            (self.is_shooting or self.is_auto_shooting) and 
+            self.attempt_shot(self.time_since_last_shot)
+        ):
             self.time_since_last_shot = 0
 
         # Invulnerability timer
@@ -219,6 +223,11 @@ class Player(CircleShape):
     
     def get_current_weapon_level(self) -> int:
         return self.weapon_current.get_level()
+    
+    # Helpers
+
+    def switch_auto_shoot(self):
+        self.is_auto_shooting = False if self.is_auto_shooting else True
     
     ### Ship
 

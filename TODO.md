@@ -25,6 +25,7 @@ FIXES/TWEAKS:
 
 IDEAS:
 - [x] Graphics/color adjustments for the leaderboards for top places
+- [x] Add auto-shoot switch
 - [ ] Add ship recolors (might need new buttons)
 - [ ] More ship skins:
     - [x] UFO - will need new parts and 2 engines

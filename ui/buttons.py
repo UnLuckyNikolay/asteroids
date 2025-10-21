@@ -88,7 +88,7 @@ class Button(_ButtonBase):
             position : tuple[int, int], 
             size : tuple[int, int], 
             corners : tuple[int, int, int, int],
-            key_func : Callable, 
+            key_func : Callable[[], None], 
             condition_func : Callable[[], bool] = lambda: True,
     ):
         super().__init__(
@@ -156,7 +156,7 @@ class Switch(_ButtonBase):
             position : tuple[int, int], 
             size : tuple[int, int], 
             corners : tuple[int, int, int, int],
-            key_func : Callable, 
+            key_func : Callable[[], None], 
             is_active : bool,
     ):
         super().__init__(
