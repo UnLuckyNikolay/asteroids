@@ -44,7 +44,7 @@ IDEAS:
 - [ ] Show current timer/difficulty modifier
 - [ ] Bubble explosion vfx for bombs
 - [ ] Add amount limit to certain asteroids (mainly Homing)
-- [ ] Condition to activate cheat switches
+- [x] Condition to activate cheat switches
 
 DISTANT/POSSIBLE IDEAS:
 - [ ] Sounds

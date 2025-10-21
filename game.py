@@ -254,6 +254,8 @@ class Game():
                 self.asteroid_field.update_spawns(self.screen_resolution)
         #elif event.type != pygame.MOUSEMOTION:
             #print(event)
+        else:
+            self.gsm.handle_event_for_secrets(event)
     
     def redraw_objects_and_ui(self) -> float:
         """

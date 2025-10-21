@@ -70,8 +70,8 @@ class GameStateManager(pygame.sprite.Sprite):
         self.__color_golden = (255, 215, 0, 255)
 
         # Secrets
-        # self.__konami_sequence : list[int] = []
-        # self.__konami_progress : int = 0
+        self.__konami_sequence : list[int] = [82, 82, 81, 81, 80, 79, 80, 79, 5, 4, 40]
+        self.__konami_progress : int = 0
 
         # Starting menu
         self.__current_menu : Menu = Menu.MAIN_MENU
@@ -240,7 +240,7 @@ class GameStateManager(pygame.sprite.Sprite):
         self.__containers_main_menu : list[Container] = []
         self.__buttons_main_menu : list[Button | Switch] = []
 
-        #self.__konami_progress = 0
+        self.__konami_progress = 0 # Resets Konami sequence
 
         center_x = int((self.game.screen_resolution[0])/2)
         center_y = int((self.game.screen_resolution[1])/2)
@@ -252,14 +252,20 @@ class GameStateManager(pygame.sprite.Sprite):
         c_settings.add_element(
             Text("Settings", (5, 1), self.__font_very_small, self.__color_white)
         )
-        # Cheats
-        c_cheats = Container((self.game.screen_resolution[0]-100, self.game.screen_resolution[1]-80), (90, 20), (2, 8, 2, 8))
-        c_cheats.add_element(
-            Text("Cheats", (13, 1), self.__font_very_small, self.__color_white)
-        )
+
+        if self.game.cheats_found:
+            # Cheats
+            c_cheats = Container((self.game.screen_resolution[0]-100, self.game.screen_resolution[1]-80), (90, 20), (2, 8, 2, 8))
+            c_cheats.add_element(
+                Text("Cheats", (13, 1), self.__font_very_small, self.__color_white)
+            )
+            
+            self.__containers_main_menu.extend(
+                [c_cheats]
+            )
         
         self.__containers_main_menu.extend(
-            [c_settings, c_cheats]
+            [c_settings]
         )
         
         # <> Buttons <>
@@ -314,50 +320,54 @@ class GameStateManager(pygame.sprite.Sprite):
             Allignment.CENTER
         )
 
-        # Cheat - Show hitbox
-        s_hitbox = Switch(
-            (self.game.screen_resolution[0]-150, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
-            self.game.switch_hitbox,
-            self.game.cheat_hitbox
-        )
-        s_hitbox.add_description(
-            Text("Switch the HITBOX cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
-        )
-        s_hitbox.set_active_outline_color(self.__color_golden)
-        s_hitbox.add_element(
-            Text("HB", (3, 7), self.__font_small, self.__color_blue)
-        )
-        s_hitbox.set_active_outline_color = self.__color_golden
-        # Cheat - Money cheat
-        s_money = Switch(
-            (self.game.screen_resolution[0]-100, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
-            self.game.switch_stonks,
-            self.game.cheat_stonks
-        )
-        s_money.add_description(
-            Text("Switch the MONEY cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
-        )
-        s_money.set_active_outline_color(self.__color_golden)
-        s_money.add_element(
-            Text("MN", (2, 7), self.__font_small, self.__color_blue)
-        )
-        s_money.set_active_outline_color = self.__color_golden
-        # Cheat - Godmode
-        s_godmode = Switch((self.game.screen_resolution[0]-50, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
-                           self.game.switch_godmode,
-                           self.game.cheat_godmode)
-        s_godmode.add_description(
-            Text("Switch the GODMODE cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
-        )
-        s_godmode.set_active_outline_color(self.__color_golden)
-        s_godmode.add_element(
-            Text("GM", (2, 7), self.__font_small, self.__color_blue)
-        )
-        s_godmode.set_active_outline_color = self.__color_golden
+        if self.game.cheats_found:
+            # Cheat - Show hitbox
+            s_hitbox = Switch(
+                (self.game.screen_resolution[0]-150, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
+                self.game.switch_hitbox,
+                self.game.cheat_hitbox
+            )
+            s_hitbox.add_description(
+                Text("Switch the HITBOX cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
+            )
+            s_hitbox.set_active_outline_color(self.__color_golden)
+            s_hitbox.add_element(
+                Text("HB", (3, 7), self.__font_small, self.__color_blue)
+            )
+            s_hitbox.set_active_outline_color = self.__color_golden
+            # Cheat - Money cheat
+            s_money = Switch(
+                (self.game.screen_resolution[0]-100, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
+                self.game.switch_stonks,
+                self.game.cheat_stonks
+            )
+            s_money.add_description(
+                Text("Switch the MONEY cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
+            )
+            s_money.set_active_outline_color(self.__color_golden)
+            s_money.add_element(
+                Text("MN", (2, 7), self.__font_small, self.__color_blue)
+            )
+            s_money.set_active_outline_color = self.__color_golden
+            # Cheat - Godmode
+            s_godmode = Switch((self.game.screen_resolution[0]-50, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
+                            self.game.switch_godmode,
+                            self.game.cheat_godmode)
+            s_godmode.add_description(
+                Text("Switch the GODMODE cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
+            )
+            s_godmode.set_active_outline_color(self.__color_golden)
+            s_godmode.add_element(
+                Text("GM", (2, 7), self.__font_small, self.__color_blue)
+            )
+            s_godmode.set_active_outline_color = self.__color_golden
+                
+            self.__buttons_main_menu.extend(
+                [s_hitbox, s_money, s_godmode]
+            )
         
         self.__buttons_main_menu.extend(
-            [b_start, b_leaderboard, b_exit, b_background, s_fullscreen, 
-            s_hitbox, s_money, s_godmode]
+            [b_start, b_leaderboard, b_exit, b_background, s_fullscreen]
         )
         
     def __initialize_leaderboard(self):
@@ -719,7 +729,7 @@ class GameStateManager(pygame.sprite.Sprite):
             [b_confirm]
         )
 
-# Template
+    ### Template for menus
 
     # def __initialize_(self):
     #     self.__containers_ : list[Container] = []
@@ -739,6 +749,16 @@ class GameStateManager(pygame.sprite.Sprite):
 
     ### Secret stuff
 
-    # def handle_event_for_secrets(self, event : pygame.event.Event):
-    #     match self.__current_menu:
-    #         case Menu.MAIN_MENU:
+    def handle_event_for_secrets(self, event : pygame.event.Event):
+        match self.__current_menu:
+            case Menu.MAIN_MENU:
+                if event.type == pygame.KEYDOWN:
+                    # Cheat visibility
+                    if event.scancode == self.__konami_sequence[self.__konami_progress]:
+                        self.__konami_progress += 1
+                        if self.__konami_progress == 11:
+                            self.__konami_progress = 0
+                            self.game.cheats_found = True
+                            self.initialize_current_menu()
+                    else:
+                        self.__konami_progress = 0
