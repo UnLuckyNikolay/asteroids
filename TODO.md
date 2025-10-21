@@ -44,6 +44,7 @@ IDEAS:
 - [ ] Bubble explosion vfx for bombs
 - [ ] Add amount limit to certain asteroids (mainly Homing)
 - [x] Condition to activate cheat switches
+- [ ] Check how to save crash logs
 
 DISTANT/POSSIBLE IDEAS:
 - [ ] Sounds
