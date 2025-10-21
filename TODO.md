@@ -20,8 +20,7 @@ FIXES/TWEAKS:
 - [x] Rename and move UserInterface class to GameStateManager, rename GameStateManager to RoundStateManager
 - [ ] Upgrade movement to properly handle turning of vectors, something is broken when turning without moving
 - [ ] Update screenshots in README
-- [ ] Add minimum asteroid price
-- [ ] Increase alpha of background of the pause menu
+- [x] Increase alpha of background of the pause menu
 - [ ] Revamp difficulty increase
 
 IDEAS:
@@ -38,7 +37,7 @@ IDEAS:
     - [ ] Short fuse for the Bomb Launcher
     - [ ] Faster fire rate for Plasma Gun
 - [ ] Profiles
-    - [ ] Player reset method
+    - [x] Player reset method
     - [ ] Profile creation
     - [ ] Player info
 - [ ] Show current timer/difficulty modifier

@@ -28,8 +28,8 @@ class ShipPart(Enum):
 
 class Player(CircleShape):
     layer = 50 # pyright: ignore
-    def __init__(self, game, position : pygame.Vector2, cheat_godmode : bool, cheat_stonks : bool, cheat_hitbox : bool):
-        super().__init__(position, (0,0), PLAYER_RADIUS)
+    def __init__(self, game):
+        super().__init__(pygame.Vector2(-100, -100), (0,0), PLAYER_RADIUS)
         self.rotation = 180
         self.rotation_inertia = self.rotation
         self.inertia = pygame.Vector2(0, 0)
@@ -43,7 +43,9 @@ class Player(CircleShape):
         self.is_shooting : bool = False
 
         self.game = game
-        self.cheat_godmode = cheat_godmode
+        self.cheat_godmode = False
+        self.cheat_hitbox = False
+        self.cheat_stonks = False
 
         self.timer_invul = 0
         self.is_invul : bool = False
@@ -59,10 +61,10 @@ class Player(CircleShape):
             ShipType.UFO,
         ]
         self.ship_model = 3
-        self.ship = Ship(self.unlocked_ships[self.ship_model], self.radius, cheat_hitbox)
-        self.magnet = Magnet(self.position, 100)
+        self.ship = Ship(self.unlocked_ships[self.ship_model], self.radius)
+        self.magnet = Magnet(self.position)
 
-        self.money = 0 if not cheat_stonks else 9999
+        self.money = 0
         self.lives = 3
         self.lives_max = 3
         self.times_healed = 0
@@ -74,8 +76,6 @@ class Player(CircleShape):
 
         self.is_sus : bool = False
         """True if cheats are enabled"""
-        if cheat_godmode or cheat_hitbox or cheat_stonks:
-            self.is_sus = True
     
 
     @property
@@ -110,6 +110,47 @@ class Player(CircleShape):
         else:
             self.__speed = value
 
+
+    def reset(self):
+        self.position = pygame.Vector2(-100, -100)
+        self.rotation = 180
+        self.rotation_inertia = self.rotation
+        self.inertia = pygame.Vector2(0, 0)
+        self.__speed = 0
+        self.__turning_speed = 0
+        self.last_dt = 0
+
+        # For controls in game.handle_event_for_ship_controls()
+        self.state_movement : int = 0 # -1 - going backwards, 0 - nothing, 1 - going forward
+        self.state_rotation : int = 0 # -1 - rotating left, 0 - nothing, 1 - rotating right
+        self.is_shooting : bool = False
+
+        self.timer_invul = 0
+        self.is_invul : bool = False
+        self.is_alive : bool = True
+        self.is_accelerating : bool = False
+        self.is_auto_shooting : bool = False
+
+        self.magnet = Magnet(self.position)
+        
+        self.money = 0
+        self.lives = 3
+        self.lives_max = 3
+        self.times_healed = 0
+
+        self.time_since_last_shot = 0
+        self.weapon_plasmagun = PlasmaGun()
+        self.weapon_bomblauncher = BombLauncher()
+        self.weapon_current = self.weapon_plasmagun
+
+    def teleport_and_prepare_for_round(self, position : tuple[int, int]):
+        self.position = pygame.Vector2(position)
+        self.magnet = Magnet(self.position)
+
+        if self.cheat_godmode or self.cheat_hitbox or self.cheat_stonks:
+            self.is_sus = True
+        if self.cheat_stonks:
+            self.money = 9999
 
     def draw(self, screen):
         self.ship.draw_rotated(
@@ -228,6 +269,16 @@ class Player(CircleShape):
 
     def switch_auto_shoot(self):
         self.is_auto_shooting = False if self.is_auto_shooting else True
+
+    def switch_godmode(self):
+        self.cheat_godmode = False if self.cheat_godmode else True
+
+    def switch_stonks(self):
+        self.cheat_stonks = False if self.cheat_stonks else True
+
+    def switch_hitbox(self):
+        self.cheat_hitbox = False if self.cheat_hitbox else True
+        self.ship.switch_hitbox_to(self.cheat_hitbox)
     
     ### Ship
 

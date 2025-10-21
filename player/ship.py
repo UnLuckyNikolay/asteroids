@@ -12,13 +12,13 @@ class ShipType(Enum):
     UFO = "UFO.v1"
 
 class Ship():
-    def __init__(self, type : ShipType, hitbox_radius, show_hitbox):
+    def __init__(self, type : ShipType, hitbox_radius):
         self.type = type
         self.time = 0
         self.current_parts : list[PartPolygon | PartCircle | PartEngineVfx]
         self.alpha = 255
 
-        self.show_hitbox = show_hitbox
+        self.show_hitbox = False
         self.hitbox_radius = hitbox_radius
 
         # Engine animation
@@ -147,6 +147,9 @@ class Ship():
     def switch_model(self, type : ShipType):
         self.type = type
         self.current_parts = self.__get_parts(type)
+
+    def switch_hitbox_to(self, boolean : bool):
+        self.show_hitbox = boolean
 
     def draw_rotated(self, screen, position : pygame.Vector2, rotation : int, magnet_radius : int, is_accelerating : bool, timer_invul=0):
         """Used to draw ships during gameplay."""

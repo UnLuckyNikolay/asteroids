@@ -32,7 +32,7 @@ class GameStateManager(pygame.sprite.Sprite):
 
         self.game = game
         self.rsm : RoundStateManager = None
-        self.player : Player = None
+        self.player : Player
         self.__hovered_button : Button | Switch | None = None
 
         # Getting the font
@@ -63,11 +63,17 @@ class GameStateManager(pygame.sprite.Sprite):
 
         # Colors
         self.__color_white = (240, 240, 240, 255)
+        """(240, 240, 240, 255)"""
         self.__color_gray = (100, 100, 100, 255)
+        """(100, 100, 100, 255)"""
         self.__color_blue = (100, 200, 255, 255)
+        """(100, 200, 255, 255)"""
         self.__color_red = (200, 0, 0, 255)
+        """(200, 0, 0, 255)"""
         self.__color_green = (0, 255, 0, 255)
+        """(0, 255, 0, 255)"""
         self.__color_golden = (255, 215, 0, 255)
+        """(255, 215, 0, 255)"""
 
         # Secrets
         self.__konami_sequence : list[int] = [82, 82, 81, 81, 80, 79, 80, 79, 5, 4, 40]
@@ -77,9 +83,8 @@ class GameStateManager(pygame.sprite.Sprite):
         self.__current_menu : Menu = Menu.MAIN_MENU
         self.initialize_current_menu()
 
-    def start_round(self, rsm, player):
+    def start_round(self, rsm):
         self.rsm = rsm
-        self.player = player
         self.switch_menu(Menu.HUD)
 
     def switch_menu(self, menu : Menu):
@@ -324,8 +329,8 @@ class GameStateManager(pygame.sprite.Sprite):
             # Cheat - Show hitbox
             s_hitbox = Switch(
                 (self.game.screen_resolution[0]-150, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
-                self.game.switch_hitbox,
-                self.game.cheat_hitbox
+                self.player.switch_hitbox,
+                self.player.cheat_hitbox
             )
             s_hitbox.add_description(
                 Text("Switch the HITBOX cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
@@ -338,8 +343,8 @@ class GameStateManager(pygame.sprite.Sprite):
             # Cheat - Money cheat
             s_money = Switch(
                 (self.game.screen_resolution[0]-100, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
-                self.game.switch_stonks,
-                self.game.cheat_stonks
+                self.player.switch_stonks,
+                self.player.cheat_stonks
             )
             s_money.add_description(
                 Text("Switch the MONEY cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
@@ -350,9 +355,11 @@ class GameStateManager(pygame.sprite.Sprite):
             )
             s_money.set_active_outline_color = self.__color_golden
             # Cheat - Godmode
-            s_godmode = Switch((self.game.screen_resolution[0]-50, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
-                            self.game.switch_godmode,
-                            self.game.cheat_godmode)
+            s_godmode = Switch(
+                (self.game.screen_resolution[0]-50, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
+                self.player.switch_godmode,
+                self.player.cheat_godmode
+            )
             s_godmode.add_description(
                 Text("Switch the GODMODE cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
             )
@@ -409,6 +416,7 @@ class GameStateManager(pygame.sprite.Sprite):
             (self.game.screen_resolution[0]-200, 68), (100, 36), (3, 6, 3, 6), 
             self.__reset_leaderboard
         )
+        b_reset.set_fill_color((100, 0, 0, 75))
         b_reset.make_weighted(ModKey.SHIFT)
         b_reset.set_outline_color(self.__color_red)
         b_reset.add_description(
@@ -484,6 +492,7 @@ class GameStateManager(pygame.sprite.Sprite):
 
         # Background
         c_background = Container((offset_x+50, offset_y+50), (1180, 540), (20, 20, 8, 15))
+        c_background.set_fill_color((75, 75, 100, 150))
                 
         # Current ship
         c_ship = Container((offset_x+65, offset_y+65), (210, 210), (12, 6, 6, 6))
@@ -674,6 +683,7 @@ class GameStateManager(pygame.sprite.Sprite):
             self.game.handler_finish_round
         )
         b_end_run.make_weighted(ModKey.SHIFT)
+        b_end_run.set_fill_color((100, 0, 0, 75))
         b_end_run.set_outline_color(self.__color_red)
         b_end_run.add_description(
             Text("SHIFT+Click to end the run early", (0, 0), self.__font_very_small, self.__color_white)

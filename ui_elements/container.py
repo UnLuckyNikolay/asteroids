@@ -20,7 +20,7 @@ class Container(pygame.sprite.Sprite):
         self._corners = corners
 
         self._color_outline = (200, 200, 200, 255)
-        self._color_fill = (75, 75, 75, 100)
+        self._color_fill = (75, 75, 100, 75)
         
         self._elements : list[tuple[Any, Allignment]] = []
 
@@ -42,7 +42,7 @@ class Container(pygame.sprite.Sprite):
             element.draw(screen, pos) # pyright: ignore[reportAttributeAccessIssue]
 
     def set_fill_color(self, color : tuple[int, int, int, int]):
-        """Default value - dark grey (75, 75, 75, 100)"""
+        """Default value - blue-ish grey (75, 75, 100, 75)"""
         self._color_fill = color
 
     def set_outline_color(self, color : tuple[int, int, int, int]):

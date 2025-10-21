@@ -37,10 +37,6 @@ class Game():
         self.player_name = "Player"
         self.cheats_found = False
 
-        self.cheat_godmode = False
-        self.cheat_stonks = False
-        self.cheat_hitbox = False
-
         self.updatable = pygame.sprite.Group()   # Must have method .update(delta)
         self.drawable = pygame.sprite.Group()
         self.asteroids = pygame.sprite.Group()            # Used for colision detection
@@ -55,12 +51,12 @@ class Game():
         StarField.containers = (self.drawable)
         Explosion.containers = (self.updatable, self.drawable, self.cleanup)
 
-        Player.containers = (self.updatable, self.drawable, self.cleanup)
+        Player.containers = (self.updatable, self.drawable)
         ProjectilePlasma.containers = (self.projectiles, self.updatable, self.drawable, self.moving_objects, self.cleanup)
         Bomb.containers = (self.drawable, self.updatable, self.cleanup)
         BombExplosion.containers = (self.explosion_hitboxes, self.cleanup)
 
-        AsteroidField.containers = (self.updatable)
+        AsteroidField.containers = (self.updatable, self.cleanup)
         Asteroid.containers = (self.asteroids, self.updatable, self.drawable, self.moving_objects, self.cleanup)
         Ore.containers = (self.loot, self.updatable, self.drawable, self.moving_objects, self.cleanup)
 
@@ -76,8 +72,9 @@ class Game():
 
         self.star_field = StarField(self.screen_resolution_fullscreen)
         self.gsm = GameStateManager(self)
+        self.player : Player = Player(self)
+        self.gsm.player = self.player
         self.asteroid_field = None
-        self.player = None
 
     def run(self):
         while self.is_running:
@@ -90,14 +87,13 @@ class Game():
             self.redraw_objects_and_ui()
 
     def game_loop(self):
-        self.player = Player(self, pygame.Vector2(self.screen_resolution[0] / 2, self.screen_resolution[1] / 2),
-                             self.cheat_godmode, self.cheat_stonks, self.cheat_hitbox)
         self.rsm = RoundStateManager(self.player)
         self.asteroid_field = AsteroidField(self, self.player, self.screen_resolution)
         self.gsm.rsm = self.rsm
         self.is_paused = False
         
-        self.gsm.start_round(self.rsm, self.player)
+        self.player.teleport_and_prepare_for_round((int(self.screen_resolution[0] / 2), int(self.screen_resolution[1] / 2)))
+        self.gsm.start_round(self.rsm)
 
 
         while self.player.is_alive:
@@ -171,10 +167,9 @@ class Game():
             self.gsm.check_score(self.rsm.score)
         self.gsm.switch_menu(Menu.MAIN_MENU)
 
-        self.player = None
+        self.player.reset()
         self.rsm = None
         self.asteroid_field = None
-        self.gsm.player = None
         self.gsm.rsm = None
 
         for object in self.cleanup:
@@ -185,7 +180,7 @@ class Game():
     def handle_keyboard_event_for_ship_controls(self, event : pygame.event.Event):
         """Used for handling inputs for controlling the ship during gameplay and pause."""
 
-        if self.player == None:
+        if self.rsm == None:
             return
 
         match event.scancode:
@@ -314,7 +309,7 @@ class Game():
         self.is_running = False
 
     def handler_finish_round(self):
-        if self.player != None and self.player.is_alive:
+        if self.player.is_alive:
             self.player.is_alive = False
 
     def handler_regenerate_background(self):
@@ -322,19 +317,6 @@ class Game():
 
     def finish_getting_player_name(self):
         self.getting_player_name = False
-
-    def switch_godmode(self):
-        self.cheat_godmode = False if self.cheat_godmode else True
-        if self.player != None:
-            self.player.cheat_godmode = self.cheat_godmode
-
-    def switch_stonks(self):
-        self.cheat_stonks = False if self.cheat_stonks else True
-
-    def switch_hitbox(self):
-        self.cheat_hitbox = False if self.cheat_hitbox else True
-        if self.player != None:
-            self.player.ship.show_hitbox = self.cheat_hitbox
 
     def switch_fullscreen(self):
         if not self.is_fullscreen:

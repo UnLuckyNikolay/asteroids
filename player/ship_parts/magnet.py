@@ -4,8 +4,8 @@ from shapes.circleshape import CircleShape
 
 
 class Magnet(CircleShape):
-    def __init__(self, position, radius):
-        super().__init__(position, pygame.Vector2(0, 0), radius, create_copy_of_position=False)
+    def __init__(self, position):
+        super().__init__(position, pygame.Vector2(0, 0), 100, create_copy_of_position=False)
         self._level : int = 1
         self._level_radius : int = 1
         self._level_strength : int = 1
