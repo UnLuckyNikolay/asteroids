@@ -2,7 +2,7 @@ venv/
 __pycache__/
 
 test.py
-leaderboard.json
+saves/
 
 build/
 dist/

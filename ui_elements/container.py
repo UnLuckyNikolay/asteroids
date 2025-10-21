@@ -2,7 +2,7 @@ import pygame, pygame.gfxdraw
 from enum import Enum
 from typing import Any
 
-from ui.helpers import get_points
+from ui_elements.helpers import get_points
 
 
 class Allignment(Enum):

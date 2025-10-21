@@ -1,6 +1,6 @@
 from typing import Callable
 
-from ui.helpers import draw_polygon
+from ui_elements.helpers import draw_polygon
 
 class HealthBar():
     def __init__(

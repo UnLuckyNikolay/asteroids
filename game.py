@@ -3,17 +3,19 @@
 import pygame
 
 from constants import *
+from game_state_manager import GameStateManager, Menu
+from round_state_manager import RoundStateManager
+
 from player.player import Player
 from player.weapons.projectiles.projectileplasma import ProjectilePlasma
 from player.weapons.projectiles.bomb import Bomb
 from player.weapons.projectiles.bombexplosion import BombExplosion
-from gamestatemanager import GameStateManager
 from vfx.explosion import Explosion
+
 from world.starfield import StarField
 from world.asteroidfield import AsteroidField
 from asteroids.asteroid import Asteroid
 from asteroids.ores import Ore
-from ui.userinterface import UserInterface, Menu
 
 
 class Game():
@@ -33,6 +35,7 @@ class Game():
         self.is_paused = False
         self.getting_player_name = False
         self.player_name = "Player"
+        self.cheats_found = False
 
         self.cheat_godmode = False
         self.cheat_stonks = False
@@ -47,7 +50,7 @@ class Game():
         self.moving_objects = pygame.sprite.Group()       # Used to destroy objects that are off-screen
         self.cleanup = pygame.sprite.Group()   # This group is cleaned (object.kill()) after each round
 
-        UserInterface.containers = (self.drawable)
+        GameStateManager.containers = (self.drawable)
 
         StarField.containers = (self.drawable)
         Explosion.containers = (self.updatable, self.drawable, self.cleanup)
@@ -72,7 +75,7 @@ class Game():
         # 100 - UserInterface
 
         self.star_field = StarField(self.screen_resolution_fullscreen)
-        self.ui = UserInterface(self)
+        self.gsm = GameStateManager(self)
         self.asteroid_field = None
         self.player = None
 
@@ -89,12 +92,12 @@ class Game():
     def game_loop(self):
         self.player = Player(self, pygame.Vector2(self.screen_resolution[0] / 2, self.screen_resolution[1] / 2),
                              self.cheat_godmode, self.cheat_stonks, self.cheat_hitbox)
-        self.gsm = GameStateManager(self.player)
+        self.rsm = RoundStateManager(self.player)
         self.asteroid_field = AsteroidField(self, self.player, self.screen_resolution)
-        self.ui.gsm = self.gsm
+        self.gsm.rsm = self.rsm
         self.is_paused = False
         
-        self.ui.start_round(self.gsm, self.player)
+        self.gsm.start_round(self.rsm, self.player)
 
 
         while self.player.is_alive:
@@ -106,12 +109,12 @@ class Game():
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                         if not self.is_paused:
                             self.is_paused = True
-                            self.ui.switch_menu(Menu.PAUSE_MENU)
+                            self.gsm.switch_menu(Menu.PAUSE_MENU)
                         else:
                             self.is_paused = False
-                            self.ui.switch_menu(Menu.HUD)
+                            self.gsm.switch_menu(Menu.HUD)
                     else:
-                        self.handle_event_for_ship_controls(event)
+                        self.handle_keyboard_event_for_ship_controls(event)
                 else:
                     self.handle_event(event)
 
@@ -128,7 +131,7 @@ class Game():
                 # Player hit
                 for asteroid in self.asteroids:
                     if asteroid.check_colision(self.player) and not self.player.is_invul:
-                        if self.player.take_damage_and_check_if_alive(self.gsm):
+                        if self.player.take_damage_and_check_if_alive(self.rsm):
                             asteroid.kill()
                             explosion = Explosion(asteroid.position, asteroid.radius)
                     
@@ -138,14 +141,14 @@ class Game():
                             projectile.kill()
                             asteroid.split()
                             explosion = Explosion(asteroid.position, asteroid.radius)
-                            self.gsm.score += asteroid.reward
+                            self.rsm.score += asteroid.reward
                     
                 # Asteroid exploded
                 for hitbox in self.explosion_hitboxes:
                     for asteroid in self.asteroids:
                         if hitbox.check_colision(asteroid) and not asteroid.has_been_hit:
                             asteroid.split()
-                            self.gsm.score += asteroid.reward
+                            self.rsm.score += asteroid.reward
                     hitbox.kill()
 
                 # Loot collected
@@ -163,23 +166,23 @@ class Game():
                 self.redraw_objects_and_ui()
 
         # Saving score and going back to Main Menu
-        if not self.player.is_sus and self.gsm.score > 0:
-            self.ui.switch_menu(Menu.NAME_CHECK)
-            self.ui.check_score(self.gsm.score)
-        self.ui.switch_menu(Menu.MAIN_MENU)
+        if not self.player.is_sus and self.rsm.score > 0:
+            self.gsm.switch_menu(Menu.NAME_CHECK)
+            self.gsm.check_score(self.rsm.score)
+        self.gsm.switch_menu(Menu.MAIN_MENU)
 
         self.player = None
-        self.gsm = None
+        self.rsm = None
         self.asteroid_field = None
-        self.ui.player = None
-        self.ui.gsm = None
+        self.gsm.player = None
+        self.gsm.rsm = None
 
         for object in self.cleanup:
             object.kill()
 
     ### Helpers
 
-    def handle_event_for_ship_controls(self, event : pygame.event.Event):
+    def handle_keyboard_event_for_ship_controls(self, event : pygame.event.Event):
         """Used for handling inputs for controlling the ship during gameplay and pause."""
 
         if self.player == None:
@@ -239,7 +242,7 @@ class Game():
         # Try button press
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == pygame.BUTTON_LEFT:
-                self.ui.try_button_press()
+                self.gsm.try_button_press()
         # Window resizing
         elif event.type == pygame.WINDOWRESIZED and self.is_fullscreen == False:
             self.is_window_resized = True
@@ -259,12 +262,12 @@ class Game():
         Also used for updating UI.
         """
 
-        self.ui.check_hovered_button()
+        self.gsm.check_hovered_button()
         for object in sorted(list(self.drawable), key = lambda object: object.layer):
             object.draw(self.screen)
 
         pygame.display.flip()
-        return self.clock.tick(FPS) / 1000
+        return self.clock.tick(MAX_FPS) / 1000
     
     def check_if_object_is_off_screen(self, object) -> bool:
         offset = 100
@@ -343,7 +346,7 @@ class Game():
             self.screen_resolution = self.screen_resolution_fullscreen
             flags = pygame.FULLSCREEN
             self.screen = pygame.display.set_mode(self.screen_resolution, flags)
-            self.ui.initialize_current_menu()
+            self.gsm.initialize_current_menu()
 
     def __switch_to_windowed(self):
             self.screen_resolution = self.screen_resolution_windowed
@@ -351,4 +354,4 @@ class Game():
             # second change changes window size
             self.screen = pygame.display.set_mode(self.screen_resolution)
             self.screen = pygame.display.set_mode(self.screen_resolution, pygame.RESIZABLE)
-            self.ui.initialize_current_menu()
+            self.gsm.initialize_current_menu()

@@ -2,10 +2,10 @@ import pygame, pygame.gfxdraw
 from typing import Callable
 from enum import Enum
 
-from ui.container import Container
-from ui.text import Text
-from ui.simple_sprite import SimpleSprite
-from ui.helpers import get_points, draw_polygon
+from ui_elements.container import Container
+from ui_elements.text import Text
+from ui_elements.simple_sprite import SimpleSprite
+from ui_elements.helpers import get_points, draw_polygon
 
 
 class ModKey(Enum):
@@ -176,7 +176,7 @@ class Switch(_ButtonBase):
         points = get_points(self._position, self._size, self._corners)
         if self._is_hovered and self._is_active:
             pygame.gfxdraw.filled_polygon(screen, points, self._color_fill_hover_active)
-        if self._is_hovered and not self._is_active:
+        elif self._is_hovered and not self._is_active:
             pygame.gfxdraw.filled_polygon(screen, points, self._color_fill_hover_inactive)
         else:
             pygame.gfxdraw.filled_polygon(screen, points, self._color_fill)

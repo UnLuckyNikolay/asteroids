@@ -46,10 +46,10 @@ class Player(CircleShape):
         self.cheat_godmode = cheat_godmode
 
         self.timer_invul = 0
-        self.is_invul = False
-        self.is_alive = True
-        self.is_accelerating = False
-        self.is_auto_shooting = False
+        self.is_invul : bool = False
+        self.is_alive : bool = True
+        self.is_accelerating : bool = False
+        self.is_auto_shooting : bool = False
 
         self.unlocked_ships = [
             ShipType.POLY,
@@ -68,11 +68,11 @@ class Player(CircleShape):
         self.times_healed = 0
 
         self.time_since_last_shot = 0
-        self.weapon_plasmagun = (PlasmaGun())
-        self.weapon_bomblauncher = (BombLauncher())
+        self.weapon_plasmagun = PlasmaGun()
+        self.weapon_bomblauncher = BombLauncher()
         self.weapon_current = self.weapon_plasmagun
 
-        self.is_sus = False
+        self.is_sus : bool = False
         """True if cheats are enabled"""
         if cheat_godmode or cheat_hitbox or cheat_stonks:
             self.is_sus = True
@@ -108,7 +108,7 @@ class Player(CircleShape):
             self.__speed = 0   # Stops the player the speed is very low during deseleration, might change later
             self.inertia = pygame.Vector2(0, 0)
         else:
-            self.__speed = value 
+            self.__speed = value
 
 
     def draw(self, screen):

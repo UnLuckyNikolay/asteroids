@@ -3,7 +3,7 @@ import pygame
 from constants import *
 
 
-class GameStateManager():
+class RoundStateManager():
     def __init__(self, player):
         self._score = 0
         self.player = player

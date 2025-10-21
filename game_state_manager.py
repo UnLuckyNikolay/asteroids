@@ -1,28 +1,28 @@
 # pyright: reportAttributeAccessIssue=false
 
-import pygame, json
+import pygame, json, os
 from enum import Enum
 
 from constants import *
-from json_helper.leaderboards.validator import ValidateLeaderboards
-from ui.container import Container, Allignment
-from ui.buttons import Button, Switch, ModKey
-from ui.text import Text, TextH, TextF
-from ui.sprites.healthbar import HealthBar
-from ui.sprites.leaderboards import Leaderboards
-from ui.sprites.symbol_fullscreen import SymbolFullscreen
-from gamestatemanager import GameStateManager
+from json_helper.leaderboard.validator import ValidateLeaderboard
+from ui_elements.container import Container, Allignment
+from ui_elements.buttons import Button, Switch, ModKey
+from ui_elements.text import Text, TextH, TextF
+from ui_elements.sprites.healthbar import HealthBar
+from ui_elements.sprites.leaderboard import Leaderboard
+from ui_elements.sprites.symbol_fullscreen import SymbolFullscreen
+from round_state_manager import RoundStateManager
 from player.player import Player, ShipUpgrade, ShipPart
 
 
 class Menu(Enum):
     MAIN_MENU = "Main Menu"
-    LEADERBOARDS = "Leaderboards"
+    LEADERBOARD = "Leaderboard"
     HUD = "HUD"
     PAUSE_MENU = "Pause"
     NAME_CHECK = "Name check"
 
-class UserInterface(pygame.sprite.Sprite):
+class GameStateManager(pygame.sprite.Sprite):
     layer = 100 # pyright: ignore
     def __init__(self, game):
         if hasattr(self, "containers"):
@@ -31,10 +31,8 @@ class UserInterface(pygame.sprite.Sprite):
             super().__init__()
 
         self.game = game
-        self.gsm : GameStateManager = None
+        self.rsm : RoundStateManager = None
         self.player : Player = None
-
-        self.__current_menu : Menu = Menu.MAIN_MENU
         self.__hovered_button : Button | Switch | None = None
 
         # Getting the font
@@ -47,9 +45,15 @@ class UserInterface(pygame.sprite.Sprite):
             print("Error: font not found")
             font_path = None
         
+        # Checking if ./saves/ folder exists
+        self.__saves_folder_path = "./saves/"
+        if not os.path.exists(self.__saves_folder_path):
+            print(f"Creating a `{self.__saves_folder_path}` folder")
+            os.makedirs(self.__saves_folder_path)
+
         # Getting the scores
-        self.__leaderboards_path = "./leaderboard.json"
-        self.__scores = ValidateLeaderboards(self.__leaderboards_path)
+        self.__leaderboard_path = f"{self.__saves_folder_path}leaderboard.json"
+        self.__scores = ValidateLeaderboard(self.__leaderboard_path)
 
         # Fonts
         self.__font_very_small = pygame.font.Font(font_path, 16)
@@ -65,10 +69,16 @@ class UserInterface(pygame.sprite.Sprite):
         self.__color_green = (0, 255, 0, 255)
         self.__color_golden = (255, 215, 0, 255)
 
+        # Secrets
+        # self.__konami_sequence : list[int] = []
+        # self.__konami_progress : int = 0
+
+        # Starting menu
+        self.__current_menu : Menu = Menu.MAIN_MENU
         self.initialize_current_menu()
 
-    def start_round(self, gsm, player):
-        self.gsm = gsm
+    def start_round(self, rsm, player):
+        self.rsm = rsm
         self.player = player
         self.switch_menu(Menu.HUD)
 
@@ -83,8 +93,8 @@ class UserInterface(pygame.sprite.Sprite):
         match self.__current_menu:
             case Menu.MAIN_MENU:
                 self.__initialize_main_menu()
-            case Menu.LEADERBOARDS:
-                self.__initialize_leaderboards()
+            case Menu.LEADERBOARD:
+                self.__initialize_leaderboard()
             case Menu.HUD:
                 self.__initialize_hud()
             case Menu.PAUSE_MENU:
@@ -105,8 +115,8 @@ class UserInterface(pygame.sprite.Sprite):
             match self.__current_menu:
                 case Menu.MAIN_MENU:
                     button_list = self.__buttons_main_menu
-                case Menu.LEADERBOARDS:
-                    button_list = self.__buttons_leaderboards
+                case Menu.LEADERBOARD:
+                    button_list = self.__buttons_leaderboard
                 case Menu.HUD:
                     return # No buttons currently planned for HUD
                 case Menu.PAUSE_MENU:
@@ -158,17 +168,17 @@ class UserInterface(pygame.sprite.Sprite):
         if not is_updated:
             return
 
-        self.__save_leaderboards()
-        self.__initialize_leaderboards()
+        self.__save_leaderboard()
+        self.__initialize_leaderboard()
 
-    def __reset_leaderboards(self):
+    def __reset_leaderboard(self):
         self.__scores = []
-        self.__save_leaderboards()
-        self.__initialize_leaderboards()
+        self.__save_leaderboard()
+        self.__initialize_leaderboard()
 
-    def __save_leaderboards(self):
-        print(f"Saving leaderboards to `{self.__leaderboards_path}`")
-        with open(self.__leaderboards_path, "w") as file:
+    def __save_leaderboard(self):
+        print(f"Saving leaderboard to `{self.__leaderboard_path}`")
+        with open(self.__leaderboard_path, "w") as file:
             json.dump(self.__scores, file)
 
     ### Drawing menus
@@ -177,8 +187,8 @@ class UserInterface(pygame.sprite.Sprite):
         match self.__current_menu:
             case Menu.MAIN_MENU:
                 self.__draw_main_menu(screen)
-            case Menu.LEADERBOARDS:
-                self.__draw_leaderboards(screen)
+            case Menu.LEADERBOARD:
+                self.__draw_leaderboard(screen)
             case Menu.HUD:
                 self.__draw_hud(screen)
             case Menu.PAUSE_MENU:
@@ -198,11 +208,11 @@ class UserInterface(pygame.sprite.Sprite):
         for button in self.__buttons_main_menu:
             button.draw(screen)
 
-    def __draw_leaderboards(self, screen):
-        for container in self.__containers_leaderboards:
+    def __draw_leaderboard(self, screen):
+        for container in self.__containers_leaderboard:
             container.draw(screen)
 
-        for button in self.__buttons_leaderboards:
+        for button in self.__buttons_leaderboard:
             button.draw(screen)
             
     def __draw_hud(self, screen):
@@ -224,10 +234,13 @@ class UserInterface(pygame.sprite.Sprite):
             button.draw(screen)
 
     ### Buttons and containers
+    # Remember to add new buttons and containers to the lists to draw them
 
     def __initialize_main_menu(self):
         self.__containers_main_menu : list[Container] = []
         self.__buttons_main_menu : list[Button | Switch] = []
+
+        #self.__konami_progress = 0
 
         center_x = int((self.game.screen_resolution[0])/2)
         center_y = int((self.game.screen_resolution[1])/2)
@@ -259,12 +272,12 @@ class UserInterface(pygame.sprite.Sprite):
         b_start.add_element(
             Text("Start", (117, 10), self.__font_big, self.__color_blue)
         )
-        # Opens the Leaderboards
-        b_leaderboards = Button(
+        # Opens the Leaderboard
+        b_leaderboard = Button(
             (center_x-185, center_y-36), (370, 72), (8, 8, 20, 20), 
-            lambda: self.switch_menu(Menu.LEADERBOARDS)
+            lambda: self.switch_menu(Menu.LEADERBOARD)
         )
-        b_leaderboards.add_element(
+        b_leaderboard.add_element(
             Text("Leaderboard", (16, 10), self.__font_big, self.__color_blue)
         )
         # Exits the game
@@ -294,7 +307,7 @@ class UserInterface(pygame.sprite.Sprite):
             self.game.is_fullscreen
         )
         s_fullscreen.add_description(
-            Text("Switch the fullscreen mode on/off", (0, 0), self.__font_very_small, self.__color_white)
+            Text("Switch the FULLSCREEN mode on/off", (0, 0), self.__font_very_small, self.__color_white)
         )
         s_fullscreen.add_element(
             SymbolFullscreen(0, 0, self.__color_blue), 
@@ -308,7 +321,7 @@ class UserInterface(pygame.sprite.Sprite):
             self.game.cheat_hitbox
         )
         s_hitbox.add_description(
-            Text("Switch the hitbox cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
+            Text("Switch the HITBOX cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
         )
         s_hitbox.set_active_outline_color(self.__color_golden)
         s_hitbox.add_element(
@@ -322,7 +335,7 @@ class UserInterface(pygame.sprite.Sprite):
             self.game.cheat_stonks
         )
         s_money.add_description(
-            Text("Switch the money cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
+            Text("Switch the MONEY cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
         )
         s_money.set_active_outline_color(self.__color_golden)
         s_money.add_element(
@@ -334,7 +347,7 @@ class UserInterface(pygame.sprite.Sprite):
                            self.game.switch_godmode,
                            self.game.cheat_godmode)
         s_godmode.add_description(
-            Text("Switch the godmode cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
+            Text("Switch the GODMODE cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
         )
         s_godmode.set_active_outline_color(self.__color_golden)
         s_godmode.add_element(
@@ -343,13 +356,13 @@ class UserInterface(pygame.sprite.Sprite):
         s_godmode.set_active_outline_color = self.__color_golden
         
         self.__buttons_main_menu.extend(
-            [b_start, b_leaderboards, b_exit, b_background, s_fullscreen, 
+            [b_start, b_leaderboard, b_exit, b_background, s_fullscreen, 
             s_hitbox, s_money, s_godmode]
         )
         
-    def __initialize_leaderboards(self):
-        self.__containers_leaderboards : list[Container | Leaderboards] = []
-        self.__buttons_leaderboards : list[Button | Switch] = []
+    def __initialize_leaderboard(self):
+        self.__containers_leaderboard : list[Container | Leaderboard] = []
+        self.__buttons_leaderboard : list[Button | Switch] = []
         
         # <> Containers <>
 
@@ -359,12 +372,12 @@ class UserInterface(pygame.sprite.Sprite):
             Text("Leaderboard", (16, 10), self.__font_big, self.__color_white)
         )
         # List of high __scores
-        c_leaderboards = Leaderboards(int(self.game.screen_resolution[0]/2)-540, 145, 
+        c_leaderboard = Leaderboard(int(self.game.screen_resolution[0]/2)-540, 145, 
             self.__font_medium, self.__scores
         )
         
-        self.__containers_leaderboards.extend(
-            [c_menu_name, c_leaderboards]
+        self.__containers_leaderboard.extend(
+            [c_menu_name, c_leaderboard]
         )
         
         # <> Buttons <>
@@ -378,24 +391,24 @@ class UserInterface(pygame.sprite.Sprite):
             Text("Back", (18, 5), self.__font_small, self.__color_blue)
         )
         
-        self.__buttons_leaderboards.extend(
+        self.__buttons_leaderboard.extend(
             [b_back]
         )
         # Reset the leaderboard
         b_reset = Button(
             (self.game.screen_resolution[0]-200, 68), (100, 36), (3, 6, 3, 6), 
-            self.__reset_leaderboards
+            self.__reset_leaderboard
         )
         b_reset.make_weighted(ModKey.SHIFT)
         b_reset.set_outline_color(self.__color_red)
         b_reset.add_description(
-            Text("SHIFT+Click to reset the leaderboards", (0, 0), self.__font_very_small, self.__color_red)
+            Text("SHIFT+Click to RESET the leaderboard", (0, 0), self.__font_very_small, self.__color_white)
         )
         b_reset.add_element(
             Text("Reset", (9, 5), self.__font_small, self.__color_red)
         )
         
-        self.__buttons_leaderboards.extend(
+        self.__buttons_leaderboard.extend(
             [b_back, b_reset]
         )
 
@@ -417,7 +430,7 @@ class UserInterface(pygame.sprite.Sprite):
         c_score = Container((25, 71), (176, 36), (5, 3, 5, 10))
         c_score.add_element(
             TextH("{}pts", (9, 5), self.__font_small, self.__color_white, 
-                  self.gsm.get_score)
+                  self.rsm.get_score)
         )
         # Current money
         c_money = Container((211, 71), (176, 36), (3, 3, 3, 3))
@@ -510,7 +523,7 @@ class UserInterface(pygame.sprite.Sprite):
         c_points = Container((offset_x+760, offset_y+65), (150, 36), (6, 3, 3, 6))
         c_points.add_element(
             TextH("{}pts", (9, 5), self.__font_small, self.__color_white, 
-                  self.gsm.get_score)
+                  self.rsm.get_score)
         )
         # Money
         c_money = Container((offset_x+920, offset_y+65), (127, 36), (3, 3, 3, 3))
@@ -569,7 +582,7 @@ class UserInterface(pygame.sprite.Sprite):
             self.player.is_auto_shooting
         )
         s_auto_shoot.add_description(
-            Text("Switch the auto-shoot on/off", (0, 0), self.__font_very_small, self.__color_white)
+            Text("Switch the AUTO-SHOOT on/off", (0, 0), self.__font_very_small, self.__color_white)
         )
         s_auto_shoot.set_active_outline_color(self.__color_green)
         s_auto_shoot.add_element(
@@ -676,7 +689,7 @@ class UserInterface(pygame.sprite.Sprite):
         c_background = Container((root_x, root_y), (450, 210), (10, 25, 10, 25))
         c_background.add_element(
             TextF("New record! {}pts", (15, 7), self.__font_medium, self.__color_white, 
-                  self.game.gsm.score)
+                  self.game.rsm.score)
         )
         c_background.add_element(
             Text("Enter your name:", (15, 47), self.__font_medium, self.__color_white)
@@ -723,3 +736,9 @@ class UserInterface(pygame.sprite.Sprite):
     #     self.__containers_.extend(
     #         []
     #     )
+
+    ### Secret stuff
+
+    # def handle_event_for_secrets(self, event : pygame.event.Event):
+    #     match self.__current_menu:
+    #         case Menu.MAIN_MENU:

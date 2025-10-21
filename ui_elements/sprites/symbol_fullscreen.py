@@ -1,6 +1,6 @@
 import pygame
 
-from ui.simple_sprite import SimpleSprite
+from ui_elements.simple_sprite import SimpleSprite
 
 
 class SymbolFullscreen(SimpleSprite):
