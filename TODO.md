@@ -14,6 +14,7 @@ FIXES/TWEAKS:
     - [x] Refactor containers and buttons
     - [x] Track hovered button
     - [x] Add descriptions while hovering
+    - [x] Add weighted buttons
 - [x] Change how max level upgrades are displayed (will need new buttons)
 - [x] Revisit visible naming scheme for ship parts
 - [ ] Rename and move UserInterface class (possibly to GameStateManager), rename GameStateManager to RoundStateManager

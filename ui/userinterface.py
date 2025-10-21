@@ -6,7 +6,7 @@ from enum import Enum
 from constants import *
 from json_helper.leaderboards.validator import ValidateLeaderboards
 from ui.container import Container, Allignment
-from ui.buttons import Button, Switch
+from ui.buttons import Button, Switch, ModKey
 from ui.text import Text, TextH, TextF
 from ui.sprites.healthbar import HealthBar
 from ui.sprites.leaderboards import Leaderboards
@@ -47,7 +47,7 @@ class UserInterface(pygame.sprite.Sprite):
             print("Error: font not found")
             font_path = None
         
-        # Getting the __scores
+        # Getting the scores
         self.__leaderboards_path = "./leaderboard.json"
         self.__scores = ValidateLeaderboards(self.__leaderboards_path)
 
@@ -158,11 +158,18 @@ class UserInterface(pygame.sprite.Sprite):
         if not is_updated:
             return
 
+        self.__save_leaderboards()
+        self.__initialize_leaderboards()
+
+    def __reset_leaderboards(self):
+        self.__scores = []
+        self.__save_leaderboards()
+        self.__initialize_leaderboards()
+
+    def __save_leaderboards(self):
         print(f"Saving leaderboards to `{self.__leaderboards_path}`")
         with open(self.__leaderboards_path, "w") as file:
             json.dump(self.__scores, file)
-
-        self.__initialize_leaderboards()
 
     ### Drawing menus
 
@@ -373,6 +380,23 @@ class UserInterface(pygame.sprite.Sprite):
         
         self.__buttons_leaderboards.extend(
             [b_back]
+        )
+        # Reset the leaderboard
+        b_reset = Button(
+            (self.game.screen_resolution[0]-200, 68), (100, 36), (3, 6, 3, 6), 
+            self.__reset_leaderboards
+        )
+        b_reset.make_weighted(ModKey.SHIFT)
+        b_reset.set_outline_color(self.__color_red)
+        b_reset.add_description(
+            Text("SHIFT+Click to reset the leaderboards", (0, 0), self.__font_very_small, self.__color_red)
+        )
+        b_reset.add_element(
+            Text("Reset", (9, 5), self.__font_small, self.__color_red)
+        )
+        
+        self.__buttons_leaderboards.extend(
+            [b_back, b_reset]
         )
 
     def __initialize_hud(self):
@@ -611,7 +635,11 @@ class UserInterface(pygame.sprite.Sprite):
             (offset_x+890, offset_y+600), (340, 72), (8, 8, 20, 20),
             self.game.handler_finish_round
         )
+        b_end_run.make_weighted(ModKey.SHIFT)
         b_end_run.set_outline_color(self.__color_red)
+        b_end_run.add_description(
+            Text("SHIFT+Click to end the run early", (0, 0), self.__font_very_small, self.__color_white)
+        )
         b_end_run.add_element(
             Text("End Run", (54, 10), self.__font_big, self.__color_red)
         )

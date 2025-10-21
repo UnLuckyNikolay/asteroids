@@ -1,10 +1,17 @@
 import pygame, pygame.gfxdraw
 from typing import Callable
+from enum import Enum
 
 from ui.container import Container
 from ui.text import Text
 from ui.simple_sprite import SimpleSprite
 from ui.helpers import get_points, draw_polygon
+
+
+class ModKey(Enum):
+    SHIFT = "Shift"
+    CTRL = "Ctrl"
+    ALT = "Alt"
 
 class _ButtonBase(Container):
     def __init__(
@@ -20,6 +27,18 @@ class _ButtonBase(Container):
         )
         self._is_hovered = False
         self._description : Text | None = None
+        self._mod_key : int | None = None
+
+    def make_weighted(self, mod_key : ModKey):
+        """Makes the button pressable only if the modifier keyboard button is held."""
+
+        match mod_key:
+            case ModKey.SHIFT:
+                self._mod_key = pygame.KMOD_SHIFT
+            case ModKey.CTRL:
+                self._mod_key = pygame.KMOD_CTRL
+            case ModKey.ALT:
+                self._mod_key = pygame.KMOD_ALT
         
     def switch_hovered_state(self):
         self._is_hovered = False if self._is_hovered else True
@@ -39,7 +58,7 @@ class _ButtonBase(Container):
         
         cursor_position = pygame.mouse.get_pos()
         width = self._description.get_width()
-        if screen_res[0]-cursor_position[0]+20 < width:
+        if screen_res[0]-cursor_position[0]-30 < width:
             draw_polygon(screen, (cursor_position[0]-14-width, cursor_position[1]-25), (width+6, 17), (0, 4, 0, 4), (50, 50, 50, 200))
             pygame.draw.aalines(
                 screen, (240, 240, 240, 255), False, 
@@ -70,7 +89,7 @@ class Button(_ButtonBase):
             size : tuple[int, int], 
             corners : tuple[int, int, int, int],
             key_func : Callable, 
-            condition_func : Callable = lambda: True,
+            condition_func : Callable[[], bool] = lambda: True,
     ):
         super().__init__(
             position, 
@@ -112,7 +131,11 @@ class Button(_ButtonBase):
                 element.draw(screen, pos) # pyright: ignore[reportAttributeAccessIssue]
 
     def run_if_possible(self) -> bool:
-        if self._condition_func():
+        mods = pygame.key.get_mods()
+        if (
+            (self._mod_key == None or (self._mod_key != None and mods & self._mod_key)) # Check for modifier keys if weighted
+            and self._condition_func()
+        ):
             self._key_func()
             return True
         return False
@@ -178,9 +201,14 @@ class Switch(_ButtonBase):
                 element.draw(screen, pos) # pyright: ignore[reportAttributeAccessIssue]
     
     def run_if_possible(self) -> bool:
-        self._key_func()
-        self._is_active = False if self._is_active else True            
-        return True
+        mods = pygame.key.get_mods()
+        if (
+            self._mod_key == None or (self._mod_key != None and mods & self._mod_key) # Check for modifier keys if weighted
+        ):
+            self._key_func()
+            self._is_active = False if self._is_active else True            
+            return True
+        return False
     
     def set_outline_color(self, color : tuple[int, int, int, int]):
         """Default value - blue (100, 200, 255, 255)."""
