@@ -7,12 +7,15 @@ from typing import Any
 from constants import *
 from json_helper.leaderboard.validator import ValidateLeaderboard
 from json_helper.profile.validator import ValidateProfile
+
 from ui_elements.container import Container, Allignment
 from ui_elements.buttons import Button, Switch, ModKey
 from ui_elements.text import Text, TextH, TextF
 from ui_elements.sprites.healthbar import HealthBar
 from ui_elements.sprites.leaderboard import Leaderboard
 from ui_elements.sprites.symbol_fullscreen import SymbolFullscreen
+from ui_elements.sprites.symbol_cross import SymbolCross
+
 from round_state_manager import RoundStateManager
 from player.player import Player, ShipUpgrade, ShipPart
 from player.player_stats import PlayerStats
@@ -68,14 +71,20 @@ class GameStateManager(pygame.sprite.Sprite):
         self.__scores = ValidateLeaderboard(self.__leaderboard_path)
 
         # Getting profile
-        self.__current_profile : int | None = None # TEST
-        self.__profile_0 : dict[str, Any] = ValidateProfile(f"{self.__saves_folder_path}profile_0.json")
-        print(f"Profile 0:\n{self.__profile_0}")
-        self.__profile_1 : dict[str, Any] = ValidateProfile(f"{self.__saves_folder_path}profile_1.json")
-        print(f"Profile 1:\n{self.__profile_1}")
-        self.__profile_2 : dict[str, Any] = ValidateProfile(f"{self.__saves_folder_path}profile_2.json")
-        print(f"Profile 2:\n{self.__profile_2}")
-        self.__profiles = [self.__profile_0, self.__profile_1, self.__profile_2]
+        self.__current_profile : int | None = None
+        self.__profile_paths : list[str] = [
+            f"{self.__saves_folder_path}profile_0.json",
+            f"{self.__saves_folder_path}profile_1.json",
+            f"{self.__saves_folder_path}profile_2.json"
+        ]
+        self.__profiles : list[dict[str, Any] | None] = [
+            ValidateProfile(self.__profile_paths[0]), 
+            ValidateProfile(self.__profile_paths[1]), 
+            ValidateProfile(self.__profile_paths[2])
+        ]
+        print(f"> Profile 0:\n{self.__profiles[0]}") # TEST
+        print(f"> Profile 1:\n{self.__profiles[1]}")
+        print(f"> Profile 2:\n{self.__profiles[2]}")
 
         # Fonts
         self.__font_very_small = pygame.font.Font(font_path, 16)
@@ -92,6 +101,8 @@ class GameStateManager(pygame.sprite.Sprite):
         """(100, 200, 255, 255)"""
         self.__color_red = (200, 0, 0, 255)
         """(200, 0, 0, 255)"""
+        self.__color_red_fill = (100, 0, 0, 75)
+        """(100, 0, 0, 75)"""
         self.__color_green = (0, 255, 0, 255)
         """(0, 255, 0, 255)"""
         self.__color_golden = (255, 215, 0, 255)
@@ -167,7 +178,7 @@ class GameStateManager(pygame.sprite.Sprite):
         if self.__current_profile == None: # In case game is exited before profile is chosen
             return
 
-        path = f"{self.__saves_folder_path}profile_{self.__current_profile}.json"
+        path = self.__profile_paths[self.__current_profile]
         save = {
             "version" : 1,
             "player_stats_save" : self.player_stats.get_save()
@@ -193,6 +204,15 @@ class GameStateManager(pygame.sprite.Sprite):
             self.switch_menu(Menu.MAIN_MENU)
         else:
             self.__current_profile = None # In case game is exited while creating a new profile
+
+    def __delete_profile(self, number):
+        try:
+            os.remove(self.__profile_paths[number])
+            print(f"Removed file `{self.__profile_paths[number]}`")
+            self.__profiles[number] = None
+        except Exception as e:
+            print(f"Error removing file `{self.__profile_paths[number]}`: {e}")
+        self.initialize_current_menu()
 
     def check_score(self, new_score):
         is_updated = False
@@ -358,6 +378,25 @@ class GameStateManager(pygame.sprite.Sprite):
                 Ship(self.__profiles[0]["player_stats_save"]["ship_model"], 0),
                 Allignment.CENTER_ON_THE_LEFT
             )
+            b_pf0_delete = Button(
+                (offset_x+830, offset_y+140+170*0), (40, 40), (8, 8, 8, 8),
+                lambda: self.__delete_profile(0)
+            )
+            b_pf0_delete.make_weighted(ModKey.SHIFT)
+            b_pf0_delete.set_outline_color(self.__color_red)
+            b_pf0_delete.set_fill_color(self.__color_red_fill)
+            b_pf0_delete.add_description(
+                Text("SHIFT+Click to DELETE the Profile", (0, 0), self.__font_very_small, self.__color_white)
+            )
+            b_pf0_delete.add_element(
+                SymbolCross(0, 0, self.__color_red), 
+                Allignment.CENTER
+            )
+
+            self.__buttons_profile_selection.extend(
+                [b_pf0_delete]
+            )
+            
         else: # Empty profile
             b_pf0 = Button(
                 (offset_x, offset_y+90+170*0), (800, 140), b_corners,
@@ -381,6 +420,25 @@ class GameStateManager(pygame.sprite.Sprite):
                 Ship(self.__profiles[1]["player_stats_save"]["ship_model"], 0),
                 Allignment.CENTER_ON_THE_LEFT
             )
+            b_pf1_delete = Button(
+                (offset_x+830, offset_y+140+170*1), (40, 40), (8, 8, 8, 8),
+                lambda: self.__delete_profile(1)
+            )
+            b_pf1_delete.make_weighted(ModKey.SHIFT)
+            b_pf1_delete.set_outline_color(self.__color_red)
+            b_pf1_delete.set_fill_color(self.__color_red_fill)
+            b_pf1_delete.add_description(
+                Text("SHIFT+Click to DELETE the Profile", (0, 0), self.__font_very_small, self.__color_white)
+            )
+            b_pf1_delete.add_element(
+                SymbolCross(0, 0, self.__color_red), 
+                Allignment.CENTER
+            )
+
+            self.__buttons_profile_selection.extend(
+                [b_pf1_delete]
+            )
+
         else: # Empty profile
             b_pf1 = Button(
                 (offset_x, offset_y+90+170*1), (800, 140), b_corners,
@@ -404,6 +462,25 @@ class GameStateManager(pygame.sprite.Sprite):
                 Ship(self.__profiles[2]["player_stats_save"]["ship_model"], 0),
                 Allignment.CENTER_ON_THE_LEFT
             )
+            b_pf2_delete = Button(
+                (offset_x+830, offset_y+140+170*1), (40, 40), (8, 8, 8, 8),
+                lambda: self.__delete_profile(2)
+            )
+            b_pf2_delete.make_weighted(ModKey.SHIFT)
+            b_pf2_delete.set_outline_color(self.__color_red)
+            b_pf1_delete.set_fill_color(self.__color_red_fill)
+            b_pf2_delete.add_description(
+                Text("SHIFT+Click to DELETE the Profile", (0, 0), self.__font_very_small, self.__color_white)
+            )
+            b_pf2_delete.add_element(
+                SymbolCross(0, 0, self.__color_red), 
+                Allignment.CENTER
+            )
+
+            self.__buttons_profile_selection.extend(
+                [b_pf2_delete]
+            )
+            
         else: # Empty profile
             b_pf2 = Button(
                 (offset_x, offset_y+90+170*2), (800, 140), b_corners,
@@ -633,7 +710,7 @@ class GameStateManager(pygame.sprite.Sprite):
             (self.game.screen_resolution[0]-200, 68), (100, 36), (3, 6, 3, 6), 
             self.__reset_leaderboard
         )
-        b_reset.set_fill_color((100, 0, 0, 75))
+        b_reset.set_fill_color(self.__color_red_fill)
         b_reset.make_weighted(ModKey.SHIFT)
         b_reset.set_outline_color(self.__color_red)
         b_reset.add_description(
@@ -900,8 +977,8 @@ class GameStateManager(pygame.sprite.Sprite):
             self.game.handler_finish_round
         )
         b_end_run.make_weighted(ModKey.SHIFT)
-        b_end_run.set_fill_color((100, 0, 0, 75))
         b_end_run.set_outline_color(self.__color_red)
+        b_end_run.set_fill_color(self.__color_red_fill)
         b_end_run.add_description(
             Text("SHIFT+Click to end the run early", (0, 0), self.__font_very_small, self.__color_white)
         )
