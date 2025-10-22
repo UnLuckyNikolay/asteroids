@@ -70,7 +70,7 @@ class GameStateManager(pygame.sprite.Sprite):
         self.__leaderboard_path = f"{self.__saves_folder_path}leaderboard.json"
         self.__scores = ValidateLeaderboard(self.__leaderboard_path)
 
-        # Getting profile
+        # Getting profiles
         self.__current_profile : int | None = None
         self.__profile_paths : list[str] = [
             f"{self.__saves_folder_path}profile_0.json",
@@ -213,6 +213,13 @@ class GameStateManager(pygame.sprite.Sprite):
         except Exception as e:
             print(f"Error removing file `{self.__profile_paths[number]}`: {e}")
         self.initialize_current_menu()
+
+    def __return_to_profile_selection(self):
+        """Used to return from the Main Menu back to the Profile Selection."""
+
+        self.save_profile()
+        self.__current_profile = None
+        self.switch_menu(Menu.PROFILE_SELECTION)
 
     def check_score(self, new_score):
         is_updated = False
@@ -541,8 +548,9 @@ class GameStateManager(pygame.sprite.Sprite):
 
         self.__konami_progress = 0 # Resets Konami sequence
 
-        center_x = int((self.game.screen_resolution[0])/2)
-        center_y = int((self.game.screen_resolution[1])/2)
+        res = self.game.screen_resolution
+        center_x = int((res[0])/2)
+        center_y = int((res[1])/2)
         
         # <> Containers <>
 
@@ -569,9 +577,15 @@ class GameStateManager(pygame.sprite.Sprite):
         
         # <> Buttons <>
 
+        # Main buttons
+        # Space between - 28
+
+        amount_of_buttons = 4
+        b_offset_y = (res[1] - (amount_of_buttons*100+28))/2
+
         # Start button, starts a Round
         b_start = Button(
-            (center_x-185, center_y-136), (370, 72), (8, 8, 20, 20), 
+            (center_x-185, b_offset_y+100*0), (370, 72), (8, 8, 20, 20), 
             self.game.game_loop
         )
         b_start.add_element(
@@ -579,15 +593,23 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         # Opens the Leaderboard
         b_leaderboard = Button(
-            (center_x-185, center_y-36), (370, 72), (8, 8, 20, 20), 
+            (center_x-185, b_offset_y+100*1), (370, 72), (8, 8, 20, 20), 
             lambda: self.switch_menu(Menu.LEADERBOARD)
         )
         b_leaderboard.add_element(
             Text("Leaderboard", (16, 10), self.__font_big, self.__color_blue)
         )
+        # Back to profile selection
+        b_profiles = Button(
+            (center_x-185, b_offset_y+100*2), (370, 72), (8, 8, 20, 20), 
+            self.__return_to_profile_selection
+        )
+        b_profiles.add_element(
+            Text("Profiles", (89, 10), self.__font_big, self.__color_blue)
+        )
         # Exits the game
         b_exit = Button(
-            (center_x-185, center_y+64), (370, 72), (8, 8, 20, 20), 
+            (center_x-185, b_offset_y+100*3), (370, 72), (8, 8, 20, 20), 
             self.game.handler_turn_off
         )
         b_exit.add_element(
@@ -668,7 +690,8 @@ class GameStateManager(pygame.sprite.Sprite):
             )
         
         self.__buttons_main_menu.extend(
-            [b_start, b_leaderboard, b_exit, b_background, s_fullscreen]
+            [b_start, b_leaderboard, b_exit, b_background, s_fullscreen,
+             b_profiles]
         )
         
     def __initialize_leaderboard(self):
