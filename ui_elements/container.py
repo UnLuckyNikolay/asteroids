@@ -7,8 +7,9 @@ from ui_elements.helpers import get_points
 
 class Allignment(Enum):
     UPPER_LEFT_CORNER = 0
-    CENTER = 1
-    CENTER_ON_THE_LEFT = 2
+    BOTTOM_LEFT_CORNER = 1
+    CENTER = 2
+    CENTER_ON_THE_LEFT = 3
     """For vertical containers. Anchor point will be equal distance for upper, bottom, and right walls."""
 
 class Container(pygame.sprite.Sprite):
@@ -62,6 +63,8 @@ class Container(pygame.sprite.Sprite):
         match allignment:
             case Allignment.UPPER_LEFT_CORNER:
                 return self._position
+            case Allignment.BOTTOM_LEFT_CORNER:
+                return (self._position[0], self._position[1] + self._size[1])
             case Allignment.CENTER:
                 return (int(self._position[0] + self._size[0] / 2), int(self._position[1] + self._size[1] / 2))
             case Allignment.CENTER_ON_THE_LEFT:

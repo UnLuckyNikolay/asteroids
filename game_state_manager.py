@@ -13,8 +13,9 @@ from ui_elements.buttons import Button, Switch, ModKey
 from ui_elements.text import Text, TextH, TextF
 from ui_elements.sprites.healthbar import HealthBar
 from ui_elements.sprites.leaderboard import Leaderboard
-from ui_elements.sprites.symbol_fullscreen import SymbolFullscreen
-from ui_elements.sprites.symbol_cross import SymbolCross
+from ui_elements.simple_sprites.symbol_fullscreen import SymbolFullscreen
+from ui_elements.simple_sprites.symbol_cross import SymbolCross
+from ui_elements.personal_sprites.getter import get_personal_sprite
 
 from round_state_manager import RoundStateManager
 from player.player import Player, ShipUpgrade, ShipPart
@@ -217,8 +218,11 @@ class GameStateManager(pygame.sprite.Sprite):
     def __return_to_profile_selection(self):
         """Used to return from the Main Menu back to the Profile Selection."""
 
-        self.save_profile()
+        if self.__current_profile != None:
+            self.save_profile()
+            self.__profiles[self.__current_profile] = ValidateProfile(self.__profile_paths[self.__current_profile])
         self.__current_profile = None
+        self.game.initialize_new_player()
         self.switch_menu(Menu.PROFILE_SELECTION)
 
     def check_score(self, new_score):
@@ -385,6 +389,13 @@ class GameStateManager(pygame.sprite.Sprite):
                 Ship(self.__profiles[0]["player_stats_save"]["ship_model"], 0),
                 Allignment.CENTER_ON_THE_LEFT
             )
+            personal_sprite = get_personal_sprite(self.__profiles[0]["player_stats_save"]["name"])
+            if personal_sprite != None:
+                b_pf0.add_element(
+                    personal_sprite(10, -10),
+                    Allignment.BOTTOM_LEFT_CORNER
+                )
+                
             b_pf0_delete = Button(
                 (offset_x+830, offset_y+140+170*0), (40, 40), (8, 8, 8, 8),
                 lambda: self.__delete_profile(0)
@@ -427,6 +438,13 @@ class GameStateManager(pygame.sprite.Sprite):
                 Ship(self.__profiles[1]["player_stats_save"]["ship_model"], 0),
                 Allignment.CENTER_ON_THE_LEFT
             )
+            personal_sprite = get_personal_sprite(self.__profiles[1]["player_stats_save"]["name"])
+            if personal_sprite != None:
+                b_pf1.add_element(
+                    personal_sprite(10, -10),
+                    Allignment.BOTTOM_LEFT_CORNER
+                )
+
             b_pf1_delete = Button(
                 (offset_x+830, offset_y+140+170*1), (40, 40), (8, 8, 8, 8),
                 lambda: self.__delete_profile(1)
@@ -469,13 +487,20 @@ class GameStateManager(pygame.sprite.Sprite):
                 Ship(self.__profiles[2]["player_stats_save"]["ship_model"], 0),
                 Allignment.CENTER_ON_THE_LEFT
             )
+            personal_sprite = get_personal_sprite(self.__profiles[2]["player_stats_save"]["name"])
+            if personal_sprite != None:
+                b_pf2.add_element(
+                    personal_sprite(10, -10),
+                    Allignment.BOTTOM_LEFT_CORNER
+                )
+
             b_pf2_delete = Button(
-                (offset_x+830, offset_y+140+170*1), (40, 40), (8, 8, 8, 8),
+                (offset_x+830, offset_y+140+170*2), (40, 40), (8, 8, 8, 8),
                 lambda: self.__delete_profile(2)
             )
             b_pf2_delete.make_weighted(ModKey.SHIFT)
             b_pf2_delete.set_outline_color(self.__color_red)
-            b_pf1_delete.set_fill_color(self.__color_red_fill)
+            b_pf2_delete.set_fill_color(self.__color_red_fill)
             b_pf2_delete.add_description(
                 Text("SHIFT+Click to DELETE the Profile", (0, 0), self.__font_very_small, self.__color_white)
             )
@@ -553,6 +578,25 @@ class GameStateManager(pygame.sprite.Sprite):
         center_y = int((res[1])/2)
         
         # <> Containers <>
+        
+        # Profile
+        c_profile = Container(
+            (res[0]/2-400, 10), (800, 140), (7, 7, 30, 30)
+        )
+        c_profile.add_element(
+            TextF("{}", (19, 10), self.__font_big, self.__color_white,
+                    self.player_stats.name)
+        )
+        c_profile.add_element(
+            Ship(self.player_stats.ship_model, 0),
+            Allignment.CENTER_ON_THE_LEFT
+        )
+        personal_sprite = get_personal_sprite(self.player_stats.name)
+        if personal_sprite != None:
+            c_profile.add_element(
+                personal_sprite(10, -10),
+                Allignment.BOTTOM_LEFT_CORNER
+            )
 
         # Settings
         c_settings = Container((10, self.game.screen_resolution[1]-80), (90, 20), (8, 2, 8, 2))
@@ -572,7 +616,7 @@ class GameStateManager(pygame.sprite.Sprite):
             )
         
         self.__containers_main_menu.extend(
-            [c_settings]
+            [c_profile, c_settings]
         )
         
         # <> Buttons <>
@@ -581,7 +625,7 @@ class GameStateManager(pygame.sprite.Sprite):
         # Space between - 28
 
         amount_of_buttons = 4
-        b_offset_y = (res[1] - (amount_of_buttons*100+28))/2
+        b_offset_y = (res[1] - (amount_of_buttons*100+28))/2 + 75
 
         # Start button, starts a Round
         b_start = Button(
