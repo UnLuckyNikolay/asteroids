@@ -7,6 +7,7 @@ from player.weapons.plasmagun import PlasmaGun
 from player.weapons.bomblauncher import BombLauncher
 from player.ship_parts.magnet import Magnet
 from player.ship import Ship, ShipType
+from player.player_stats import PlayerStats
 
 
 # New upgrades should be added to methods get_upgrade_level and buy_upgrade
@@ -28,7 +29,7 @@ class ShipPart(Enum):
 
 class Player(CircleShape):
     layer = 50 # pyright: ignore
-    def __init__(self, game):
+    def __init__(self, game, stats):
         super().__init__(pygame.Vector2(-100, -100), (0,0), PLAYER_RADIUS)
         self.rotation = 180
         self.rotation_inertia = self.rotation
@@ -43,9 +44,7 @@ class Player(CircleShape):
         self.is_shooting : bool = False
 
         self.game = game
-        self.cheat_godmode = False
-        self.cheat_hitbox = False
-        self.cheat_stonks = False
+        self.stats : PlayerStats = stats
 
         self.timer_invul = 0
         self.is_invul : bool = False
@@ -53,30 +52,20 @@ class Player(CircleShape):
         self.is_accelerating : bool = False
         self.is_auto_shooting : bool = False
 
-        self.unlocked_ships = [
-            ShipType.POLY,
-            ShipType.POLY2BP,
-            ShipType.POLY2,
-            ShipType.POLY3,
-            ShipType.UFO,
-        ]
-        self.ship_model = 3
-        self.ship = Ship(self.unlocked_ships[self.ship_model], self.radius)
-        self.magnet = Magnet(self.position)
-
         self.money = 0
         self.lives = 3
         self.lives_max = 3
         self.times_healed = 0
 
-        self.time_since_last_shot = 0
+        self.ship = Ship(self.stats.unlocked_ships[self.stats.ship_model], self.radius)
+        self.magnet = Magnet(self.position)
         self.weapon_plasmagun = PlasmaGun()
         self.weapon_bomblauncher = BombLauncher()
+        self.time_since_last_shot = 0
         self.weapon_current = self.weapon_plasmagun
 
         self.is_sus : bool = False
         """True if cheats are enabled"""
-    
 
     @property
     def turning_speed(self):
@@ -92,7 +81,6 @@ class Player(CircleShape):
             self.__turning_speed = 0
         else:
             self.__turning_speed = value
-
 
     @property
     def speed(self):
@@ -147,10 +135,12 @@ class Player(CircleShape):
         self.position = pygame.Vector2(position)
         self.magnet = Magnet(self.position)
 
-        if self.cheat_godmode or self.cheat_hitbox or self.cheat_stonks:
+        if self.stats.cheat_godmode or self.stats.cheat_hitbox or self.stats.cheat_stonks:
             self.is_sus = True
-        if self.cheat_stonks:
-            self.money = 9999
+        else:
+            self.is_sus = False
+        if self.stats.cheat_stonks:
+            self.money = 999999
 
     def draw(self, screen):
         self.ship.draw_rotated(
@@ -238,7 +228,7 @@ class Player(CircleShape):
                 self.is_invul = False
 
     def take_damage_and_check_if_alive(self, gsm) -> bool:
-        if self.cheat_godmode:
+        if self.stats.cheat_godmode:
             return self.is_alive
         elif self.lives > 1:
             self.lives -= 1
@@ -269,16 +259,6 @@ class Player(CircleShape):
 
     def switch_auto_shoot(self):
         self.is_auto_shooting = False if self.is_auto_shooting else True
-
-    def switch_godmode(self):
-        self.cheat_godmode = False if self.cheat_godmode else True
-
-    def switch_stonks(self):
-        self.cheat_stonks = False if self.cheat_stonks else True
-
-    def switch_hitbox(self):
-        self.cheat_hitbox = False if self.cheat_hitbox else True
-        self.ship.switch_hitbox_to(self.cheat_hitbox)
     
     ### Ship
 
@@ -287,14 +267,6 @@ class Player(CircleShape):
     
     def get_ship_name(self) -> str:
         return self.ship.type.value
-    
-    def switch_ship_model_to_next(self):
-        self.ship_model = (self.ship_model+1) % len(self.unlocked_ships)
-        self.ship.switch_model(self.unlocked_ships[self.ship_model])
-    
-    def switch_ship_model_to_previous(self):
-        self.ship_model = (self.ship_model-1) % len(self.unlocked_ships)
-        self.ship.switch_model(self.unlocked_ships[self.ship_model])
 
     def get_part_level(self, part : ShipPart) -> int:
         match part:

@@ -2,9 +2,11 @@
 
 import pygame, json, os
 from enum import Enum
+from typing import Any
 
 from constants import *
 from json_helper.leaderboard.validator import ValidateLeaderboard
+from json_helper.profile.validator import ValidateProfile
 from ui_elements.container import Container, Allignment
 from ui_elements.buttons import Button, Switch, ModKey
 from ui_elements.text import Text, TextH, TextF
@@ -13,14 +15,21 @@ from ui_elements.sprites.leaderboard import Leaderboard
 from ui_elements.sprites.symbol_fullscreen import SymbolFullscreen
 from round_state_manager import RoundStateManager
 from player.player import Player, ShipUpgrade, ShipPart
+from player.player_stats import PlayerStats
 
 
+# New menus should be added to:
+# .initialize_current_menu
+# .check_hovered_button 
+# .draw
 class Menu(Enum):
+    PROFILE_SELECTION = "Profile selection" # WIP
+    NAME_EDIT = "Name edit" # NOT ADDED
     MAIN_MENU = "Main Menu"
     LEADERBOARD = "Leaderboard"
     HUD = "HUD"
     PAUSE_MENU = "Pause"
-    NAME_CHECK = "Name check"
+    NAME_CHECK = "Name check" # REDO AFTERWARDS TO ROUND_END
 
 class GameStateManager(pygame.sprite.Sprite):
     layer = 100 # pyright: ignore
@@ -33,7 +42,9 @@ class GameStateManager(pygame.sprite.Sprite):
         self.game = game
         self.rsm : RoundStateManager = None
         self.player : Player
+        self.player_stats : PlayerStats
         self.__hovered_button : Button | Switch | None = None
+        self.__current_menu : Menu = Menu.MAIN_MENU
 
         # Getting the font
         font_path = "./fonts/anita-semi-square.normaali.ttf" #"../../fonts/anita-semi-square.normaali.ttf"
@@ -54,6 +65,15 @@ class GameStateManager(pygame.sprite.Sprite):
         # Getting the scores
         self.__leaderboard_path = f"{self.__saves_folder_path}leaderboard.json"
         self.__scores = ValidateLeaderboard(self.__leaderboard_path)
+
+        # Getting profile
+        self.current_profile : int = 1 # TEST
+        self.profile_1 : dict[str, Any] = ValidateProfile(f"{self.__saves_folder_path}profile_1")
+        print(f"Profile 1:\n{self.profile_1}")
+        self.profile_2 : dict[str, Any] = ValidateProfile(f"{self.__saves_folder_path}profile_2")
+        print(f"Profile 2:\n{self.profile_2}")
+        self.profile_3 : dict[str, Any] = ValidateProfile(f"{self.__saves_folder_path}profile_3")
+        print(f"Profile 3:\n{self.profile_3}")
 
         # Fonts
         self.__font_very_small = pygame.font.Font(font_path, 16)
@@ -79,10 +99,6 @@ class GameStateManager(pygame.sprite.Sprite):
         self.__konami_sequence : list[int] = [82, 82, 81, 81, 80, 79, 80, 79, 5, 4, 40]
         self.__konami_progress : int = 0
 
-        # Starting menu
-        self.__current_menu : Menu = Menu.MAIN_MENU
-        self.initialize_current_menu()
-
     def start_round(self, rsm):
         self.rsm = rsm
         self.switch_menu(Menu.HUD)
@@ -96,6 +112,8 @@ class GameStateManager(pygame.sprite.Sprite):
 
     def initialize_current_menu(self):
         match self.__current_menu:
+            case Menu.PROFILE_SELECTION:
+                self.__initialize_profile_selection()
             case Menu.MAIN_MENU:
                 self.__initialize_main_menu()
             case Menu.LEADERBOARD:
@@ -118,6 +136,8 @@ class GameStateManager(pygame.sprite.Sprite):
 
             # Getting button list
             match self.__current_menu:
+                case Menu.PROFILE_SELECTION:
+                    button_list = self.__buttons_profile_selection
                 case Menu.MAIN_MENU:
                     button_list = self.__buttons_main_menu
                 case Menu.LEADERBOARD:
@@ -153,6 +173,32 @@ class GameStateManager(pygame.sprite.Sprite):
             return
         
         self.__hovered_button.run_if_possible()
+
+    ### Saving
+
+    def save_profile(self):
+        path = f"{self.__saves_folder_path}profile_{self.current_profile}"
+        save = {
+            "version" : 1,
+            "player_stats_save" : self.player_stats.get_save()
+        }
+        print(f"Saving current profile to `{path}`")
+        with open(path, "w") as file:
+            json.dump(save, file)
+
+    def load_profile(self, number):
+        match number:
+            case 1:
+                profile = self.profile_1
+            case 2:
+                profile = self.profile_2
+            case 3:
+                profile = self.profile_3
+
+        if profile == None:
+            return
+        if profile["version"] == 1:
+            self.player_stats.load_save(profile["player_stats_save"])
 
     def check_score(self, new_score):
         is_updated = False
@@ -190,6 +236,8 @@ class GameStateManager(pygame.sprite.Sprite):
 
     def draw(self, screen):
         match self.__current_menu:
+            case Menu.PROFILE_SELECTION:
+                self.__draw_profile_selection(screen)
             case Menu.MAIN_MENU:
                 self.__draw_main_menu(screen)
             case Menu.LEADERBOARD:
@@ -205,6 +253,13 @@ class GameStateManager(pygame.sprite.Sprite):
 
         if self.__hovered_button != None:
             self.__hovered_button.draw_description(screen, self.game.screen_resolution)
+
+    def __draw_profile_selection(self, screen):
+        for container in self.__containers_profile_selection:
+            container.draw(screen)
+        
+        for button in self.__buttons_profile_selection:
+            button.draw(screen)
 
     def __draw_main_menu(self, screen):
         for container in self.__containers_main_menu:
@@ -241,6 +296,41 @@ class GameStateManager(pygame.sprite.Sprite):
     ### Buttons and containers
     # Remember to add new buttons and containers to the lists to draw them
 
+    def __initialize_profile_selection(self):
+        self.__containers_profile_selection : list[Container] = []
+        self.__buttons_profile_selection : list[Button | Switch] = []
+        
+        res = self.game.screen_resolution
+        offset_x = 10#res[0]-400
+        offset_y = 10#200
+
+        # 30 between elements
+
+        # <> Containers <>
+
+        c_menu_name = Container((offset_x+75, offset_y), (650, 60), (20, 20, 8, 8))
+        c_menu_name.add_element(
+            Text(
+                "Select the Profile", (83, 4), self.__font_big, self.__color_white
+            )
+        )
+
+        self.__containers_profile_selection.extend(
+            [c_menu_name]
+        )
+        
+        # <> Buttons <>
+
+        # if self.profile_1 == None:
+        #     b_pf1 = Button(
+        #         (offset_x, offset_y+90), (800, 140), (3, 65, 3, 65),
+
+        #     )
+
+        self.__buttons_profile_selection.extend(
+            []
+        )
+
     def __initialize_main_menu(self):
         self.__containers_main_menu : list[Container] = []
         self.__buttons_main_menu : list[Button | Switch] = []
@@ -258,7 +348,7 @@ class GameStateManager(pygame.sprite.Sprite):
             Text("Settings", (5, 1), self.__font_very_small, self.__color_white)
         )
 
-        if self.game.cheats_found:
+        if self.player_stats.found_cheats:
             # Cheats
             c_cheats = Container((self.game.screen_resolution[0]-100, self.game.screen_resolution[1]-80), (90, 20), (2, 8, 2, 8))
             c_cheats.add_element(
@@ -325,12 +415,12 @@ class GameStateManager(pygame.sprite.Sprite):
             Allignment.CENTER
         )
 
-        if self.game.cheats_found:
+        if self.player_stats.found_cheats:
             # Cheat - Show hitbox
             s_hitbox = Switch(
                 (self.game.screen_resolution[0]-150, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
-                self.player.switch_hitbox,
-                self.player.cheat_hitbox
+                self.player_stats.switch_hitbox,
+                self.player_stats.cheat_hitbox
             )
             s_hitbox.add_description(
                 Text("Switch the HITBOX cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
@@ -343,8 +433,8 @@ class GameStateManager(pygame.sprite.Sprite):
             # Cheat - Money cheat
             s_money = Switch(
                 (self.game.screen_resolution[0]-100, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
-                self.player.switch_stonks,
-                self.player.cheat_stonks
+                self.player_stats.switch_stonks,
+                self.player_stats.cheat_stonks
             )
             s_money.add_description(
                 Text("Switch the MONEY cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
@@ -357,8 +447,8 @@ class GameStateManager(pygame.sprite.Sprite):
             # Cheat - Godmode
             s_godmode = Switch(
                 (self.game.screen_resolution[0]-50, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
-                self.player.switch_godmode,
-                self.player.cheat_godmode
+                self.player_stats.switch_godmode,
+                self.player_stats.cheat_godmode
             )
             s_godmode.add_description(
                 Text("Switch the GODMODE cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
@@ -612,7 +702,7 @@ class GameStateManager(pygame.sprite.Sprite):
         # Model switching
         b_model_left = Button(
             (offset_x+290, offset_y+65+row_height*1), (36, 36), (6, 3, 3, 6), 
-            self.player.switch_ship_model_to_previous
+            self.player_stats.switch_ship_model_to_previous
         )
         b_model_left.add_element(
             Text("<", (12, 5), self.__font_small, self.__color_blue)
@@ -620,7 +710,7 @@ class GameStateManager(pygame.sprite.Sprite):
 
         b_model_right = Button(
             (offset_x+709, offset_y+65+row_height*1), (36, 36), (3, 6, 6, 3), 
-            self.player.switch_ship_model_to_next
+            self.player_stats.switch_ship_model_to_next
         )
         b_model_right.add_element(
             Text(">", (12, 5), self.__font_small, self.__color_blue)
@@ -753,7 +843,7 @@ class GameStateManager(pygame.sprite.Sprite):
         
     #     # <> Buttons <>
 
-    #     self.__containers_.extend(
+    #     self.__buttons_.extend(
     #         []
     #     )
 
@@ -768,7 +858,7 @@ class GameStateManager(pygame.sprite.Sprite):
                         self.__konami_progress += 1
                         if self.__konami_progress == 11:
                             self.__konami_progress = 0
-                            self.game.cheats_found = True
+                            self.player_stats.found_cheats = True
                             self.initialize_current_menu()
                     else:
                         self.__konami_progress = 0

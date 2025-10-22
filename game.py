@@ -7,6 +7,7 @@ from game_state_manager import GameStateManager, Menu
 from round_state_manager import RoundStateManager
 
 from player.player import Player
+from player.player_stats import PlayerStats
 from player.weapons.projectiles.projectileplasma import ProjectilePlasma
 from player.weapons.projectiles.bomb import Bomb
 from player.weapons.projectiles.bombexplosion import BombExplosion
@@ -35,7 +36,6 @@ class Game():
         self.is_paused = False
         self.getting_player_name = False
         self.player_name = "Player"
-        self.cheats_found = False
 
         self.updatable = pygame.sprite.Group()   # Must have method .update(delta)
         self.drawable = pygame.sprite.Group()
@@ -72,19 +72,27 @@ class Game():
 
         self.star_field = StarField(self.screen_resolution_fullscreen)
         self.gsm = GameStateManager(self)
-        self.player : Player = Player(self)
+        self.player_stats : PlayerStats = PlayerStats()
+        self.player : Player = Player(self, self.player_stats)
+        self.player_stats.set_player(self.player)
         self.gsm.player = self.player
+        self.gsm.player_stats = self.player_stats
         self.asteroid_field = None
+
+        self.gsm.load_profile(1)
+        self.gsm.initialize_current_menu()
 
     def run(self):
         while self.is_running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    return
+                    break
                 else:
                     self.handle_event(event)
             
             self.redraw_objects_and_ui()
+        
+        self.gsm.save_profile() # Save on exit
 
     def game_loop(self):
         self.rsm = RoundStateManager(self.player)
@@ -165,6 +173,7 @@ class Game():
         if not self.player.is_sus and self.rsm.score > 0:
             self.gsm.switch_menu(Menu.NAME_CHECK)
             self.gsm.check_score(self.rsm.score)
+        self.gsm.save_profile()
         self.gsm.switch_menu(Menu.MAIN_MENU)
 
         self.player.reset()
