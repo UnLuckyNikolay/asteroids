@@ -5,15 +5,18 @@ from constants import *
 
 
 class ShipType(Enum):
-    POLY = "Poly.v1"
-    POLY2BP = "Poly.v2:Bp"
-    POLY2 = "Poly.v2"
-    POLY3 = "Poly.v3"
-    UFO = "UFO.v1"
+    POLY = 0
+    POLY2BP = 1
+    POLY2 = 2
+    POLY3 = 3
+    UFO = 4
 
 class Ship():
-    def __init__(self, type : ShipType, hitbox_radius):
-        self.type = type
+    def __init__(self, type : ShipType | int, hitbox_radius):
+        if type is ShipType:
+            self.type = type
+        else:
+            self.type = ShipType(type)
         self.time = 0
         self.current_parts : list[PartPolygon | PartCircle | PartEngineVfx]
         self.alpha = 255
@@ -25,7 +28,7 @@ class Ship():
         self.engine_vfx_timer = 0.2 # Duration of a frame in sec
         self.engine_vfx_current_frame : int = 0
 
-        # Colors for parts
+        # Colors for parts, WITHOUT alpha
         white = (255, 255, 255)
         gray_light = (150, 150, 170)
         gray_mid = (119, 119, 132)
@@ -143,6 +146,19 @@ class Ship():
             self.engine_vfx_current_frame = 0
         elif next_engine_frame == 1 and self.engine_vfx_current_frame != 1:
             self.engine_vfx_current_frame = 1
+
+    def get_name(self) -> str:
+        match self.type:
+            case ShipType.POLY:
+                return "Poly.v1"
+            case ShipType.POLY2BP:
+                return "Poly.v2:Bp"
+            case ShipType.POLY2:
+                return "Poly.v2"
+            case ShipType.POLY3:
+                return "Poly.v3"
+            case ShipType.UFO:
+                return "UFO.v1"
 
     def switch_model(self, type : ShipType):
         self.type = type

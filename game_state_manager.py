@@ -16,15 +16,16 @@ from ui_elements.sprites.symbol_fullscreen import SymbolFullscreen
 from round_state_manager import RoundStateManager
 from player.player import Player, ShipUpgrade, ShipPart
 from player.player_stats import PlayerStats
+from player.ship import Ship
 
 
 # New menus should be added to:
 # .initialize_current_menu
 # .check_hovered_button 
-# .draw
+# .draw (and make new function)
 class Menu(Enum):
     PROFILE_SELECTION = "Profile selection" # WIP
-    NAME_EDIT = "Name edit" # NOT ADDED
+    NEW_PROFILE = "Name edit" # NOT ADDED
     MAIN_MENU = "Main Menu"
     LEADERBOARD = "Leaderboard"
     HUD = "HUD"
@@ -44,7 +45,7 @@ class GameStateManager(pygame.sprite.Sprite):
         self.player : Player
         self.player_stats : PlayerStats
         self.__hovered_button : Button | Switch | None = None
-        self.__current_menu : Menu = Menu.MAIN_MENU
+        self.__current_menu : Menu = Menu.PROFILE_SELECTION
 
         # Getting the font
         font_path = "./fonts/anita-semi-square.normaali.ttf" #"../../fonts/anita-semi-square.normaali.ttf"
@@ -67,13 +68,14 @@ class GameStateManager(pygame.sprite.Sprite):
         self.__scores = ValidateLeaderboard(self.__leaderboard_path)
 
         # Getting profile
-        self.current_profile : int = 1 # TEST
-        self.profile_1 : dict[str, Any] = ValidateProfile(f"{self.__saves_folder_path}profile_1")
-        print(f"Profile 1:\n{self.profile_1}")
-        self.profile_2 : dict[str, Any] = ValidateProfile(f"{self.__saves_folder_path}profile_2")
-        print(f"Profile 2:\n{self.profile_2}")
-        self.profile_3 : dict[str, Any] = ValidateProfile(f"{self.__saves_folder_path}profile_3")
-        print(f"Profile 3:\n{self.profile_3}")
+        self.__current_profile : int | None = None # TEST
+        self.__profile_0 : dict[str, Any] = ValidateProfile(f"{self.__saves_folder_path}profile_0.json")
+        print(f"Profile 0:\n{self.__profile_0}")
+        self.__profile_1 : dict[str, Any] = ValidateProfile(f"{self.__saves_folder_path}profile_1.json")
+        print(f"Profile 1:\n{self.__profile_1}")
+        self.__profile_2 : dict[str, Any] = ValidateProfile(f"{self.__saves_folder_path}profile_2.json")
+        print(f"Profile 2:\n{self.__profile_2}")
+        self.__profiles = [self.__profile_0, self.__profile_1, self.__profile_2]
 
         # Fonts
         self.__font_very_small = pygame.font.Font(font_path, 16)
@@ -110,23 +112,6 @@ class GameStateManager(pygame.sprite.Sprite):
         self.__hovered_button = None
         self.initialize_current_menu()
 
-    def initialize_current_menu(self):
-        match self.__current_menu:
-            case Menu.PROFILE_SELECTION:
-                self.__initialize_profile_selection()
-            case Menu.MAIN_MENU:
-                self.__initialize_main_menu()
-            case Menu.LEADERBOARD:
-                self.__initialize_leaderboard()
-            case Menu.HUD:
-                self.__initialize_hud()
-            case Menu.PAUSE_MENU:
-                self.__initialize_pause_menu()
-            case Menu.NAME_CHECK:
-                self.__initialize_name_check()
-            case _:
-                print(f"> Error: missing menu {self.__current_menu.value} in UserInterface.initialize_current_menu")
-
     def check_hovered_button(self):
         """Checks mouse position against all the buttons in the current menus and tries to run the button function."""
 
@@ -138,6 +123,8 @@ class GameStateManager(pygame.sprite.Sprite):
             match self.__current_menu:
                 case Menu.PROFILE_SELECTION:
                     button_list = self.__buttons_profile_selection
+                case Menu.NEW_PROFILE:
+                    button_list = self.__buttons_new_profile
                 case Menu.MAIN_MENU:
                     button_list = self.__buttons_main_menu
                 case Menu.LEADERBOARD:
@@ -177,7 +164,10 @@ class GameStateManager(pygame.sprite.Sprite):
     ### Saving
 
     def save_profile(self):
-        path = f"{self.__saves_folder_path}profile_{self.current_profile}"
+        if self.__current_profile == None: # In case game is exited before profile is chosen
+            return
+
+        path = f"{self.__saves_folder_path}profile_{self.__current_profile}.json"
         save = {
             "version" : 1,
             "player_stats_save" : self.player_stats.get_save()
@@ -186,19 +176,23 @@ class GameStateManager(pygame.sprite.Sprite):
         with open(path, "w") as file:
             json.dump(save, file)
 
-    def load_profile(self, number):
-        match number:
-            case 1:
-                profile = self.profile_1
-            case 2:
-                profile = self.profile_2
-            case 3:
-                profile = self.profile_3
+    def __load_profile(self, number):
+        print(number)
+        self.__current_profile = number
+        profile = self.__profiles[number]
 
-        if profile == None:
-            return
         if profile["version"] == 1:
             self.player_stats.load_save(profile["player_stats_save"])
+
+        self.switch_menu(Menu.MAIN_MENU)
+
+    def __new_profile(self, number):
+        self.switch_menu(Menu.NEW_PROFILE)
+        self.__current_profile = number
+        if self.game.get_player_name():
+            self.switch_menu(Menu.MAIN_MENU)
+        else:
+            self.__current_profile = None # In case game is exited while creating a new profile
 
     def check_score(self, new_score):
         is_updated = False
@@ -213,7 +207,7 @@ class GameStateManager(pygame.sprite.Sprite):
         if len(self.__scores) != LEADERBOARD_LENGTH:
             is_updated = True
             self.game.get_player_name()
-            self.__scores.append({"name": self.game.player_name, "score": new_score})
+            self.__scores.append({"name": self.player_stats.name, "score": new_score})
             self.__scores.sort(key=lambda x: x["score"], reverse=True)
 
         if not is_updated:
@@ -238,6 +232,8 @@ class GameStateManager(pygame.sprite.Sprite):
         match self.__current_menu:
             case Menu.PROFILE_SELECTION:
                 self.__draw_profile_selection(screen)
+            case Menu.NEW_PROFILE:
+                self.__draw_new_profile(screen)
             case Menu.MAIN_MENU:
                 self.__draw_main_menu(screen)
             case Menu.LEADERBOARD:
@@ -259,6 +255,13 @@ class GameStateManager(pygame.sprite.Sprite):
             container.draw(screen)
         
         for button in self.__buttons_profile_selection:
+            button.draw(screen)
+
+    def __draw_new_profile(self, screen):
+        for container in self.__containers_new_profile:
+            container.draw(screen)
+        
+        for button in self.__buttons_new_profile:
             button.draw(screen)
 
     def __draw_main_menu(self, screen):
@@ -295,14 +298,33 @@ class GameStateManager(pygame.sprite.Sprite):
 
     ### Buttons and containers
     # Remember to add new buttons and containers to the lists to draw them
+    
+    def initialize_current_menu(self):
+        match self.__current_menu:
+            case Menu.PROFILE_SELECTION:
+                self.__initialize_profile_selection()
+            case Menu.NEW_PROFILE:
+                self.__initialize_new_profile()
+            case Menu.MAIN_MENU:
+                self.__initialize_main_menu()
+            case Menu.LEADERBOARD:
+                self.__initialize_leaderboard()
+            case Menu.HUD:
+                self.__initialize_hud()
+            case Menu.PAUSE_MENU:
+                self.__initialize_pause_menu()
+            case Menu.NAME_CHECK:
+                self.__initialize_name_check()
+            case _:
+                print(f"> Error: missing menu {self.__current_menu.value} in UserInterface.initialize_current_menu")
 
     def __initialize_profile_selection(self):
         self.__containers_profile_selection : list[Container] = []
         self.__buttons_profile_selection : list[Button | Switch] = []
         
         res = self.game.screen_resolution
-        offset_x = 10#res[0]-400
-        offset_y = 10#200
+        offset_x = res[0]/2-400
+        offset_y = res[1]/2-285
 
         # 30 between elements
 
@@ -321,14 +343,119 @@ class GameStateManager(pygame.sprite.Sprite):
         
         # <> Buttons <>
 
-        # if self.profile_1 == None:
-        #     b_pf1 = Button(
-        #         (offset_x, offset_y+90), (800, 140), (3, 65, 3, 65),
+        b_corners = (7, 30, 7, 30)
+        # Profile 0
+        if self.__profiles[0] != None:
+            b_pf0 = Button(
+                (offset_x, offset_y+90+170*0), (800, 140), b_corners,
+                lambda: self.__load_profile(0)
+            )
+            b_pf0.add_element(
+                TextF("{}", (19, 10), self.__font_big, self.__color_blue,
+                      self.__profiles[0]["player_stats_save"]["name"])
+            )
+            b_pf0.add_element(
+                Ship(self.__profiles[0]["player_stats_save"]["ship_model"], 0),
+                Allignment.CENTER_ON_THE_LEFT
+            )
+        else: # Empty profile
+            b_pf0 = Button(
+                (offset_x, offset_y+90+170*0), (800, 140), b_corners,
+                lambda: self.__new_profile(0)
+            )
+            b_pf0.add_element(
+                Text("Null", (19, 10), self.__font_big, self.__color_blue)
+            )
 
-        #     )
+        # Profile 1
+        if self.__profiles[1] != None:
+            b_pf1 = Button(
+                (offset_x, offset_y+90+170*1), (800, 140), b_corners,
+                lambda: self.__load_profile(1)
+            )
+            b_pf1.add_element(
+                TextF("{}", (19, 10), self.__font_big, self.__color_blue,
+                      self.__profiles[1]["player_stats_save"]["name"])
+            )
+            b_pf1.add_element(
+                Ship(self.__profiles[1]["player_stats_save"]["ship_model"], 0),
+                Allignment.CENTER_ON_THE_LEFT
+            )
+        else: # Empty profile
+            b_pf1 = Button(
+                (offset_x, offset_y+90+170*1), (800, 140), b_corners,
+                lambda: self.__new_profile(1)
+            )
+            b_pf1.add_element(
+                Text("Null", (19, 10), self.__font_big, self.__color_blue)
+            )
+
+        # Profile 2
+        if self.__profiles[2] != None:
+            b_pf2 = Button(
+                (offset_x, offset_y+90+170*2), (800, 140), b_corners,
+                lambda: self.__load_profile(2)
+            )
+            b_pf2.add_element(
+                TextF("{}", (19, 10), self.__font_big, self.__color_blue,
+                      self.__profiles[2]["player_stats_save"]["name"])
+            )
+            b_pf2.add_element(
+                Ship(self.__profiles[2]["player_stats_save"]["ship_model"], 0),
+                Allignment.CENTER_ON_THE_LEFT
+            )
+        else: # Empty profile
+            b_pf2 = Button(
+                (offset_x, offset_y+90+170*2), (800, 140), b_corners,
+                lambda: self.__new_profile(2)
+            )
+            b_pf2.add_element(
+                Text("Null", (19, 10), self.__font_big, self.__color_blue)
+            )
 
         self.__buttons_profile_selection.extend(
-            []
+            [b_pf0, b_pf1, b_pf2]
+        )
+
+    def __initialize_new_profile(self):
+        self.__containers_new_profile : list[Container] = []
+        self.__buttons_new_profile : list[Button | Switch] = []
+
+        root_x = self.game.screen_resolution[0]/2-225
+        root_y = self.game.screen_resolution[1]/2-105
+        
+        # <> Containers <>
+
+        c_background = Container((root_x, root_y), (450, 210), (10, 25, 10, 25))
+        c_background.add_element(
+            TextF("Creating a new Profile.", (15, 7), self.__font_medium, self.__color_white)
+        )
+        c_background.add_element(
+            Text("Enter your name:", (15, 47), self.__font_medium, self.__color_white)
+        )
+
+        c_name = Container((root_x+10, root_y+90), (430, 50), (3, 10, 3, 10))
+        c_name.add_element(
+            TextH("{}", (10, 10), self.__font_medium, self.__color_white, 
+                  lambda: self.player_stats.name)
+        )
+
+        self.__containers_new_profile.extend(
+            [c_background, c_name]
+        )
+        
+        # <> Buttons <>
+
+        b_confirm = Button(
+            (root_x+125, root_y+150), (200, 50), (3, 10, 3, 10),
+            self.game.finish_getting_player_name
+        )
+        b_confirm.add_element(
+            Text("Confirm", (10, 8), self.__font_medium, self.__color_blue)
+        )
+
+        self.__buttons_new_profile.extend(
+            [b_confirm]
         )
 
     def __initialize_main_menu(self):
@@ -595,7 +722,7 @@ class GameStateManager(pygame.sprite.Sprite):
         c_model = Container((offset_x+290, offset_y+65), (455, 36), (6, 6, 6, 6))
         c_model.add_element(
             TextH("Model: {}", (12, 5), self.__font_small, self.__color_white,
-                  self.player.get_ship_name)
+                  self.player.ship.get_name)
         )
         
         c_switch_model = Container((offset_x+336, offset_y+65+row_height*1), (363, 36), (3, 3, 3, 3))
@@ -808,7 +935,7 @@ class GameStateManager(pygame.sprite.Sprite):
         c_name = Container((root_x+10, root_y+90), (430, 50), (3, 10, 3, 10))
         c_name.add_element(
             TextH("{}", (10, 10), self.__font_medium, self.__color_white, 
-                  lambda: self.game.player_name)
+                  lambda: self.player_stats.name)
         )
 
         self.__containers_name_check.extend(

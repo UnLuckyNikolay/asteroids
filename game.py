@@ -35,7 +35,6 @@ class Game():
         self.is_running = True
         self.is_paused = False
         self.getting_player_name = False
-        self.player_name = "Player"
 
         self.updatable = pygame.sprite.Group()   # Must have method .update(delta)
         self.drawable = pygame.sprite.Group()
@@ -79,13 +78,13 @@ class Game():
         self.gsm.player_stats = self.player_stats
         self.asteroid_field = None
 
-        self.gsm.load_profile(1)
         self.gsm.initialize_current_menu()
 
     def run(self):
         while self.is_running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    self.is_running = False
                     break
                 else:
                     self.handle_event(event)
@@ -284,33 +283,33 @@ class Game():
             object.position.y > self.screen_resolution[1]+offset
         )
     
-    def get_player_name(self):
+    def get_player_name(self) -> bool:
         self.getting_player_name = True
         while self.getting_player_name:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.is_running = False
-                    return
+                    return False
                 elif event.type == pygame.KEYDOWN:
                     #print(event)
                     if event.key == pygame.K_BACKSPACE:
-                        self.player_name = self.player_name[:-1]
+                        self.player_stats.name = self.player_stats.name[:-1]
                     elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
-                        return
+                        if len(self.player_stats.name.strip()) > 0:
+                            self.getting_player_name = False
                     elif event.key == pygame.K_TAB or event.key == pygame.K_ESCAPE:
                         continue
                     else:
                         k = event.dict["unicode"]
-                        if k != "" and len(self.player_name) < PLAYER_MAX_NAME_LENGTH:
-                            self.player_name = self.player_name + k
+                        if k != "" and len(self.player_stats.name) < PLAYER_MAX_NAME_LENGTH:
+                            self.player_stats.name = self.player_stats.name + k
                 else:
                     self.handle_event(event)
             
             self.redraw_objects_and_ui()
 
-        self.player_name = self.player_name.strip()
-        if self.player_name == "":
-            self.player_name = "Player"
+        self.player_stats.name = self.player_stats.name.strip()
+        return True
 
     ### Handlers
     
@@ -325,7 +324,8 @@ class Game():
         self.star_field.regenerate()
 
     def finish_getting_player_name(self):
-        self.getting_player_name = False
+        if len(self.player_stats.name.strip()) > 0:
+            self.getting_player_name = False
 
     def switch_fullscreen(self):
         if not self.is_fullscreen:

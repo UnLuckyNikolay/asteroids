@@ -264,9 +264,6 @@ class Player(CircleShape):
 
     def get_ship(self) -> Ship:
         return self.ship
-    
-    def get_ship_name(self) -> str:
-        return self.ship.type.value
 
     def get_part_level(self, part : ShipPart) -> int:
         match part:

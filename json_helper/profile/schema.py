@@ -12,14 +12,22 @@ schema_v1 = {
             "type": "object",
             "required": [
                 "version",
+                "name",
+                "ship_model",
                 "found_cheats",
                 "cheat_godmode",
                 "cheat_hitbox",
-                "cheat_stonks",
-                "ship_model"
+                "cheat_stonks"
             ],
             "properties": {
                 "version": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string",
+                    "default": "Player"
+                },
+                "ship_model": {
                     "type": "number"
                 },
                 "found_cheats": {
@@ -33,9 +41,6 @@ schema_v1 = {
                 },
                 "cheat_stonks": {
                     "type": "boolean"
-                },
-                "ship_model": {
-                    "type": "number"
                 }
             }
         }

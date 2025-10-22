@@ -27,21 +27,25 @@ IDEAS:
 - [x] Graphics/color adjustments for the leaderboards for top places
 - [x] Add auto-shoot switch
 - [ ] Add ship recolors
-- [ ] More ship skins:
+- [ ] Additional ship skins:
     - [x] UFO - will need new parts and 2 engines
-- [ ] More weapons
+- [ ] Additional weapons
 - [ ] Additional ship upgrades:
     - [ ] Speed (might need ship vectors tweaked)
     - [ ] Rotation
 - [ ] Additional weapon upgrades:
     - [ ] Short fuse for the Bomb Launcher
     - [ ] Faster fire rate for Plasma Gun
+- [ ] Additional cheats:
+    - [ ] BIG cheat
 - [ ] Profiles
     - [x] Player reset method
-    - [ ] Profile creation
+    - [x] Profile creation
     - [ ] Player info
+    - [ ] ???
+    - [ ] New end screen
 - [ ] Show current timer/difficulty modifier
-- [ ] Bubble explosion vfx for bombs
+- [ ] Bubble explosion vfx (for bombs or better for player death)
 - [ ] Add amount limit to certain asteroids (mainly Homing)
 - [x] Condition to activate cheat switches
 - [x] Check how to save crash logs

@@ -10,7 +10,7 @@ def ValidateLeaderboard(leaderboard_path) -> list:
         with open(leaderboard_path, "r") as file:
             data = json.load(file)
     except FileNotFoundError:
-        data = []
+        return []
 
     try:
         jsonschema.validate(data, schema_v1)

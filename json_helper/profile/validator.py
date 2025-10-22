@@ -10,7 +10,7 @@ def ValidateProfile(player_save_path) -> dict | None:
         with open(player_save_path, "r") as file:
             data = json.load(file)
     except:
-        data = None
+        return None
 
     try:
         jsonschema.validate(data, schema_v1)
