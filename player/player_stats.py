@@ -11,7 +11,7 @@ from asteroids.ores import Ore, CopperOre, SilverOre, GoldenOre, Diamond
 class PlayerStats():
     """Used to keep track of certain player stats outside of rounds."""
     def __init__(self):
-        self.name : str = "Player"
+        self.name : str = ""
         self.max_score : int = 0
 
         self.__ship_model : int = 3        

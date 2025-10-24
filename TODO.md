@@ -22,6 +22,7 @@ FIXES/TWEAKS:
 - [ ] Update screenshots in README
 - [x] Increase alpha of background of the pause menu
 - [ ] Revamp difficulty increase
+- [ ] Homing isn't affected by delta
 
 IDEAS:
 - [x] Graphics/color adjustments for the leaderboards for top places
@@ -41,7 +42,7 @@ IDEAS:
 - [ ] Profiles
     - [x] Player reset method
     - [x] Profile creation
-    - [ ] Player info
+    - [x] Player info
     - [ ] ???
     - [ ] New end screen
 - [ ] Show current timer/difficulty modifier
@@ -51,6 +52,7 @@ IDEAS:
 - [x] Check how to save crash logs
 
 DISTANT/POSSIBLE IDEAS:
+- [ ] Save backups
 - [ ] Sounds
 - [ ] Music
 - [ ] Temporary boosts as loot

@@ -56,3 +56,15 @@ class SymbolArrowUp(SimpleSprite):
 
         pygame.gfxdraw.filled_polygon(screen, [(x, y-5), (x-10, y+5), (x+10, y+5)], color)
         
+class SymbolPencil(SimpleSprite):
+    def __init__(self, local_x, local_y, color):
+        super().__init__(local_x, local_y, color)
+    
+    def draw(self, screen, position : tuple[int, int], color_override : tuple[int, int, int, int] | None = None):
+        color = color_override if color_override != None else self.color
+        x = position[0] + self.x
+        y = position[1] + self.y
+
+        pygame.gfxdraw.filled_polygon(screen, [(x-12, y+12), (x-7, y+12), (x-12, y+7)], color)
+        pygame.gfxdraw.filled_polygon(screen, [(x-4, y+9), (x-9, y+4), (x+7, y-12), (x+8, y-12), (x+12, y-8), (x+12, y-7)], color)
+        

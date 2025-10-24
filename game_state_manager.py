@@ -13,7 +13,7 @@ from ui_elements.buttons import Button, Switch, ModKey
 from ui_elements.text import Text, TextH, TextF
 from ui_elements.sprites.healthbar import HealthBar
 from ui_elements.sprites.leaderboard import Leaderboard
-from ui_elements.simple_sprites.symbols import SymbolFullscreen, SymbolCross, SymbolArrowDown, SymbolArrowUp
+from ui_elements.simple_sprites.symbols import *
 from ui_elements.personal_sprites.getter import get_personal_sprite
 
 from round_state_manager import RoundStateManager
@@ -28,9 +28,10 @@ from player.ship import Ship
 # .initialize_current_menu (+ new function)
 class Menu(Enum):
     PROFILE_SELECTION = "Profile selection"
-    NEW_PROFILE = "Name edit"
+    NEW_PROFILE = "New profile"
     MAIN_MENU = "Main Menu"
     PLAYER_INFO = "Player Info"
+    NAME_EDIT = "Name edit"
     LEADERBOARD = "Leaderboard"
     HUD = "HUD"
     PAUSE_MENU = "Pause"
@@ -83,7 +84,6 @@ class GameStateManager(pygame.sprite.Sprite):
             ValidateProfile(self.__profile_paths[1]), 
             ValidateProfile(self.__profile_paths[2])
         ]
-        print(f"> Profile 0:\n{self.__profiles[0]}") # TEST
 
         # Defaults used for loading save in profile selection if something is missing
         self.__default_player_name = "Player"
@@ -143,6 +143,8 @@ class GameStateManager(pygame.sprite.Sprite):
                     button_list = self.__buttons_main_menu
                 case Menu.PLAYER_INFO:
                     button_list = self.__buttons_player_info
+                case Menu.NAME_EDIT:
+                    button_list = self.__buttons_name_edit
                 case Menu.LEADERBOARD:
                     button_list = self.__buttons_leaderboard
                 case Menu.HUD:
@@ -218,6 +220,13 @@ class GameStateManager(pygame.sprite.Sprite):
             print(f"Error removing file `{self.__profile_paths[number]}`: {e}")
         self.initialize_current_menu()
 
+    def __rename_player(self, starting_menu : Menu):
+        self.switch_menu(Menu.NAME_EDIT)
+        if self.game.get_player_name():
+            self.switch_menu(starting_menu)
+        elif self.player_stats.name == "":
+            self.player_stats.name = "Player"
+
     def __return_to_profile_selection(self):
         """Used to return from the Main Menu back to the Profile Selection."""
 
@@ -270,6 +279,8 @@ class GameStateManager(pygame.sprite.Sprite):
                 self.__draw_main_menu(screen)
             case Menu.PLAYER_INFO:
                 self.__draw_player_info(screen)
+            case Menu.NAME_EDIT:
+                self.__draw_name_edit(screen)
             case Menu.LEADERBOARD:
                 self.__draw_leaderboard(screen)
             case Menu.HUD:
@@ -312,6 +323,13 @@ class GameStateManager(pygame.sprite.Sprite):
         for button in self.__buttons_player_info:
             button.draw(screen)
 
+    def __draw_name_edit(self, screen):
+        for container in self.__containers_name_edit:
+            container.draw(screen)
+        
+        for button in self.__buttons_name_edit:
+            button.draw(screen)
+
     def __draw_leaderboard(self, screen):
         for container in self.__containers_leaderboard:
             container.draw(screen)
@@ -350,6 +368,8 @@ class GameStateManager(pygame.sprite.Sprite):
                 self.__initialize_main_menu()
             case Menu.PLAYER_INFO:
                 self.__initialize_player_info()
+            case Menu.NAME_EDIT:
+                self.__initialize_name_edit()
             case Menu.LEADERBOARD:
                 self.__initialize_leaderboard()
             case Menu.HUD:
@@ -676,7 +696,7 @@ class GameStateManager(pygame.sprite.Sprite):
 
         c_name = Container((root_x+10, root_y+90), (430, 50), (3, 10, 3, 10))
         c_name.add_element(
-            TextH("{}", (10, 10), self.__font_medium, self.__color_white, 
+            TextH("{}", (10, 8), self.__font_medium, self.__color_white, 
                   lambda: self.player_stats.name)
         )
 
@@ -715,11 +735,11 @@ class GameStateManager(pygame.sprite.Sprite):
             (center_x-400, 10), (800, 140), (7, 7, 30, 30)
         )
         c_profile.add_element(
-            TextH("{}", (24, 15), self.__font_big, self.__color_white,
+            TextH("{}", (70, 12), self.__font_big, self.__color_white,
                     lambda: self.player_stats.name)
         )
         c_profile.add_element(
-            TextH("Max Score: {}", (24, 75), self.__font_medium, self.__color_white,
+            TextH("Max Score: {}", (24, 72), self.__font_medium, self.__color_white,
                     lambda: self.player_stats.max_score)
         )
         c_profile.add_element(
@@ -740,6 +760,16 @@ class GameStateManager(pygame.sprite.Sprite):
         # <> Buttons <>
 
         # Profile
+        # Rename
+        b_rename = Button(
+            (center_x-380, 30), (35, 35), (3, 3, 3, 3),
+            lambda: self.__rename_player(Menu.MAIN_MENU)
+        )
+        b_rename.add_element(
+            SymbolPencil(0, 0, self.__color_blue),
+            Allignment.CENTER
+        )
+        # Open
         b_open_info = Button(
             (center_x-15, 125), (50, 20), (3, 3, 3, 3),
             lambda: self.switch_menu(Menu.PLAYER_INFO)
@@ -789,7 +819,8 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         
         self.__buttons_main_menu.extend(
-            [b_start, b_leaderboard, b_exit, b_profiles, b_open_info]
+            [b_start, b_leaderboard, b_exit, b_profiles, b_open_info,
+             b_rename]
         )
 
         self.__add_mini_settings_and_cheats(self.__containers_main_menu, self.__buttons_main_menu)
@@ -800,9 +831,11 @@ class GameStateManager(pygame.sprite.Sprite):
         
         res = self.game.screen_resolution
         center_x = int(res[0]/2)
-        size_y = 500
+        root_x = center_x-400
+        root_y = 10
+        size_y = 435
 
-        text_start_y = 120
+        text_start_y = 115
         text_row_y = 30
         text_nudge_x = 24
 
@@ -810,14 +843,14 @@ class GameStateManager(pygame.sprite.Sprite):
 
         # Profile
         c_profile = Container(
-            (res[0]/2-400, 10), (800, size_y), (7, 7, 30, 30)
+            (root_x, root_y), (800, size_y), (7, 7, 30, 30)
         )
         c_profile.add_element(
-            TextH("{}", (24, 15), self.__font_big, self.__color_white,
+            TextH("{}", (70, 12), self.__font_big, self.__color_white,
                     lambda: self.player_stats.name)
         )
         c_profile.add_element(
-            TextH("Max Score: {}", (24, 75), self.__font_medium, self.__color_white,
+            TextH("Max Score: {}", (24, 72), self.__font_medium, self.__color_white,
                     lambda: self.player_stats.max_score)
         )
         c_profile.add_element(
@@ -901,12 +934,13 @@ class GameStateManager(pygame.sprite.Sprite):
                 Allignment.BOTTOM_LEFT_CORNER
             )
 
-
         self.__containers_player_info.extend(
             [c_profile]
         )
         
         # <> Buttons <>
+
+        # Close
         b_close_info = Button(
             (center_x-15, size_y-15), (50, 20), (3, 3, 3, 3),
             lambda: self.switch_menu(Menu.MAIN_MENU)
@@ -915,13 +949,60 @@ class GameStateManager(pygame.sprite.Sprite):
             SymbolArrowUp(0, 0, self.__color_blue),
             Allignment.CENTER
         )
+        # Rename
+        b_rename = Button(
+            (root_x+20, root_y+20), (35, 35), (3, 3, 3, 3),
+            lambda: self.__rename_player(Menu.PLAYER_INFO)
+        )
+        b_rename.add_element(
+            SymbolPencil(0, 0, self.__color_blue),
+            Allignment.CENTER
+        )
 
         self.__buttons_player_info.extend(
-            [b_close_info]
+            [b_close_info, b_rename]
         )
 
         self.__add_mini_settings_and_cheats(self.__containers_player_info, self.__buttons_player_info)
     
+    def __initialize_name_edit(self):
+        self.__containers_name_edit : list[Container] = []
+        self.__buttons_name_edit : list[Button | Switch] = []
+
+        root_x = self.game.screen_resolution[0]/2-225
+        root_y = self.game.screen_resolution[1]/2-85
+        
+        # <> Containers <>
+
+        c_background = Container((root_x, root_y), (450, 170), (10, 25, 10, 25))
+        c_background.add_element(
+            Text("Edit your name:", (15, 7), self.__font_medium, self.__color_white)
+        )
+
+        c_name = Container((root_x+10, root_y+50), (430, 50), (3, 10, 3, 10))
+        c_name.add_element(
+            TextH("{}", (10, 8), self.__font_medium, self.__color_white, 
+                  lambda: self.player_stats.name)
+        )
+
+        self.__containers_name_edit.extend(
+            [c_background, c_name]
+        )
+        
+        # <> Buttons <>
+
+        b_confirm = Button(
+            (root_x+125, root_y+110), (200, 50), (3, 10, 3, 10),
+            self.game.finish_getting_player_name
+        )
+        b_confirm.add_element(
+            Text("Confirm", (10, 8), self.__font_medium, self.__color_blue)
+        )
+
+        self.__buttons_name_edit.extend(
+            [b_confirm]
+        )
+
     def __initialize_leaderboard(self):
         self.__containers_leaderboard : list[Container | Leaderboard] = []
         self.__buttons_leaderboard : list[Button | Switch] = []
@@ -1257,14 +1338,8 @@ class GameStateManager(pygame.sprite.Sprite):
                   self.game.rsm.score)
         )
 
-        c_name = Container((root_x+10, root_y+90), (430, 50), (3, 10, 3, 10))
-        c_name.add_element(
-            TextH("{}", (10, 10), self.__font_medium, self.__color_white, 
-                  lambda: self.player_stats.name)
-        )
-
         self.__containers_name_check.extend(
-            [c_background, c_name]
+            [c_background]
         )
         
         # <> Buttons <>
