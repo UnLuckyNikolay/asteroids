@@ -8,8 +8,11 @@ from ui_elements.helpers import get_points
 class Allignment(Enum):
     UPPER_LEFT_CORNER = 0
     BOTTOM_LEFT_CORNER = 1
+
     CENTER = 2
     CENTER_ON_THE_LEFT = 3
+
+    N_FROM_UPPER_RIGHT_CORNER = 4
     """For vertical containers. Anchor point will be equal distance for upper, bottom, and right walls."""
 
 class Container(pygame.sprite.Sprite):
@@ -25,7 +28,7 @@ class Container(pygame.sprite.Sprite):
         self._color_outline = (200, 200, 200, 255)
         self._color_fill = (75, 75, 100, 75)
         
-        self._elements : list[tuple[Any, Allignment]] = []
+        self._elements : list[tuple[Any, Allignment, int]] = []
 
     def draw(self, screen):
         points = get_points(self._position, self._size, self._corners)
@@ -33,7 +36,7 @@ class Container(pygame.sprite.Sprite):
         pygame.draw.polygon(screen, self._color_outline, points, 3)
 
         for tuple in self._elements:
-            pos = self._get_alligned_position(tuple[1])
+            pos = self._get_alligned_position(tuple[1], tuple[2])
 
             if callable(tuple[0]):
                 element = tuple[0]()
@@ -56,10 +59,15 @@ class Container(pygame.sprite.Sprite):
     def set_corners(self, topleft : int, topright : int, bottomright : int, bottomleft : int):
         self._corners = (topleft, topright, bottomright, bottomleft)
 
-    def add_element(self, element, allignment : Allignment = Allignment.UPPER_LEFT_CORNER):
-        self._elements.append((element, allignment))
+    def add_element(
+            self, 
+            element, 
+            allignment : Allignment = Allignment.UPPER_LEFT_CORNER,
+            allignment_N : int = 0
+        ):
+        self._elements.append((element, allignment, allignment_N))
 
-    def _get_alligned_position(self, allignment : Allignment) -> tuple[int, int]:
+    def _get_alligned_position(self, allignment : Allignment, N : int) -> tuple[int, int]:
         match allignment:
             case Allignment.UPPER_LEFT_CORNER:
                 return self._position
@@ -69,7 +77,9 @@ class Container(pygame.sprite.Sprite):
                 return (int(self._position[0] + self._size[0] / 2), int(self._position[1] + self._size[1] / 2))
             case Allignment.CENTER_ON_THE_LEFT:
                 return (int(self._position[0] + self._size[0] - self._size[1] / 2), int(self._position[1] + self._size[1] / 2))
-            
+            case Allignment.N_FROM_UPPER_RIGHT_CORNER:
+                return (int(self._position[0] + self._size[0] - N), int(self._position[1] + N))
+
     def _get_divided_color_tuple(self, color : tuple[int, int, int, int], divider : int | float, alpha_override : int | None = None) -> tuple[int, int, int, int]:
         """Returns a new tuple with all color values divided and rounded down. Alpha is not divided but can be overridden."""
 

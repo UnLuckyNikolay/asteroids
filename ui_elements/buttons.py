@@ -116,7 +116,7 @@ class Button(_ButtonBase):
             pygame.draw.polygon(screen, self._color_outline_inactive, points, 3)
 
         for tuple in self._elements:
-            pos = self._get_alligned_position(tuple[1])
+            pos = self._get_alligned_position(tuple[1], tuple[2])
 
             if callable(tuple[0]):
                 element = tuple[0]()
@@ -186,7 +186,7 @@ class Switch(_ButtonBase):
             pygame.draw.polygon(screen, self._color_outline, points, 3)
 
         for tuple in self._elements:
-            pos = self._get_alligned_position(tuple[1])
+            pos = self._get_alligned_position(tuple[1], tuple[2])
 
             if callable(tuple[0]):
                 element = tuple[0]()

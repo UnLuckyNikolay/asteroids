@@ -32,9 +32,10 @@ class Game():
 
         self.clock = pygame.time.Clock()
         self.dt = 0
-        self.is_running = True
-        self.is_paused = False
-        self.getting_player_name = False
+        self.is_running : bool = True
+        self.is_paused : bool = False
+        self.getting_player_name : bool = False
+        self.is_round_end : bool = False
 
         self.updatable = pygame.sprite.Group()   # Must have method .update(delta)
         self.drawable = pygame.sprite.Group()
@@ -85,14 +86,7 @@ class Game():
 
     def run(self):
         while self.is_running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.is_running = False
-                    break
-                else:
-                    self.handle_event(event)
-            
-            self.redraw_objects_and_ui()
+            self.process_and_refresh()
         
         self.gsm.save_profile() # Save on exit
 
@@ -148,6 +142,8 @@ class Game():
                             asteroid.split()
                             explosion = Explosion(asteroid.position, asteroid.radius)
                             self.rsm.score += asteroid.reward
+                            if not self.player.is_sus:
+                                self.player_stats.increase_count_stat(type(asteroid))
                     
                 # Asteroid exploded
                 for hitbox in self.explosion_hitboxes:
@@ -155,12 +151,16 @@ class Game():
                         if hitbox.check_colision(asteroid) and not asteroid.has_been_hit:
                             asteroid.split()
                             self.rsm.score += asteroid.reward
+                            if not self.player.is_sus:
+                                self.player_stats.increase_count_stat(type(asteroid))
                     hitbox.kill()
 
                 # Loot collected
                 for loot in self.loot:
                     if loot.check_colision(self.player):
                         self.player.collect_loot(loot.price)
+                        if not self.player.is_sus:
+                            self.player_stats.increase_count_stat(type(loot))
                         loot.kill()
                     elif loot.check_colision(self.player.magnet):
                         loot.home_towards(self.player.position, self.player.magnet.get_strength())
@@ -175,7 +175,11 @@ class Game():
         if not self.player.is_sus and self.rsm.score > 0:
             self.gsm.switch_menu(Menu.NAME_CHECK)
             self.gsm.check_score(self.rsm.score)
+            self.player_stats.check_max_score(self.rsm.score)
         self.gsm.save_profile()
+        self.is_round_end = True
+        while self.is_round_end:
+            self.process_and_refresh()
         self.gsm.switch_menu(Menu.MAIN_MENU)
 
         self.player.reset()
@@ -185,6 +189,9 @@ class Game():
 
         for object in self.cleanup:
             object.kill()
+
+    def finish_round(self):
+        self.is_round_end = False
 
     ### Helpers
 
@@ -262,6 +269,22 @@ class Game():
             #print(event)
         else:
             self.gsm.handle_event_for_secrets(event)
+
+    def process_and_refresh(self) -> float:
+        """
+        Checks events and redraws the screen. Returns delta.
+
+        Don't use during gameplay! Or things go kaput.
+        """
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.is_running = False
+                break
+            else:
+                self.handle_event(event)
+        
+        return self.redraw_objects_and_ui()
     
     def redraw_objects_and_ui(self) -> float:
         """
@@ -286,7 +309,7 @@ class Game():
             object.position.y > self.screen_resolution[1]+offset
         )
     
-    def get_player_name(self) -> bool:
+    def get_player_name(self) -> bool: # Used in profile creation in game_state_manager
         self.getting_player_name = True
         while self.getting_player_name:
             for event in pygame.event.get():
@@ -314,6 +337,10 @@ class Game():
         self.player_stats.name = self.player_stats.name.strip()
         return True
 
+    def finish_getting_player_name(self):
+        if len(self.player_stats.name.strip()) > 0:
+            self.getting_player_name = False
+
     ### Handlers
     
     def handler_turn_off(self):
@@ -325,10 +352,6 @@ class Game():
 
     def handler_regenerate_background(self):
         self.star_field.regenerate()
-
-    def finish_getting_player_name(self):
-        if len(self.player_stats.name.strip()) > 0:
-            self.getting_player_name = False
 
     def switch_fullscreen(self):
         if not self.is_fullscreen:
