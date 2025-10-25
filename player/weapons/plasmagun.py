@@ -11,11 +11,24 @@ class PlasmaGun(Weapon):
         self._cooldown = 0.4
 
         self._level_projectiles = 1
+        self._level_cooldown = 1
 
+
+    def upgrade_cooldown(self):
+        match self._level_cooldown:
+            case 1:
+                self._level += 1
+                self._level_cooldown += 1
+                self._cooldown = 0.35
+            case 2:
+                self._level += 1
+                self._level_cooldown += 1
+                self._cooldown = 0.3
 
     def upgrade_projectiles(self):
-        self._level += 1
-        self._level_projectiles += 1
+        if self._level_projectiles < 3:
+            self._level += 1
+            self._level_projectiles += 1
 
     def attempt_shot(self, position, rotation, time_since_last_shot):
         if time_since_last_shot >= self._cooldown:

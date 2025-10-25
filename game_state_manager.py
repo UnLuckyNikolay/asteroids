@@ -1203,36 +1203,46 @@ class GameStateManager(pygame.sprite.Sprite):
             self.player.get_lives)
         )
         # List - weapons
+        # Plasma Gun
         c_weapon_1 = Container((offset_x+760, offset_y+65+row_height*1), (455, 36), (6, 6, 6, 6))
         c_weapon_1.add_element(
             TextH("Weapon 1: {}.v{}", (12, 5), self.__font_small, self.__color_white,
                   self.player.weapon_plasmagun.get_name,
                   lambda: self.player.get_part_level(ShipPart.PLASMAGUN))
         )
-
         c_weapon_1_proj = Container((offset_x+760, offset_y+65+row_height*2), (409, 36), (6, 3, 3, 6))
         c_weapon_1_proj.add_element(
             TextH("Projectiles: {}", (12, 5), self.__font_small, self.__color_white,
                   lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.PLASMAGUN_PROJECTILES))
         )
-        
-        c_weapon_2 = Container((offset_x+760, offset_y+65+row_height*3), (455, 36), (6, 6, 6, 6))
+        c_weapon_1_cd = Container((offset_x+760, offset_y+65+row_height*3), (409, 36), (6, 3, 3, 6))
+        c_weapon_1_cd.add_element(
+            TextH("Cooldown: {}", (12, 5), self.__font_small, self.__color_white,
+                  lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.PLASMAGUN_COOLDOWN))
+        )
+        #Bomb Launcher
+        c_weapon_2 = Container((offset_x+760, offset_y+65+row_height*4), (455, 36), (6, 6, 6, 6))
         c_weapon_2.add_element(
             TextH("Weapon 2: {}.v{}", (12, 5), self.__font_small, self.__color_white,
                   self.player.weapon_bomblauncher.get_name,
                   lambda: self.player.get_part_level(ShipPart.BOMBLAUNCHER))
         )
-        
-        c_weapon_2_rad = Container((offset_x+760, offset_y+65+row_height*4), (409, 36), (6, 3, 3, 6))
+        c_weapon_2_rad = Container((offset_x+760, offset_y+65+row_height*5), (409, 36), (6, 3, 3, 6))
         c_weapon_2_rad.add_element(
             TextH("Radius: {}", (12, 5), self.__font_small, self.__color_white,
                   lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.BOMBLAUNCHER_RADIUS))
+        )
+        c_weapon_2_fuse = Container((offset_x+760, offset_y+65+row_height*6), (409, 36), (6, 3, 3, 6))
+        c_weapon_2_fuse.add_element(
+            TextH("Fuse: {}", (12, 5), self.__font_small, self.__color_white,
+                  lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.BOMBLAUNCHER_FUSE))
         )
 
         self.__containers_pause_menu.extend(
             [c_background, c_ship, c_model, c_switch_model, c_heal,
              c_magnet, c_magnet_rad, c_magnet_str, c_points, c_money,
-             c_health, c_weapon_1, c_weapon_1_proj, c_weapon_2, c_weapon_2_rad]
+             c_health, c_weapon_1, c_weapon_1_proj, c_weapon_2, c_weapon_2_rad,
+             c_weapon_2_fuse, c_weapon_1_cd]
         )
         
         # <> Buttons <>
@@ -1300,23 +1310,41 @@ class GameStateManager(pygame.sprite.Sprite):
         )
 
         # Upgrade weapons
-        b_weapon_1_up = Button(
+        b_weapon_1_proj_up = Button(
             (offset_x+1179, offset_y+65+row_height*2), (36, 36), (3, 6, 6, 3),
             lambda: self.player.buy_upgrade(ShipUpgrade.PLASMAGUN_PROJECTILES),
             lambda: self.player.can_buy_upgrade(ShipUpgrade.PLASMAGUN_PROJECTILES)
         )
-        b_weapon_1_up.set_outline_color(self.__color_green)
-        b_weapon_1_up.add_element(
+        b_weapon_1_proj_up.set_outline_color(self.__color_green)
+        b_weapon_1_proj_up.add_element(
+            Text("/\\", (5, 5), self.__font_small, self.__color_green)
+        )
+        b_weapon_1_cd_up = Button(
+            (offset_x+1179, offset_y+65+row_height*3), (36, 36), (3, 6, 6, 3),
+            lambda: self.player.buy_upgrade(ShipUpgrade.PLASMAGUN_COOLDOWN),
+            lambda: self.player.can_buy_upgrade(ShipUpgrade.PLASMAGUN_COOLDOWN)
+        )
+        b_weapon_1_cd_up.set_outline_color(self.__color_green)
+        b_weapon_1_cd_up.add_element(
             Text("/\\", (5, 5), self.__font_small, self.__color_green)
         )
         
-        b_weapon_2_up = Button(
-            (offset_x+1179, offset_y+65+row_height*4), (36, 36), (3, 6, 6, 3),
+        b_weapon_2_rad_up = Button(
+            (offset_x+1179, offset_y+65+row_height*5), (36, 36), (3, 6, 6, 3),
             lambda: self.player.buy_upgrade(ShipUpgrade.BOMBLAUNCHER_RADIUS),
             lambda: self.player.can_buy_upgrade(ShipUpgrade.BOMBLAUNCHER_RADIUS)
         )
-        b_weapon_2_up.set_outline_color(self.__color_green)
-        b_weapon_2_up.add_element(
+        b_weapon_2_rad_up.set_outline_color(self.__color_green)
+        b_weapon_2_rad_up.add_element(
+            Text("/\\", (5, 5), self.__font_small, self.__color_green)
+        )
+        b_weapon_2_fuse_up = Button(
+            (offset_x+1179, offset_y+65+row_height*6), (36, 36), (3, 6, 6, 3),
+            lambda: self.player.buy_upgrade(ShipUpgrade.BOMBLAUNCHER_FUSE),
+            lambda: self.player.can_buy_upgrade(ShipUpgrade.BOMBLAUNCHER_FUSE)
+        )
+        b_weapon_2_fuse_up.set_outline_color(self.__color_green)
+        b_weapon_2_fuse_up.add_element(
             Text("/\\", (5, 5), self.__font_small, self.__color_green)
         )
 
@@ -1337,7 +1365,8 @@ class GameStateManager(pygame.sprite.Sprite):
 
         self.__buttons_pause_menu.extend(
             [b_model_left, b_model_right, b_heal, b_magnet_rad, b_magnet_str,
-             b_weapon_1_up, b_weapon_2_up, b_end_run, s_auto_shoot]
+             b_end_run, s_auto_shoot, b_weapon_1_cd_up, b_weapon_1_proj_up, b_weapon_2_fuse_up,
+             b_weapon_2_rad_up]
         )
 
     def __initialize_name_check(self):

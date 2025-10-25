@@ -10,16 +10,21 @@ from player.ship import Ship, ShipType
 from player.player_stats import PlayerStats
 
 
-# New upgrades should be added to methods get_upgrade_level and buy_upgrade
+# New upgrades should be added to:
+# - .get_upgrade_level 
+# - .buy_upgrade
 class ShipUpgrade(Enum):
     """List of player upgrades"""
 
     PLASMAGUN_PROJECTILES = "Plasma Gun: Projectiles"
+    PLASMAGUN_COOLDOWN = "Plasma Gun: Cooldown"
     BOMBLAUNCHER_RADIUS = "Bomb Launcher: Radius"
+    BOMBLAUNCHER_FUSE = "Bomb Launcher: Fuse"
     MAGNET_RADIUS = "Magnet: Radius"
     MAGNET_STRENGTH = "Magnet: Strength"
 
-# New parts should be added to get_part_level
+# New parts should be added to 
+# - .get_part_level
 class ShipPart(Enum):
     """List of player parts"""
 
@@ -135,7 +140,7 @@ class Player(CircleShape):
         else:
             self.is_sus = False
         if self.stats.cheat_stonks:
-            self.money = 999999
+            self.money = 9999
         self.ship.switch_hitbox_to(self.stats.cheat_hitbox)
 
     def draw(self, screen):
@@ -310,8 +315,12 @@ class Player(CircleShape):
         match ship_part:
             case ShipUpgrade.PLASMAGUN_PROJECTILES:
                 return self.weapon_plasmagun._level_projectiles
+            case ShipUpgrade.PLASMAGUN_COOLDOWN:
+                return self.weapon_plasmagun._level_cooldown
             case ShipUpgrade.BOMBLAUNCHER_RADIUS:
                 return self.weapon_bomblauncher._level_radius
+            case ShipUpgrade.BOMBLAUNCHER_FUSE:
+                return self.weapon_bomblauncher._level_fuse
             case ShipUpgrade.MAGNET_RADIUS:
                 return self.magnet._level_radius
             case ShipUpgrade.MAGNET_STRENGTH:
@@ -353,8 +362,12 @@ class Player(CircleShape):
         match ship_part:
             case ShipUpgrade.PLASMAGUN_PROJECTILES:
                 self.weapon_plasmagun.upgrade_projectiles()
+            case ShipUpgrade.PLASMAGUN_COOLDOWN:
+                self.weapon_plasmagun.upgrade_cooldown()
             case ShipUpgrade.BOMBLAUNCHER_RADIUS:
                 self.weapon_bomblauncher.upgrade_radius()
+            case ShipUpgrade.BOMBLAUNCHER_FUSE:
+                self.weapon_bomblauncher.upgrade_fuse()
             case ShipUpgrade.MAGNET_RADIUS:
                 self.magnet.upgrade_radius()
             case ShipUpgrade.MAGNET_STRENGTH:

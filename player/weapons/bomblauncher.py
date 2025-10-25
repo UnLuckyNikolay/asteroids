@@ -7,14 +7,35 @@ from player.weapons.projectiles.bomb import Bomb
 class BombLauncher(Weapon):
     def __init__(self):
         super().__init__("BombLauncher")
-        self._cooldown = 1.0
+        self._cooldown = 1.5
+        self._explosion_radius = 100
+        self._fuse_timer = 2.5
 
         self._level_radius = 1
+        self._level_fuse = 1
 
+
+    def upgrade_fuse(self):
+        match self._level_fuse:
+            case 1:
+                self._level += 1
+                self._level_fuse += 1
+                self._fuse_timer = 2.1
+            case 2:
+                self._level += 1
+                self._level_fuse += 1
+                self._fuse_timer = 1.7
 
     def upgrade_radius(self):
-        self._level += 1
-        self._level_radius += 1
+        match self._level_radius:
+            case 1:
+                self._level += 1
+                self._level_radius += 1
+                self._explosion_radius = 150
+            case 2:
+                self._level += 1
+                self._level_radius += 1
+                self._explosion_radius = 200
 
     def attempt_shot(self, position, rotation, time_since_last_shot):
         if time_since_last_shot >= self._cooldown:
@@ -26,11 +47,5 @@ class BombLauncher(Weapon):
     
     def _spawn_bomb(self, dot, position, rotation):
         spawn = pygame.Vector2(dot).rotate(rotation)
-        match self._level_radius:
-            case 1:
-                bomb = Bomb(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), pygame.Vector2(0, 0), 100)
-            case 2:
-                bomb = Bomb(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), pygame.Vector2(0, 0), 150)
-            case 3:
-                bomb = Bomb(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), pygame.Vector2(0, 0), 200)
+        bomb = Bomb(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), pygame.Vector2(0, 0), self._explosion_radius, self._fuse_timer)
                 

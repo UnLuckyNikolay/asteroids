@@ -30,19 +30,21 @@ IDEAS:
 - [ ] Add ship recolors
 - [ ] Additional ship skins:
     - [x] UFO - will need new parts and 2 engines
+    - [ ] Classic/cartoon-ish rocket
 - [ ] Additional weapons
 - [ ] Additional ship upgrades:
     - [ ] Speed (might need ship vectors tweaked)
     - [ ] Rotation
-- [ ] Additional weapon upgrades:
-    - [ ] Short fuse for the Bomb Launcher
-    - [ ] Faster fire rate for Plasma Gun
+- [x] Additional weapon upgrades:
+    - [x] Short fuse for the Bomb Launcher
+    - [x] Faster fire rate for Plasma Gun
 - [ ] Additional cheats:
     - [ ] BIG cheat
 - [ ] Profiles
     - [x] Player reset method
     - [x] Profile creation
     - [x] Player info
+    - [ ] Saved unlocked ships (check ordered dict?)
     - [ ] New end screen
     - [ ] ???
     - [ ] Profit
@@ -61,6 +63,7 @@ DISTANT/POSSIBLE IDEAS:
 - [ ] Persistent upgrades (will need profiles)
 - [ ] Game modes 
     - [ ] Classic with only normal asteroids and white/black graphics
+    - [ ] Drift mode with no shooting and only homing asteroid (would need timer, might need difficulty revamp)
 - [ ] Enemy ships/bosses
 - [ ] Achievements (will need profiles)
 - [ ] Better asteroid sprite
