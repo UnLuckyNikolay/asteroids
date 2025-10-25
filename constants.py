@@ -9,12 +9,12 @@ ASTEROID_MAX_RADIUS = ASTEROID_MIN_RADIUS * ASTEROID_KINDS
 LOOT_SLOWDOWN = 0.5
 
 CHANCE_GOLDEN = 5 #5
-CHANCE_HOMING = 100 #12
+CHANCE_HOMING = 12 #12
 CHANCE_EXPLOSIVE = 22 #22
 
 HOMING_SPEED = 300 #300
-DIFFICULTY_INCREASE_MP = 0.92 #0.92 float, should be less than 1, spawn time of asteroids is multiplied by it every 15 seconds
-DIFFICULTY_INCREASE_TIMER = 15 #15 seconds
+DIFFICULTY_INCREASE_MP = 0.92 #0.92 float, should be less than 1, spawn time of asteroids is multiplied by it every N seconds
+DIFFICULTY_INCREASE_TIMER = 15.0 #15 seconds
 
 STAR_BIG_MULT = 5
 STAR_MEDIUM_MULT = 30

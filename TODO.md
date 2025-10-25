@@ -21,7 +21,7 @@ FIXES/TWEAKS:
 - [ ] Upgrade movement to properly handle turning of vectors, something is broken when turning without moving
 - [ ] Update screenshots in README
 - [x] Increase alpha of background of the pause menu
-- [ ] Revamp difficulty increase
+- [x] Revamp difficulty increase
 - [x] Homing isn't affected by delta
 
 IDEAS:

@@ -14,14 +14,25 @@ class AsteroidField(pygame.sprite.Sprite):
         self.game = game
         self.player = player
 
-        self.__edges : list[tuple[pygame.Vector2, Callable[[Any], pygame.Vector2]]]
-        self.__time_passed_for_spawns : float = 0.0
+        self.__time_passed : float = 0.0 # Isn't reduced
+        self.__time_passed_for_spawns : float = 0.0 # Reduced by spawns
         self.__time_passed_for_difficulty : float = 0.0
-        self.__spawn_time_mp : float = 1.0
-        self.__spawn_time : float
+
+        self.__edges : list[tuple[pygame.Vector2, Callable[[Any], pygame.Vector2]]]
 
         self.__amount_homing : int = 0
         self.__amount_homing_max : int = 3
+
+        self.__difficulty_increase_timer : float = DIFFICULTY_INCREASE_TIMER
+
+        self.__spawn_time : float # Base, depends on the screen resolution
+        self.__spawn_time_mp : float = 1 # Decreases with time
+        self.__spawn_time_mp_increase : float = DIFFICULTY_INCREASE_MP
+        self.__spawn_time_mp_min : float = 0.25
+
+        self.__speed_mod : int = 0
+        self.__speed_mod_increase : int = 2
+        self.__speed_mod_max : int = 40
 
         self.update_spawns(screen_resolution)
 
@@ -45,7 +56,7 @@ class AsteroidField(pygame.sprite.Sprite):
                 lambda x: pygame.Vector2(x * screen_resolution[0], screen_resolution[1] + ASTEROID_MAX_RADIUS),
             ),
         ]
-        self.__spawn_time = (ASTEROID_SPAWN_RATE * (1280*720) / (screen_resolution[0]*screen_resolution[1]))
+        self.__spawn_time = (ASTEROID_SPAWN_RATE * (1280*720) / (screen_resolution[0]*screen_resolution[1])) # Very elegant, I know
 
     def kill_asteroid(self, asteroid):
         self.__check_asteroid(asteroid)
@@ -60,6 +71,7 @@ class AsteroidField(pygame.sprite.Sprite):
             self.__amount_homing -= 1
     
     def update(self, dt):
+        self.__time_passed += dt
         self.__time_passed_for_spawns += dt
         self.__time_passed_for_difficulty += dt
 
@@ -69,16 +81,22 @@ class AsteroidField(pygame.sprite.Sprite):
             self.__time_passed_for_spawns -= spawn_time
 
             edge = random.choice(self.__edges)
-            speed = random.randint(40, 120)
+            speed = random.randint(40, 80) + self.__speed_mod
             velocity = edge[0] * speed
             velocity = velocity.rotate(random.randint(-30, 30))
             position = edge[1](random.uniform(0, 1))
             kind = random.randint(1, ASTEROID_KINDS)
             self.__spawn(ASTEROID_MIN_RADIUS * kind, position, velocity, speed)
-            
-        while self.__time_passed_for_difficulty >= DIFFICULTY_INCREASE_TIMER:
-            self.__time_passed_for_difficulty -= DIFFICULTY_INCREASE_TIMER
-            self.__spawn_time_mp *= DIFFICULTY_INCREASE_MP
+        
+        # Difficulty increase
+        while self.__time_passed_for_difficulty >= self.__difficulty_increase_timer:
+            self.__time_passed_for_difficulty -= self.__difficulty_increase_timer
+            self.__spawn_time_mp *= self.__spawn_time_mp_increase
+            if self.__spawn_time_mp < self.__spawn_time_mp_min:
+                self.__spawn_time_mp = self.__spawn_time_mp_min
+            self.__speed_mod += self.__speed_mod_increase
+            if self.__speed_mod > self.__speed_mod_max:
+                self.__speed_mod = self.__speed_mod_max
 
 
     def __spawn(self, radius, position, velocity, speed):
