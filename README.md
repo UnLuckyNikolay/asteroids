@@ -1,6 +1,6 @@
 # Asteroids
 
-A classic game of Asteroids built using Pygame as a Boot.dev project and then enhanced with additional features.
+A classic game of Asteroids built using Pygame as a Boot.dev project and then enhanced with lots of additional features.
 
 ## Install and Run
 
@@ -24,7 +24,7 @@ A classic game of Asteroids built using Pygame as a Boot.dev project and then en
 4. Run:
 
 	```bash 
-	python3 main.py
+	python3 main.pyw
 	```
 
 ## Features
@@ -42,7 +42,7 @@ A classic game of Asteroids built using Pygame as a Boot.dev project and then en
 * Multiple ship skins
 * Loot that can be collected to upgrade the ship and weapons
 * Difficulty increase with time
-* Configurable game settings via `constants.py` (including screen resolution, player stats, asteroid spawns and debug options)
+* Profiles that keep track of your stats
 * Local leaderboards
 
 ## Controls
@@ -52,9 +52,9 @@ A classic game of Asteroids built using Pygame as a Boot.dev project and then en
 * `Space` - Shoot the current weapon
 * `1` - Switch to the Plasma Gun
 * `2` - Switch to the Bomb Launcher
-* `Escape` - to open the Pause menu
+* `Escape` - Open the Pause menu
 
-## Screenshots
+## Screenshots (Outdated)
 
 ![Gameplay Showcase 1](https://imgur.com/LEnoEWm.png)
 
@@ -67,6 +67,7 @@ A classic game of Asteroids built using Pygame as a Boot.dev project and then en
 * Movement system that implements inertia and speed-up time for both moving and turning
 * Game loop that uses delta and collision checks
 * Point system that is used for building a local leaderboard (saved in JSON file)
+* Configurable game settings via `constants.py` (including max fps, screen resolution, player stats, asteroid spawns and debug options)
 
 ## License
 
