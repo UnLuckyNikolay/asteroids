@@ -1086,7 +1086,6 @@ class GameStateManager(pygame.sprite.Sprite):
             
             self.__buttons_leaderboard.append(b_ufo)
 
-
     def __initialize_hud(self):
         self.__containers_hud : list[Container] = []
 
@@ -1095,11 +1094,17 @@ class GameStateManager(pygame.sprite.Sprite):
         # <> Containers <>
 
         # Current weapon
-        c_weapon = Container((25, 25), (548, 36), (10, 10, 5, 5))
+        c_weapon = Container((25, 25), (362, 36), (10, 5, 5, 5))
         c_weapon.add_element(
-            TextH("Weapon: {}.v{}", (9, 5), self.__font_small, self.__color_white, 
+            TextH("{}.v{}", (9, 5), self.__font_small, self.__color_white, 
                   self.player.get_current_weapon_name,
                   self.player.get_current_weapon_level)
+        )
+        # Timer
+        c_timer = Container((397, 25), (176, 36), (5, 10, 5, 5))
+        c_timer.add_element(
+            TextH("Time: {}", (9, 5), self.__font_small, self.__color_white, 
+                  self.game.rsm.get_current_time_as_text)
         )
         # Current score
         c_score = Container((25, 71), (176, 36), (5, 3, 5, 10))
@@ -1124,7 +1129,7 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         
         self.__containers_hud.extend(
-            [c_weapon, c_score, c_money, c_health]
+            [c_weapon, c_score, c_money, c_health, c_timer]
         )
 
         # Cheats detected

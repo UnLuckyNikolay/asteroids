@@ -49,6 +49,7 @@ class Game():
         self.cleanup = pygame.sprite.Group()   # This group is cleaned (object.kill()) after each round
 
         GameStateManager.containers = (self.drawable)
+        RoundStateManager.containers = (self.updatable)
 
         StarField.containers = (self.drawable)
         Explosion.containers = (self.updatable, self.drawable, self.cleanup)
