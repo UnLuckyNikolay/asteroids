@@ -145,7 +145,7 @@ class Game():
                             explosion = Explosion(asteroid.position, asteroid.radius)
                             self.rsm.score += asteroid.reward
                             if not self.player.is_sus:
-                                self.player_stats.increase_count_stat(type(asteroid))
+                                self.rsm.increase_count_stat(type(asteroid))
                     
                 # Asteroid exploded
                 for hitbox in self.explosion_hitboxes:
@@ -154,7 +154,7 @@ class Game():
                             self.asteroid_field.split_asteroid(asteroid)
                             self.rsm.score += asteroid.reward
                             if not self.player.is_sus:
-                                self.player_stats.increase_count_stat(type(asteroid))
+                                self.rsm.increase_count_stat(type(asteroid))
                     hitbox.kill()
 
                 # Loot collected
@@ -162,7 +162,7 @@ class Game():
                     if loot.check_colision(self.player):
                         self.player.collect_loot(loot.price)
                         if not self.player.is_sus:
-                            self.player_stats.increase_count_stat(type(loot))
+                            self.rsm.increase_count_stat(type(loot))
                         loot.kill()
                     elif loot.check_colision(self.player.magnet):
                         loot.home_towards(self.dt, self.player.position, self.player.magnet.get_strength())
@@ -176,13 +176,13 @@ class Game():
         # Saving score and going back to Main Menu
         if not self.player.is_sus and self.rsm.score > 0:
             is_new_record = self.gsm.check_score(self.rsm.score)
-            self.player_stats.check_max_score(self.rsm.score)
+            self.player_stats.process_round_stats(self.rsm)
+            self.gsm.save_profile()
             if is_new_record:
                 self.is_round_end = True
                 self.gsm.switch_menu(Menu.NAME_CHECK)
                 while self.is_round_end:
                     self.process_and_refresh()
-            self.gsm.save_profile()
         self.gsm.switch_menu(Menu.MAIN_MENU)
 
         self.player.reset()

@@ -1,11 +1,12 @@
 from player.ship import ShipType
 
-from asteroids.asteroid import Asteroid
-from asteroids.asteroidbasic import AsteroidBasic
-from asteroids.asteroidexplosive import AsteroidExplosive
-from asteroids.asteroidgolden import AsteroidGolden
-from asteroids.asteroidhoming import AsteroidHoming
-from asteroids.ores import Ore, CopperOre, SilverOre, GoldenOre, Diamond
+from round_state_manager import RoundStateManager
+# from asteroids.asteroid import Asteroid
+# from asteroids.asteroidbasic import AsteroidBasic
+# from asteroids.asteroidexplosive import AsteroidExplosive
+# from asteroids.asteroidgolden import AsteroidGolden
+# from asteroids.asteroidhoming import AsteroidHoming
+# from asteroids.ores import Ore, CopperOre, SilverOre, GoldenOre, Diamond
 
 
 class PlayerStats():
@@ -15,6 +16,7 @@ class PlayerStats():
         self.player = None
         self.name : str = "" # Empty for the Profile creation, default while loading a save is "Player"
         self.max_score : int = 0
+        self.longest_run : float = 0 # In seconds
 
         self.unlocked_ships : list[list[int | bool]] = [
             [int(ShipType.POLY.value), True],
@@ -69,38 +71,25 @@ class PlayerStats():
         id = ship_type.value
         for i in range(len(self.unlocked_ships)):
             if self.unlocked_ships[i][0] == id:
-                return self.unlocked_ships[i][1]
-                
+                return self.unlocked_ships[i][1]   
 
-    def increase_count_stat(self, entity_type : type):
-        """Used for destroying asteroids and collecting loot."""
+    def process_round_stats(self, rsm : RoundStateManager):
+        if rsm.score > self.max_score:
+            self.max_score = rsm.score
+        if rsm.round_time > self.longest_run:
+            self.longest_run = rsm.round_time
+        
+        self.destroyed_asteroids += rsm.destroyed_asteroids
+        self.destroyed_asteroids_basic += rsm.destroyed_asteroids_basic
+        self.destroyed_asteroids_explosive += rsm.destroyed_asteroids_explosive
+        self.destroyed_asteroids_golden += rsm.destroyed_asteroids_golden
+        self.destroyed_asteroids_homing += rsm.destroyed_asteroids_homing
 
-        if issubclass(entity_type, Asteroid):
-            self.destroyed_asteroids += 1
-            if entity_type == AsteroidBasic:
-                self.destroyed_asteroids_basic += 1
-            elif entity_type == AsteroidExplosive:
-                self.destroyed_asteroids_explosive += 1
-            elif entity_type == AsteroidGolden:
-                self.destroyed_asteroids_golden += 1
-            elif entity_type == AsteroidHoming:
-                self.destroyed_asteroids_homing += 1
-            else:
-                print(f"ERROR: Asteroid `{entity_type}` is missing from PlayerStats.increase_count_stat.")
-        elif issubclass(entity_type, Ore):
-            self.collected_loot += 1
-            if entity_type == CopperOre:
-                self.collected_ores_copper += 1
-            elif entity_type == SilverOre:
-                self.collected_ores_silver += 1
-            elif entity_type == GoldenOre:
-                self.collected_ores_golden += 1
-            elif entity_type == Diamond:
-                self.collected_diamonds += 1
-            else:
-                print(f"ERROR: Loot `{entity_type}` is missing from PlayerStats.increase_count_stat.")
-        else:
-            print(f"ERROR: `{entity_type}` is missing from PlayerStats.increase_count_stat.")
+        self.collected_loot += rsm.collected_loot
+        self.collected_ores_copper += rsm.collected_ores_copper
+        self.collected_ores_silver += rsm.collected_ores_silver
+        self.collected_ores_golden += rsm.collected_ores_golden
+        self.collected_diamonds += rsm.collected_diamonds
 
     def set_player(self, player):
         self.player = player
@@ -112,6 +101,7 @@ class PlayerStats():
 
             "name" : self.name,
             "max_score" : self.max_score,
+            "longest_run" : self.longest_run,
 
             # Ship
             "unlocked_ships" : self.unlocked_ships,
@@ -145,6 +135,7 @@ class PlayerStats():
         if player_stats_save["version"] == 1:
             self.name = player_stats_save.get("name", "Player") # Different to default
             self.max_score = player_stats_save.get("max_score", self.max_score)
+            self.longest_run = player_stats_save.get("longest_run", self.longest_run)
 
             # Ship
             self.unlocked_ships = player_stats_save.get("unlocked_ships", self.unlocked_ships)
@@ -171,9 +162,12 @@ class PlayerStats():
             self.collected_ores_golden = player_stats_save.get("collected_ores_golden", self.collected_ores_golden)
             self.collected_diamonds = player_stats_save.get("collected_diamonds", self.collected_diamonds)
 
-    def check_max_score(self, score : int):
-        if score > self.max_score:
-            self.max_score = score
+    def get_longest_time_as_text(self) -> str:
+        seconds = int(self.longest_run%60)
+        seconds = str(seconds) if seconds >= 10 else f"0{str(seconds)}"
+        minutes = int(self.longest_run//60)
+
+        return f"{minutes}:{seconds}"
 
     def switch_godmode(self):
         self.cheat_godmode = False if self.cheat_godmode else True

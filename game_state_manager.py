@@ -846,9 +846,9 @@ class GameStateManager(pygame.sprite.Sprite):
         center_x = int(res[0]/2)
         root_x = center_x-400
         root_y = 10
-        size_y = 443
+        size_y = 483
 
-        text_start_y = 117
+        text_start_y = 157
         text_row_y = 30
         text_nudge_x = 35
 
@@ -865,6 +865,14 @@ class GameStateManager(pygame.sprite.Sprite):
         c_profile.add_element(
             TextH("Max Score: {}", (text_nudge_x, 77), self.__font_medium, self.__color_white,
                     lambda: self.player_stats.max_score)
+        )
+        c_profile.add_element(
+            Ship(self.player_stats.ship_model_value, 0),
+            Allignment.N_FROM_UPPER_RIGHT_CORNER, 70
+        )
+        c_profile.add_element(
+            TextH("Longest run: {}", (text_nudge_x, 117), self.__font_medium, self.__color_white,
+                    self.player_stats.get_longest_time_as_text)
         )
         c_profile.add_element(
             Ship(self.player_stats.ship_model_value, 0),
@@ -1110,7 +1118,7 @@ class GameStateManager(pygame.sprite.Sprite):
         c_score = Container((25, 71), (176, 36), (5, 3, 5, 10))
         c_score.add_element(
             TextH("{}pts", (9, 5), self.__font_small, self.__color_white, 
-                  self.rsm.get_score)
+                  lambda: self.rsm.score)
         )
         # Current money
         c_money = Container((211, 71), (176, 36), (3, 3, 3, 3))
@@ -1207,7 +1215,7 @@ class GameStateManager(pygame.sprite.Sprite):
         c_points = Container((offset_x+760, offset_y+65), (150, 36), (6, 3, 3, 6))
         c_points.add_element(
             TextH("{}pts", (9, 5), self.__font_small, self.__color_white, 
-                  self.rsm.get_score)
+                  lambda: self.rsm.score)
         )
         # Money
         c_money = Container((offset_x+920, offset_y+65), (127, 36), (3, 3, 3, 3))
