@@ -5,18 +5,18 @@ from constants import *
 
 
 class ShipType(Enum):
-    POLY = 0
-    POLY2BP = 1
-    POLY2 = 2
-    POLY3 = 3
-    UFO = 4
+    POLY = 110
+    POLY2BP = 121
+    POLY2 = 120
+    POLY3 = 130
+    UFO = 220
 
 class Ship():
-    def __init__(self, type : ShipType | int, hitbox_radius):
-        if type is ShipType:
-            self.type = type
+    def __init__(self, ship_type : ShipType | int, hitbox_radius):
+        if ship_type is ShipType:
+            self.ship_type = ship_type
         else:
-            self.type = ShipType(type)
+            self.ship_type = ShipType(ship_type)
         self.time = 0
         self.current_parts : list[PartPolygon | PartCircle | PartEngineVfx]
         self.alpha = 255
@@ -137,7 +137,7 @@ class Ship():
             PartCircle((0, 0), 3, gray_light),
         ]
         
-        self.switch_model(self.type)
+        self.switch_model(self.ship_type)
 
     def update(self, dt):
         self.time += dt
@@ -148,7 +148,7 @@ class Ship():
             self.engine_vfx_current_frame = 1
 
     def get_name(self) -> str:
-        match self.type:
+        match self.ship_type:
             case ShipType.POLY:
                 return "Poly.v1"
             case ShipType.POLY2BP:
@@ -160,9 +160,12 @@ class Ship():
             case ShipType.UFO:
                 return "UFO.v1"
 
-    def switch_model(self, type : ShipType):
-        self.type = type
-        self.current_parts = self.__get_parts(type)
+    def switch_model(self, ship_type : ShipType):
+        if ship_type is ShipType:
+            self.ship_type = ship_type
+        else:
+            self.ship_type = ShipType(ship_type)
+        self.current_parts = self.__get_parts(self.ship_type)
 
     def switch_hitbox_to(self, boolean : bool):
         self.show_hitbox = boolean
@@ -193,10 +196,10 @@ class Ship():
             part.draw_scaled(screen, *position, multiplier)
 
     
-    def __get_parts(self, type) -> list:
+    def __get_parts(self, ship_type : ShipType) -> list:
         """Returns list of parts, tuple(x, y) indicating engine vfx anchor spot, list of engine vfx colors."""
 
-        match type:
+        match ship_type:
             case ShipType.POLY:
                 return self.parts_poly
             case ShipType.POLY2BP:
@@ -208,7 +211,7 @@ class Ship():
             case ShipType.UFO:
                 return self.parts_ufo
             case _:
-                print(f"> Error: Missing `{type}` in ship.__get_parts")
+                print(f"> Error: Missing `{ship_type}` in ship.__get_parts")
                 return None, None, None # pyright: ignore[reportReturnType]
 
 

@@ -62,7 +62,7 @@ class Player(CircleShape):
         self.lives_max = 3
         self.times_healed = 0
 
-        self.ship = Ship(self.stats.unlocked_ships[self.stats.ship_model], self.radius)
+        self.ship = Ship(self.stats.unlocked_ships[self.stats.ship_model_index][0], self.radius)
         self.magnet = Magnet(self.position)
         self.weapon_plasmagun = PlasmaGun()
         self.weapon_bomblauncher = BombLauncher()

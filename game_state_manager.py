@@ -9,7 +9,7 @@ from json_helper.leaderboard.validator import ValidateLeaderboard
 from json_helper.profile.validator import ValidateProfile
 
 from ui_elements.container import Container, Allignment
-from ui_elements.buttons import Button, Switch, ModKey
+from ui_elements.buttons import Button, Switch, ModKey, ButtonRound
 from ui_elements.text import Text, TextH, TextF
 from ui_elements.sprites.healthbar import HealthBar
 from ui_elements.sprites.leaderboard import Leaderboard
@@ -19,7 +19,7 @@ from ui_elements.personal_sprites.getter import get_personal_sprite
 from round_state_manager import RoundStateManager
 from player.player import Player, ShipUpgrade, ShipPart
 from player.player_stats import PlayerStats
-from player.ship import Ship
+from player.ship import Ship, ShipType
 
 
 # New menus should be added to:
@@ -87,7 +87,7 @@ class GameStateManager(pygame.sprite.Sprite):
 
         # Defaults used for loading save in profile selection if something is missing
         self.__default_player_name = "Player"
-        self.__dafault_ship_model = 3
+        self.__default_ship_model_value = 130 # Value of the ShipType Enum
 
         # Fonts
         self.__font_very_small = pygame.font.Font(font_path, 16)
@@ -164,12 +164,7 @@ class GameStateManager(pygame.sprite.Sprite):
                     return
         
         # Check if cursor moved off the button
-        elif (
-            position[0] < self.__hovered_button._position[0] or
-            position[0] > self.__hovered_button._position[0] + self.__hovered_button._size[0] or
-            position[1] < self.__hovered_button._position[1] or
-            position[1] > self.__hovered_button._position[1] + self.__hovered_button._size[1]
-        ):
+        elif not self.__hovered_button.check_cursor_hover(position):
             self.__hovered_button.switch_hovered_state()
             self.__hovered_button = None
 
@@ -543,7 +538,7 @@ class GameStateManager(pygame.sprite.Sprite):
                       self.__profiles[0]["player_stats_save"].get("max_score", 0))
             )
             b_pf0.add_element(
-                Ship(self.__profiles[0]["player_stats_save"].get("ship_model", self.__dafault_ship_model), 0),
+                Ship(self.__profiles[0]["player_stats_save"].get("ship_model_value", self.__default_ship_model_value), 0),
                 Allignment.CENTER_ON_THE_LEFT
             )
             personal_sprite = get_personal_sprite(self.__profiles[0]["player_stats_save"].get("name", self.__default_player_name))
@@ -596,7 +591,7 @@ class GameStateManager(pygame.sprite.Sprite):
                       self.__profiles[1]["player_stats_save"].get("max_score", 0))
             )
             b_pf1.add_element(
-                Ship(self.__profiles[1]["player_stats_save"].get("ship_model", self.__dafault_ship_model), 0),
+                Ship(self.__profiles[1]["player_stats_save"].get("ship_model_value", self.__default_ship_model_value), 0),
                 Allignment.CENTER_ON_THE_LEFT
             )
             personal_sprite = get_personal_sprite(self.__profiles[1]["player_stats_save"].get("name", self.__default_player_name))
@@ -649,7 +644,7 @@ class GameStateManager(pygame.sprite.Sprite):
                       self.__profiles[2]["player_stats_save"].get("max_score", 0))
             )
             b_pf2.add_element(
-                Ship(self.__profiles[2]["player_stats_save"].get("ship_model", self.__dafault_ship_model), 0),
+                Ship(self.__profiles[2]["player_stats_save"].get("ship_model_value", self.__default_ship_model_value), 0),
                 Allignment.CENTER_ON_THE_LEFT
             )
             personal_sprite = get_personal_sprite(self.__profiles[2]["player_stats_save"].get("name", self.__default_player_name))
@@ -761,7 +756,7 @@ class GameStateManager(pygame.sprite.Sprite):
                     lambda: self.player_stats.max_score)
         )
         c_profile.add_element(
-            Ship(self.player_stats.ship_model, 0),
+            Ship(self.player_stats.ship_model_value, 0),
             Allignment.CENTER_ON_THE_LEFT
         )
         personal_sprite = get_personal_sprite(self.player_stats.name)
@@ -872,7 +867,7 @@ class GameStateManager(pygame.sprite.Sprite):
                     lambda: self.player_stats.max_score)
         )
         c_profile.add_element(
-            Ship(self.player_stats.ship_model, 0),
+            Ship(self.player_stats.ship_model_value, 0),
             Allignment.N_FROM_UPPER_RIGHT_CORNER, 70
         )
         c_profile.add_element(
@@ -1024,16 +1019,18 @@ class GameStateManager(pygame.sprite.Sprite):
     def __initialize_leaderboard(self):
         self.__containers_leaderboard : list[Container | Leaderboard] = []
         self.__buttons_leaderboard : list[Button | Switch] = []
+
+        res = self.game.screen_resolution
         
         # <> Containers <>
 
         # Name of the menu
-        c_menu_name = Container((self.game.screen_resolution[0] / 2 - 185, 35), (370, 72), (8, 8, 20, 20))
+        c_menu_name = Container((res[0] / 2 - 185, 35), (370, 72), (8, 8, 20, 20))
         c_menu_name.add_element(
             Text("Leaderboard", (16, 10), self.__font_big, self.__color_white)
         )
         # List of high __scores
-        c_leaderboard = Leaderboard(int(self.game.screen_resolution[0]/2)-540, 145, 
+        c_leaderboard = Leaderboard(int(res[0]/2)-540, 145, 
             self.__font_medium, self.__scores
         )
         
@@ -1057,7 +1054,7 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         # Reset the leaderboard
         b_reset = Button(
-            (self.game.screen_resolution[0]-200, 68), (100, 36), (3, 6, 3, 6), 
+            (res[0]-200, 68), (100, 36), (3, 6, 3, 6), 
             self.__reset_leaderboard
         )
         b_reset.set_fill_color(self.__color_red_fill)
@@ -1073,6 +1070,22 @@ class GameStateManager(pygame.sprite.Sprite):
         self.__buttons_leaderboard.extend(
             [b_back, b_reset]
         )
+
+        # UFO secret
+        if not self.player_stats.check_unlocked_ship(ShipType.UFO):
+            b_ufo = ButtonRound(
+                (res[0]-30, res[1]-20), 6,
+                lambda: self.unlock_ship(ShipType.UFO)
+            )
+            b_ufo.set_outline_color(self.__color_gray)
+            b_ufo.set_fill_color(self.__color_green)
+            b_ufo.set_hover_fill_color(self.__color_green)
+            b_ufo.add_description(
+            Text("Do you want to believe?", (0, 0), self.__font_very_small, self.__color_green)
+            )
+            
+            self.__buttons_leaderboard.append(b_ufo)
+
 
     def __initialize_hud(self):
         self.__containers_hud : list[Container] = []
@@ -1436,3 +1449,7 @@ class GameStateManager(pygame.sprite.Sprite):
                             self.initialize_current_menu()
                     else:
                         self.__konami_progress = 0
+
+    def unlock_ship(self, ship_type : ShipType):
+        self.player_stats.unlock_ship(ship_type)
+        self.initialize_current_menu()
