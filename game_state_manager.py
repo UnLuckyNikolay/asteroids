@@ -1124,8 +1124,11 @@ class GameStateManager(pygame.sprite.Sprite):
             Text("Lives", (9, 5), self.__font_small, self.__color_white)
         )
         c_health.add_element(
-            HealthBar((102, 5), 2, 6,
-                      self.player.get_lives)
+            HealthBar(
+                (102, 5), 2, 6,
+                self.player.get_lives,
+                self.player_stats.cheat_godmode
+            )
         )
         
         self.__containers_hud.extend(
@@ -1218,8 +1221,11 @@ class GameStateManager(pygame.sprite.Sprite):
             Text("Lives", (9, 5), self.__font_small, self.__color_white)
         )
         c_health.add_element(
-            HealthBar((84, 5), 2, 2,
-            self.player.get_lives)
+            HealthBar(
+                (84, 5), 2, 2,
+                self.player.get_lives,
+                self.player_stats.cheat_godmode
+            )
         )
         # List - weapons
         # Plasma Gun
