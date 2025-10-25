@@ -44,13 +44,12 @@ class _ButtonBase(Container):
         self._is_hovered = False if self._is_hovered else True
 
     def check_cursor_hover(self, position):
-        if (position[0] > self._position[0] and
+        return (
+            position[0] > self._position[0] and
             position[0] < self._position[0] + self._size[0] and
             position[1] > self._position[1] and
-            position[1] < self._position[1] + self._size[1]):
-            return True
-        else:
-            return False
+            position[1] < self._position[1] + self._size[1]
+        )
 
     def draw_description(self, screen, screen_res : tuple[int, int]):
         if self._description == None:
@@ -150,6 +149,9 @@ class Button(_ButtonBase):
         """Default value - dark grey (100, 100, 100, 255)"""
         self._color_outline_inactive = color
 
+    def set_hover_fill_color(self, color : tuple[int, int, int, int]):
+        self._color_fill_hover = color
+
 class Switch(_ButtonBase):
     def __init__(
             self,
@@ -221,3 +223,56 @@ class Switch(_ButtonBase):
 
         self._color_outline_active = color
         self._color_fill_hover_active = self._get_divided_color_tuple(self._color_outline_active, 2, 150)
+
+class ButtonRound(Button):
+    def __init__(
+            self,
+            position : tuple[int, int], 
+            radius : int, 
+            key_func : Callable[[], None], 
+            condition_func : Callable[[], bool] = lambda: True,
+    ):
+        super().__init__(
+            position,
+            (0, 0),
+            (0, 0, 0, 0),
+            key_func,
+            condition_func
+        )
+        self._radius = radius
+
+    def check_cursor_hover(self, position):
+        return (
+            (self._position[0]-position[0])**2 + (self._position[1]-position[1])**2 < self._radius**2
+        )
+    
+    def draw(self, screen):
+        is_possible = self._condition_func()
+        if self._is_hovered and is_possible:
+            pygame.gfxdraw.filled_circle(screen, *self._position, self._radius-2, self._color_fill_hover)
+        else:
+            pygame.gfxdraw.filled_circle(screen, *self._position, self._radius-2, self._color_fill)
+        if is_possible:
+            pygame.draw.circle(screen, self._color_outline, self._position, self._radius, 3)
+        else:
+            pygame.draw.circle(screen, self._color_outline_inactive, self._position, self._radius, 3)
+
+        for tuple in self._elements:
+            pos = self._get_alligned_position(tuple[1], tuple[2])
+
+            if callable(tuple[0]):
+                element = tuple[0]()
+                if element == None:
+                    continue
+            else:
+                element = tuple[0]
+
+            if (isinstance(element, Text) or isinstance(element, SimpleSprite)) and not is_possible:
+                element.draw(screen, pos, self._color_outline_inactive) # pyright: ignore[reportAttributeAccessIssue]
+            else:
+                element.draw(screen, pos) # pyright: ignore[reportAttributeAccessIssue]
+
+    def set_corners(self, topleft : int, topright : int, bottomright : int, bottomleft : int):
+        """Does nothing for round buttons."""
+        return
+    
