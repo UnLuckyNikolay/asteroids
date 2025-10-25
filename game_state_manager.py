@@ -471,11 +471,12 @@ class GameStateManager(pygame.sprite.Sprite):
                 self.player_stats.cheat_stonks
             )
             s_money.add_description(
-                Text("Switch the MONEY cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
+                Text("Switch the STONKS cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
             )
             s_money.set_active_outline_color(self.__color_golden)
             s_money.add_element(
-                Text("MN", (2, 7), self.__font_small, self.__color_blue)
+                SymbolStonks(0, 0, self.__color_blue),
+                Allignment.CENTER
             )
             s_money.set_active_outline_color = self.__color_golden
             # Cheat - Godmode
