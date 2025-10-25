@@ -22,7 +22,7 @@ FIXES/TWEAKS:
 - [ ] Update screenshots in README
 - [x] Increase alpha of background of the pause menu
 - [ ] Revamp difficulty increase
-- [ ] Homing isn't affected by delta
+- [x] Homing isn't affected by delta
 
 IDEAS:
 - [x] Graphics/color adjustments for the leaderboards for top places
@@ -50,7 +50,7 @@ IDEAS:
     - [ ] Profit
 - [ ] Show current timer/difficulty modifier
 - [ ] Bubble explosion vfx (for bombs or better for player death)
-- [ ] Add amount limit to certain asteroids (mainly Homing)
+- [x] Add amount limit to certain asteroids (mainly Homing)
 - [x] Condition to activate cheat switches
 - [x] Check how to save crash logs
 

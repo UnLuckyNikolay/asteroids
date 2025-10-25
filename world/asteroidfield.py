@@ -1,4 +1,5 @@
 import pygame, random
+from typing import Callable, Any
 
 from constants import *
 from asteroids.asteroidbasic import AsteroidBasic
@@ -13,44 +14,61 @@ class AsteroidField(pygame.sprite.Sprite):
         self.game = game
         self.player = player
 
-        self.time_passed_for_spawns = 0.0
-        self.time_passed_for_difficulty = 0.0
-        self.spawn_time_mp = 1.0
+        self.__edges : list[tuple[pygame.Vector2, Callable[[Any], pygame.Vector2]]]
+        self.__time_passed_for_spawns : float = 0.0
+        self.__time_passed_for_difficulty : float = 0.0
+        self.__spawn_time_mp : float = 1.0
+        self.__spawn_time : float
+
+        self.__amount_homing : int = 0
+        self.__amount_homing_max : int = 3
 
         self.update_spawns(screen_resolution)
 
 
     def update_spawns(self, screen_resolution):
-        self.edges = [
-            [
+        self.__edges = [
+            (
                 pygame.Vector2(1, 0),
                 lambda y: pygame.Vector2(-ASTEROID_MAX_RADIUS, y * screen_resolution[1]),
-            ],
-            [
+            ),
+            (
                 pygame.Vector2(-1, 0),
                 lambda y: pygame.Vector2(screen_resolution[0] + ASTEROID_MAX_RADIUS, y * screen_resolution[1]),
-            ],
-            [
+            ),
+            (
                 pygame.Vector2(0, 1),
                 lambda x: pygame.Vector2(x * screen_resolution[0], -ASTEROID_MAX_RADIUS),
-            ],
-            [
+            ),
+            (
                 pygame.Vector2(0, -1),
                 lambda x: pygame.Vector2(x * screen_resolution[0], screen_resolution[1] + ASTEROID_MAX_RADIUS),
-            ],
+            ),
         ]
-        self.spawn_time = (ASTEROID_SPAWN_RATE * (1280*720) / (screen_resolution[0]*screen_resolution[1]))
+        self.__spawn_time = (ASTEROID_SPAWN_RATE * (1280*720) / (screen_resolution[0]*screen_resolution[1]))
+
+    def kill_asteroid(self, asteroid):
+        self.__check_asteroid(asteroid)
+        asteroid.kill()
+
+    def split_asteroid(self, asteroid):
+        self.__check_asteroid(asteroid)
+        asteroid.split()
+
+    def __check_asteroid(self, asteroid):
+        if isinstance(asteroid, AsteroidHoming):
+            self.__amount_homing -= 1
     
     def update(self, dt):
-        self.time_passed_for_spawns += dt
-        self.time_passed_for_difficulty += dt
+        self.__time_passed_for_spawns += dt
+        self.__time_passed_for_difficulty += dt
 
-        spawn_time = self.spawn_time*self.spawn_time_mp
+        spawn_time = self.__spawn_time*self.__spawn_time_mp
 
-        while self.time_passed_for_spawns > spawn_time:
-            self.time_passed_for_spawns -= spawn_time
+        while self.__time_passed_for_spawns > spawn_time:
+            self.__time_passed_for_spawns -= spawn_time
 
-            edge = random.choice(self.edges)
+            edge = random.choice(self.__edges)
             speed = random.randint(40, 120)
             velocity = edge[0] * speed
             velocity = velocity.rotate(random.randint(-30, 30))
@@ -58,9 +76,9 @@ class AsteroidField(pygame.sprite.Sprite):
             kind = random.randint(1, ASTEROID_KINDS)
             self.__spawn(ASTEROID_MIN_RADIUS * kind, position, velocity, speed)
             
-        while self.time_passed_for_difficulty >= DIFFICULTY_INCREASE_TIMER:
-            self.time_passed_for_difficulty -= DIFFICULTY_INCREASE_TIMER
-            self.spawn_time_mp *= DIFFICULTY_INCREASE_MP
+        while self.__time_passed_for_difficulty >= DIFFICULTY_INCREASE_TIMER:
+            self.__time_passed_for_difficulty -= DIFFICULTY_INCREASE_TIMER
+            self.__spawn_time_mp *= DIFFICULTY_INCREASE_MP
 
 
     def __spawn(self, radius, position, velocity, speed):
@@ -68,7 +86,8 @@ class AsteroidField(pygame.sprite.Sprite):
         if roll <= CHANCE_GOLDEN:
             velocity = velocity * 3
             asteroid = AsteroidGolden(position, velocity, speed*3)
-        elif roll <= CHANCE_HOMING:
+        elif roll <= CHANCE_HOMING and self.__amount_homing < self.__amount_homing_max:
+            self.__amount_homing += 1
             velocity = velocity * 2
             asteroid = AsteroidHoming(position, velocity, speed*2, self.player)
         elif roll <= CHANCE_EXPLOSIVE:
