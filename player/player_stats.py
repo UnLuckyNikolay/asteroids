@@ -155,7 +155,6 @@ class PlayerStats():
 
     def switch_hitbox(self):
         self.cheat_hitbox = False if self.cheat_hitbox else True
-        self.player.ship.switch_hitbox_to(self.cheat_hitbox)
         
     def switch_ship_model_to_next(self):
         self.ship_model = (self.ship_model+1) % len(self.unlocked_ships)

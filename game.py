@@ -30,6 +30,8 @@ class Game():
         self.screen = pygame.display.set_mode(self.screen_resolution, pygame.RESIZABLE, display=0)
         pygame.display.set_caption("Asteroids from Outer Space")
 
+        self.max_fps = MAX_FPS
+        self.is_slow = False
         self.clock = pygame.time.Clock()
         self.dt = 0
         self.is_running : bool = True
@@ -99,7 +101,6 @@ class Game():
         self.player.teleport_and_prepare_for_round((int(self.screen_resolution[0] / 2), int(self.screen_resolution[1] / 2)))
         self.gsm.start_round(self.rsm)
 
-
         while self.player.is_alive:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -163,7 +164,7 @@ class Game():
                             self.player_stats.increase_count_stat(type(loot))
                         loot.kill()
                     elif loot.check_colision(self.player.magnet):
-                        loot.home_towards(self.player.position, self.player.magnet.get_strength())
+                        loot.home_towards(self.dt, self.player.position, self.player.magnet.get_strength())
 
                 self.dt = self.redraw_objects_and_ui()
 
@@ -173,13 +174,14 @@ class Game():
 
         # Saving score and going back to Main Menu
         if not self.player.is_sus and self.rsm.score > 0:
-            self.gsm.switch_menu(Menu.NAME_CHECK)
-            self.gsm.check_score(self.rsm.score)
+            is_new_record = self.gsm.check_score(self.rsm.score)
             self.player_stats.check_max_score(self.rsm.score)
-        self.gsm.save_profile()
-        self.is_round_end = True
-        while self.is_round_end:
-            self.process_and_refresh()
+            if is_new_record:
+                self.is_round_end = True
+                self.gsm.switch_menu(Menu.NAME_CHECK)
+                while self.is_round_end:
+                    self.process_and_refresh()
+            self.gsm.save_profile()
         self.gsm.switch_menu(Menu.MAIN_MENU)
 
         self.player.reset()
@@ -280,6 +282,7 @@ class Game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.is_running = False
+                self.is_round_end = False
                 break
             else:
                 self.handle_event(event)
@@ -298,7 +301,7 @@ class Game():
             object.draw(self.screen)
 
         pygame.display.flip()
-        return self.clock.tick(MAX_FPS) / 1000
+        return self.clock.tick(self.max_fps) / 1000
     
     def check_if_object_is_off_screen(self, object) -> bool:
         offset = 100
@@ -360,6 +363,10 @@ class Game():
         else:
             self.is_fullscreen = False
             self.__switch_to_windowed()
+
+    def switch_low_fps(self):
+        self.max_fps = 75 if self.max_fps == 10 else 10
+        self.is_slow = False if self.is_slow else True
     
     def __switch_to_fullscreen(self):
             self.screen_resolution = self.screen_resolution_fullscreen

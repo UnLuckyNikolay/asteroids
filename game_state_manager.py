@@ -26,7 +26,7 @@ from player.ship import Ship
 # .check_hovered_button 
 # .draw (+ new function)
 # .initialize_current_menu (+ new function)
-class Menu(Enum):
+class Menu(Enum): # Remember not to name 2 the same ever fucking again
     PROFILE_SELECTION = "Profile selection"
     NEW_PROFILE = "New profile"
     MAIN_MENU = "Main Menu"
@@ -237,7 +237,9 @@ class GameStateManager(pygame.sprite.Sprite):
         self.game.initialize_new_player()
         self.switch_menu(Menu.PROFILE_SELECTION)
 
-    def check_score(self, new_score):
+    def check_score(self, new_score) -> bool:
+        """Returns True if new leaderboard record is set."""
+
         is_updated = False
 
         while len(self.__scores) > LEADERBOARD_LENGTH:   # Shortens leaderboard if max length was reduced
@@ -252,10 +254,9 @@ class GameStateManager(pygame.sprite.Sprite):
             self.__scores.append({"name": self.player_stats.name, "score": new_score})
             self.__scores.sort(key=lambda x: x["score"], reverse=True)
 
-        if not is_updated:
-            return
-
-        self.__save_leaderboard()
+        if is_updated:
+            self.__save_leaderboard()
+        return is_updated
 
     def __reset_leaderboard(self):
         self.__scores = []
@@ -435,6 +436,18 @@ class GameStateManager(pygame.sprite.Sprite):
             SymbolFullscreen(0, 0, self.__color_blue), 
             Allignment.CENTER
         )
+        # Low FPS
+        s_slow = Switch(
+            (110, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
+            self.game.switch_low_fps,
+            self.game.is_slow
+        )
+        s_slow.add_description(
+            Text("DEBUG: Switch max FPS between 75 and 10", (0, 0), self.__font_very_small, self.__color_white)
+        )
+        s_slow.add_element(
+            Text("SL", (4, 7), self.__font_small, self.__color_blue)
+        )
 
         if self.player_stats.found_cheats:
             # Cheat - Show hitbox
@@ -485,7 +498,7 @@ class GameStateManager(pygame.sprite.Sprite):
             )
 
         button_list.extend(
-            [b_background, s_fullscreen]
+            [b_background, s_fullscreen, s_slow]
         )
 
     def __initialize_profile_selection(self):
@@ -521,11 +534,11 @@ class GameStateManager(pygame.sprite.Sprite):
                 lambda: self.__load_profile(0)
             )
             b_pf0.add_element(
-                TextF("{}", (24, 15), self.__font_big, self.__color_blue,
+                TextF("{}", (35, 18), self.__font_big, self.__color_blue,
                       self.__profiles[0]["player_stats_save"].get("name", self.__default_player_name))
             )
             b_pf0.add_element(
-                TextF("Max Score: {}", (24, 75), self.__font_medium, self.__color_white,
+                TextF("Max Score: {}", (35, 77), self.__font_medium, self.__color_white,
                       self.__profiles[0]["player_stats_save"].get("max_score", 0))
             )
             b_pf0.add_element(
@@ -564,7 +577,7 @@ class GameStateManager(pygame.sprite.Sprite):
                 lambda: self.__new_profile(0)
             )
             b_pf0.add_element(
-                Text("Null", (19, 10), self.__font_big, self.__color_blue)
+                Text("Null", (35, 18), self.__font_big, self.__color_blue)
             )
 
         # Profile 1
@@ -574,11 +587,11 @@ class GameStateManager(pygame.sprite.Sprite):
                 lambda: self.__load_profile(1)
             )
             b_pf1.add_element(
-                TextF("{}", (24, 15), self.__font_big, self.__color_blue,
+                TextF("{}", (35, 18), self.__font_big, self.__color_blue,
                       self.__profiles[1]["player_stats_save"].get("name", self.__default_player_name))
             )
             b_pf1.add_element(
-                TextF("Max Score: {}", (24, 75), self.__font_medium, self.__color_white,
+                TextF("Max Score: {}", (35, 77), self.__font_medium, self.__color_white,
                       self.__profiles[1]["player_stats_save"].get("max_score", 0))
             )
             b_pf1.add_element(
@@ -617,7 +630,7 @@ class GameStateManager(pygame.sprite.Sprite):
                 lambda: self.__new_profile(1)
             )
             b_pf1.add_element(
-                Text("Null", (19, 10), self.__font_big, self.__color_blue)
+                Text("Null", (35, 18), self.__font_big, self.__color_blue)
             )
 
         # Profile 2
@@ -627,11 +640,11 @@ class GameStateManager(pygame.sprite.Sprite):
                 lambda: self.__load_profile(2)
             )
             b_pf2.add_element(
-                TextF("{}", (24, 15), self.__font_big, self.__color_blue,
+                TextF("{}", (35, 18), self.__font_big, self.__color_blue,
                       self.__profiles[2]["player_stats_save"].get("name", self.__default_player_name))
             )
             b_pf2.add_element(
-                TextF("Max Score: {}", (24, 75), self.__font_medium, self.__color_white,
+                TextF("Max Score: {}", (35, 77), self.__font_medium, self.__color_white,
                       self.__profiles[2]["player_stats_save"].get("max_score", 0))
             )
             b_pf2.add_element(
@@ -670,7 +683,7 @@ class GameStateManager(pygame.sprite.Sprite):
                 lambda: self.__new_profile(2)
             )
             b_pf2.add_element(
-                Text("Null", (19, 10), self.__font_big, self.__color_blue)
+                Text("Null", (35, 18), self.__font_big, self.__color_blue)
             )
 
         self.__buttons_profile_selection.extend(
@@ -727,6 +740,10 @@ class GameStateManager(pygame.sprite.Sprite):
         res = self.game.screen_resolution
         center_x = int((res[0])/2)
         center_y = int((res[1])/2)
+
+        root_x = center_x-400
+        root_y = 10
+        text_nudge_x = 35
         
         # <> Containers <>
         
@@ -735,11 +752,11 @@ class GameStateManager(pygame.sprite.Sprite):
             (center_x-400, 10), (800, 140), (7, 7, 30, 30)
         )
         c_profile.add_element(
-            TextH("{}", (70, 12), self.__font_big, self.__color_white,
+            TextH("{}", (text_nudge_x+46, 18), self.__font_big, self.__color_white,
                     lambda: self.player_stats.name)
         )
         c_profile.add_element(
-            TextH("Max Score: {}", (24, 72), self.__font_medium, self.__color_white,
+            TextH("Max Score: {}", (text_nudge_x, 77), self.__font_medium, self.__color_white,
                     lambda: self.player_stats.max_score)
         )
         c_profile.add_element(
@@ -762,7 +779,7 @@ class GameStateManager(pygame.sprite.Sprite):
         # Profile
         # Rename
         b_rename = Button(
-            (center_x-380, 30), (35, 35), (3, 3, 3, 3),
+            (root_x+text_nudge_x, root_y+26), (35, 35), (3, 3, 3, 3),
             lambda: self.__rename_player(Menu.MAIN_MENU)
         )
         b_rename.add_element(
@@ -833,11 +850,11 @@ class GameStateManager(pygame.sprite.Sprite):
         center_x = int(res[0]/2)
         root_x = center_x-400
         root_y = 10
-        size_y = 435
+        size_y = 443
 
-        text_start_y = 115
+        text_start_y = 117
         text_row_y = 30
-        text_nudge_x = 24
+        text_nudge_x = 35
 
         # <> Containers <>
 
@@ -845,12 +862,12 @@ class GameStateManager(pygame.sprite.Sprite):
         c_profile = Container(
             (root_x, root_y), (800, size_y), (7, 7, 30, 30)
         )
-        c_profile.add_element(
-            TextH("{}", (70, 12), self.__font_big, self.__color_white,
+        c_profile.add_element( # (35, 18)
+            TextH("{}", (text_nudge_x+46, 18), self.__font_big, self.__color_white,
                     lambda: self.player_stats.name)
         )
         c_profile.add_element(
-            TextH("Max Score: {}", (24, 72), self.__font_medium, self.__color_white,
+            TextH("Max Score: {}", (text_nudge_x, 77), self.__font_medium, self.__color_white,
                     lambda: self.player_stats.max_score)
         )
         c_profile.add_element(
@@ -951,7 +968,7 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         # Rename
         b_rename = Button(
-            (root_x+20, root_y+20), (35, 35), (3, 3, 3, 3),
+            (root_x+text_nudge_x, root_y+26), (35, 35), (3, 3, 3, 3),
             lambda: self.__rename_player(Menu.PLAYER_INFO)
         )
         b_rename.add_element(

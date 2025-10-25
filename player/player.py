@@ -77,8 +77,6 @@ class Player(CircleShape):
             self.__turning_speed = -PLAYER_TURNING_MAX
         elif value > PLAYER_TURNING_MAX:
             self.__turning_speed = PLAYER_TURNING_MAX
-        elif self.__turning_speed != 0 and abs(value) < PLAYER_TURNING_ACCELERATION and abs(self.__turning_speed) < PLAYER_TURNING_ACCELERATION:
-            self.__turning_speed = 0
         else:
             self.__turning_speed = value
 
@@ -92,9 +90,6 @@ class Player(CircleShape):
             self.__speed = -PLAYER_SPEED_MAX
         elif value > PLAYER_SPEED_MAX:
             self.__speed = PLAYER_SPEED_MAX
-        elif self.__speed != 0 and abs(value) < PLAYER_ACCELERATION and abs(self.__speed) < PLAYER_ACCELERATION:
-            self.__speed = 0   # Stops the player the speed is very low during deseleration, might change later
-            self.inertia = pygame.Vector2(0, 0)
         else:
             self.__speed = value
 
@@ -141,6 +136,7 @@ class Player(CircleShape):
             self.is_sus = False
         if self.stats.cheat_stonks:
             self.money = 999999
+        self.ship.switch_hitbox_to(self.stats.cheat_hitbox)
 
     def draw(self, screen):
         self.ship.draw_rotated(
@@ -156,7 +152,7 @@ class Player(CircleShape):
         self.rotation += self.turning_speed * dt
 
     def move(self, dt):
-        self.inertia = self.inertia * ((100 - PLAYER_ACCELERATION) / 100) + pygame.Vector2(0, 1).rotate(self.rotation_inertia) * (PLAYER_ACCELERATION / 100)
+        self.inertia = self.inertia * ((100 - PLAYER_ACCELERATION * dt) / 100) + pygame.Vector2(0, 1).rotate(self.rotation_inertia) * (PLAYER_ACCELERATION * dt / 100)
         self.position += self.inertia * self.speed * dt
 
         screen_resolution = self.game.screen_resolution
@@ -183,33 +179,49 @@ class Player(CircleShape):
             self.rotate(dt)
         match self.state_rotation:
             case 1:
-                self.turning_speed += PLAYER_TURNING_ACCELERATION
+                self.turning_speed += PLAYER_TURNING_ACCELERATION * dt
             case -1:
-                self.turning_speed -= PLAYER_TURNING_ACCELERATION
+                self.turning_speed -= PLAYER_TURNING_ACCELERATION * dt
             case 0: # Deceleration
+                amount = PLAYER_TURNING_ACCELERATION * dt / 2
                 if self.turning_speed > 0:
-                    self.turning_speed -= int(PLAYER_TURNING_ACCELERATION / 2)
+                    if self.turning_speed < amount:
+                        self.__turning_speed = 0
+                    else:
+                        self.turning_speed -= amount
                 elif self.turning_speed < 0:
-                    self.turning_speed += int(PLAYER_TURNING_ACCELERATION / 2)
+                    if self.turning_speed > -amount:
+                        self.__turning_speed = 0
+                    else:
+                        self.turning_speed += amount
 
         # Movement
         if self.speed != 0:
             self.move(dt)
         match self.state_movement:
             case 1:
-                self.is_accelerating = True
+                self.is_accelerating = True # For drawing engine animation
                 self.rotation_inertia = self.rotation
-                self.speed += PLAYER_ACCELERATION
+                self.speed += PLAYER_ACCELERATION * dt
             case -1:
                 self.is_accelerating = False
                 self.rotation_inertia = self.rotation
-                self.speed -= PLAYER_ACCELERATION
+                self.speed -= PLAYER_ACCELERATION * dt
             case 0: # Deceleration
+                amount = PLAYER_ACCELERATION * dt / 2
                 self.is_accelerating = False
                 if self.speed > 0:
-                    self.speed -= int(PLAYER_ACCELERATION / 2)
+                    if self.speed < amount:
+                        self.speed = 0
+                        self.inertia = pygame.Vector2(0, 0)
+                    else:
+                        self.speed -= amount
                 elif self.speed < 0:
-                    self.speed += int(PLAYER_ACCELERATION / 2)
+                    if self.speed > -amount:
+                        self.speed = 0
+                        self.inertia = pygame.Vector2(0, 0)
+                    else:
+                        self.speed += amount
 
         # Shooting
         if (

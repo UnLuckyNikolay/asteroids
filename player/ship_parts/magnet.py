@@ -9,7 +9,7 @@ class Magnet(CircleShape):
         self._level : int = 1
         self._level_radius : int = 1
         self._level_strength : int = 1
-        self._strength : int = 4
+        self._strength : int = 240
 
     def get_strength(self):
         return self._strength
@@ -29,7 +29,7 @@ class Magnet(CircleShape):
         match self._level_strength:
             case 1:
                 self._level_strength = 2
-                self._strength = 7
+                self._strength = 360
             case 2:
                 self._level_strength = 3
-                self._strength = 10
+                self._strength = 600

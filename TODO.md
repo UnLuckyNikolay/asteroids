@@ -43,8 +43,9 @@ IDEAS:
     - [x] Player reset method
     - [x] Profile creation
     - [x] Player info
-    - [ ] ???
     - [ ] New end screen
+    - [ ] ???
+    - [ ] Profit
 - [ ] Show current timer/difficulty modifier
 - [ ] Bubble explosion vfx (for bombs or better for player death)
 - [ ] Add amount limit to certain asteroids (mainly Homing)
