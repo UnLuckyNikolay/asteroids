@@ -34,5 +34,4 @@ class AsteroidHoming(Asteroid):
             velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
             loot = CopperOre(self.position, velocity)
 
-        pygame.sprite.Sprite.kill(self)
-        self.has_been_hit = True
+        self.kill()

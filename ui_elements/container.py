@@ -8,7 +8,8 @@ from ui_elements.helpers import get_points
 
 
 class Allignment(Enum):
-    """Use .CENTER to place text in the middle without additional nudging."""
+    """Use .CENTER or .LEFT_WALL to place text in the middle with minimum nudging."""
+    
     UPPER_LEFT_CORNER = 0
     BOTTOM_LEFT_CORNER = 1
     UPPER_RIGHT_CORNER = 2
@@ -53,7 +54,7 @@ class Container(pygame.sprite.Sprite):
             elif isinstance(tuple[0], (TextPlain, TextUpdated)):
                 size = tuple[0].prepare_and_return_size()
                 element = tuple[0]
-                pos = self._get_alligned_position(tuple[1], (tuple[2][0]+2, tuple[2][1]+1), text_size=size) # Nudges all text a bit to the right
+                pos = self._get_alligned_position(tuple[1], (tuple[2][0]+2, tuple[2][1]+1), text_size=size) # Nudges all text a bit
             else:
                 element = tuple[0]
                 pos = self._get_alligned_position(tuple[1], tuple[2])

@@ -127,19 +127,22 @@ class Game():
 
                 for object in self.moving_objects:
                     if self.check_if_object_is_off_screen(object):
-                        object.kill()
+                        if isinstance(object, Asteroid):
+                            self.asteroid_field.kill_asteroid(object) # The field kills/splits asteroids to keep count of certain types
+                        else:
+                            object.kill()
 
                 # Colision checks
                 # Player hit
                 for asteroid in self.asteroids:
-                    if asteroid.check_colision(self.player) and not self.player.is_invul:
+                    if asteroid.check_colision(self.player) and not self.player.is_invul: # No check for dead asteroids because first loop, only off-screen ones are dead
                         if self.player.take_damage_and_check_if_alive(self.rsm):
-                            self.asteroid_field.kill_asteroid(asteroid) # The field kills/splits asteroids to keep count of certain types
+                            self.asteroid_field.kill_asteroid(asteroid)
                             explosion = Explosion(asteroid.position, asteroid.radius)
                     
                     # Asteroid shot
                     for projectile in self.projectiles:
-                        if projectile.check_colision(asteroid) and not asteroid.has_been_hit:
+                        if projectile.check_colision(asteroid) and not asteroid.is_dead:
                             projectile.kill()
                             self.asteroid_field.split_asteroid(asteroid)
                             explosion = Explosion(asteroid.position, asteroid.radius)
@@ -150,7 +153,7 @@ class Game():
                 # Asteroid exploded
                 for hitbox in self.explosion_hitboxes:
                     for asteroid in self.asteroids:
-                        if hitbox.check_colision(asteroid) and not asteroid.has_been_hit:
+                        if hitbox.check_colision(asteroid) and not asteroid.is_dead:
                             self.asteroid_field.split_asteroid(asteroid)
                             self.rsm.score += asteroid.reward
                             if not self.player.is_sus:

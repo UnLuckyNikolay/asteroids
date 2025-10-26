@@ -35,7 +35,7 @@ class Leaderboard():
                     self.scores[i]['name']
                 ),
                 Allignment.LEFT_WALL,
-                (13, 0)
+                nudge=(13, 0)
             )
             containers.append(c_next_board)
         

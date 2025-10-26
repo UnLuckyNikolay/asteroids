@@ -59,12 +59,16 @@ class AsteroidField(pygame.sprite.Sprite):
         self.__spawn_time = (ASTEROID_SPAWN_RATE * (1280*720) / (screen_resolution[0]*screen_resolution[1])) # Very elegant, I know
 
     def kill_asteroid(self, asteroid):
-        self.__check_asteroid(asteroid)
-        asteroid.kill()
+        if not asteroid.is_dead:
+            self.__check_asteroid(asteroid)
+            asteroid.is_dead = True
+            asteroid.kill()
 
     def split_asteroid(self, asteroid):
-        self.__check_asteroid(asteroid)
-        asteroid.split()
+        if not asteroid.is_dead:
+            self.__check_asteroid(asteroid)
+            asteroid.is_dead = True
+            asteroid.split()
 
     def __check_asteroid(self, asteroid):
         if isinstance(asteroid, AsteroidHoming):

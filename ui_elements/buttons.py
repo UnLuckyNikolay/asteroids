@@ -3,7 +3,7 @@ from typing import Callable
 from enum import Enum
 
 from ui_elements.container import Container, Allignment
-from ui_elements.text import TextPlain, TextUpdated
+from ui_elements.text import TextPlain
 from ui_elements.helpers import get_points, draw_polygon
 
 

@@ -19,7 +19,7 @@ class Asteroid(CircleShape):
         super().__init__(position, velocity, radius)
         self.max_speed : int = max_speed
         self.size : int = int(self.radius / ASTEROID_MIN_RADIUS)
-        self.has_been_hit : bool = False
+        self.is_dead : bool = False
         self.reward : int = reward
 
         self.color_fill = color_fill
@@ -40,7 +40,6 @@ class Asteroid(CircleShape):
     
     def update(self, dt):
         self.position += self.velocity * dt
-
 
     def __get_points_for_drawing(self):
         amount_of_points = int(self.radius / ASTEROID_MIN_RADIUS * 7 + 7)

@@ -18,8 +18,8 @@ FIXES/TWEAKS:
 - [x] Change how max level upgrades are displayed
 - [x] Revisit visible naming scheme for ship parts
 - [x] Rename and move UserInterface class to GameStateManager, rename GameStateManager to RoundStateManager
-- [ ] Upgrade movement to properly handle turning of vectors, something is broken when turning without moving
-- [ ] Update screenshots in README
+- [ ] FOR NEXT VERSION >>> Upgrade movement to properly handle turning of vectors, something is broken when turning without moving
+- [ ] FOR NEXT VERSION >>> Update screenshots in README
 - [x] Increase alpha of background of the pause menu
 - [x] Revamp difficulty increase
 - [x] Homing isn't affected by delta
@@ -28,20 +28,21 @@ FIXES/TWEAKS:
 IDEAS:
 - [x] Graphics/color adjustments for the leaderboards for top places
 - [x] Add auto-shoot switch
-- [ ] Add ship recolors
+- [ ] FOR NEXT VERSION >>> Add ship recolors
 - [ ] Additional ship skins:
     - [x] UFO - will need new parts and 2 engines
     - [ ] Classic/cartoon-ish rocket
-- [ ] Additional weapons
+- [ ] Additional weapons:
 - [ ] Additional ship upgrades:
-    - [ ] Speed (might need ship vectors tweaked)
+    - [ ] Speed (will need ship vectors tweaked)
     - [ ] Rotation
 - [x] Additional weapon upgrades:
     - [x] Short fuse for the Bomb Launcher
     - [x] Faster fire rate for Plasma Gun
 - [ ] Additional cheats:
     - [ ] BIG cheat
-- [ ] Profiles
+    - [ ] Hidden joke weapon
+- [ ] FOR NEXT VERSION >>> Profiles
     - [x] Player reset method
     - [x] Profile creation
     - [x] Player info
@@ -62,10 +63,10 @@ DISTANT/POSSIBLE IDEAS:
 - [ ] Music
 - [ ] Temporary boosts as loot
 - [ ] Difficulty selection (speed of difficulty ramp-up, max amount of special asteroids)
-- [ ] Persistent upgrades (will need profiles)
+- [ ] Persistent upgrades
 - [ ] Game modes 
     - [ ] Classic with only normal asteroids and white/black graphics
-    - [ ] Drift mode with no shooting and only homing asteroid (would need timer, might need difficulty revamp)
+    - [ ] Drift mode with no shooting and only homing asteroid
 - [ ] Enemy ships/bosses
-- [ ] Achievements (will need profiles)
+- [ ] Achievements
 - [ ] Better asteroid sprite

@@ -75,13 +75,3 @@ class TextUpdated(pygame.sprite.Sprite):
 
     def draw(self, screen, position : tuple[int, int]):
         screen.blit(self._surface, (position[0] + self._position[0], position[1] + self._position[1]))
-
-    # def draw(self, screen, position : tuple[int, int], color_override : tuple[int, int, int, int] | None = None):
-    #     text = self._text
-    #     for getter in self._getters:
-    #         text = text.replace("{}", str(getter()), 1)
-    #     if color_override == None:
-    #         button_text = self._font.render(text, True, self._color)
-    #     else:
-    #         button_text = self._font.render(text, True, color_override)
-    #     screen.blit(button_text, (position[0] + self._position[0], position[1] + self._position[1]))

@@ -12,9 +12,6 @@ class AsteroidBasic(Asteroid):
 
 
     def split(self):
-        pygame.sprite.Sprite.kill(self)
-        self.has_been_hit = True
-
         if self.radius <= ASTEROID_MIN_RADIUS:
             loot_quality = random.randint(1, 100)
             angle = random.randint(-15, 15)
@@ -41,3 +38,5 @@ class AsteroidBasic(Asteroid):
             
             velocity = self.velocity.rotate(-split_angle) * 1.3
             asteroid_2 = AsteroidBasic(self.position, velocity, int(self.max_speed * 1.3), new_radius)
+
+        self.kill()

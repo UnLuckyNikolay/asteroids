@@ -22,5 +22,4 @@ class AsteroidGolden(Asteroid):
             velocity = self.velocity * (0.75 * LOOT_SLOWDOWN)
             loot3 = GoldenOre(self.position, velocity)
 
-        pygame.sprite.Sprite.kill(self)
-        self.has_been_hit = True
+        self.kill()
