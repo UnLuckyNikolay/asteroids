@@ -1,6 +1,6 @@
 from constants import LEADERBOARD_LENGTH
 from ui_elements.container import Container, Allignment
-from ui_elements.text import TextF
+from ui_elements.text import TextPlain
 
 class Leaderboard():
     def __init__(self, x, y, font, scores):
@@ -29,9 +29,13 @@ class Leaderboard():
             c_next_board.set_outline_color(color)
             c_next_board.set_fill_color((int(color[0]/3), int(color[1]/3), int(color[2]/3), 100))
             c_next_board.add_element(
-                TextF("{} - {}", (13, 8), self.font, color,
-                      self.scores[i]['score'],
-                      self.scores[i]['name'])
+                TextPlain(
+                    "{} - {}", self.font, color,
+                    self.scores[i]['score'],
+                    self.scores[i]['name']
+                ),
+                Allignment.LEFT_WALL,
+                (13, 0)
             )
             containers.append(c_next_board)
         

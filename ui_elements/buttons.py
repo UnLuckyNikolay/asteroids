@@ -2,9 +2,8 @@ import pygame, pygame.gfxdraw
 from typing import Callable
 from enum import Enum
 
-from ui_elements.container import Container
-from ui_elements.text import Text
-from ui_elements.simple_sprite import SimpleSprite
+from ui_elements.container import Container, Allignment
+from ui_elements.text import TextPlain, TextUpdated
 from ui_elements.helpers import get_points, draw_polygon
 
 
@@ -26,7 +25,7 @@ class _ButtonBase(Container):
             corners,
         )
         self._is_hovered = False
-        self._description : Text | None = None
+        self._description : TextPlain | None = None
         self._mod_key : int | None = None
 
     def make_weighted(self, mod_key : ModKey):
@@ -78,8 +77,9 @@ class _ButtonBase(Container):
             )
             self._description.draw(screen, (cursor_position[0]+11, cursor_position[1]-25))
 
-    def add_description(self, text : Text):
+    def add_description(self, text : TextPlain):
         self._description = text
+
 
 class Button(_ButtonBase):
     def __init__(
@@ -95,15 +95,16 @@ class Button(_ButtonBase):
             size,
             corners,
         )
-        self.set_outline_color((100, 200, 255, 255))
         self._color_outline_inactive = (100, 100, 100, 255)
         self._color_fill_hover = self._get_divided_color_tuple(self._color_outline, 2, 150)
 
         self._key_func = key_func
         self._condition_func = condition_func
+        self.set_outline_color((100, 200, 255, 255))
 
     def draw(self, screen):
         is_possible = self._condition_func()
+        self._check_element_color(is_possible)
         points = get_points(self._position, self._size, self._corners)
         if self._is_hovered and is_possible:
             pygame.gfxdraw.filled_polygon(screen, points, self._color_fill_hover)
@@ -114,20 +115,18 @@ class Button(_ButtonBase):
         else:
             pygame.draw.polygon(screen, self._color_outline_inactive, points, 3)
 
-        for tuple in self._elements:
-            pos = self._get_alligned_position(tuple[1], tuple[2])
+        self._draw_elements(screen)
 
-            if callable(tuple[0]):
-                element = tuple[0]()
-                if element == None:
-                    continue
-            else:
-                element = tuple[0]
-
-            if (isinstance(element, Text) or isinstance(element, SimpleSprite)) and not is_possible:
-                element.draw(screen, pos, self._color_outline_inactive) # pyright: ignore[reportAttributeAccessIssue]
-            else:
-                element.draw(screen, pos) # pyright: ignore[reportAttributeAccessIssue]
+    def add_element(
+            self, 
+            element, 
+            allignment : Allignment = Allignment.UPPER_LEFT_CORNER,
+            nudge : tuple[int, int] = (0, 0),
+            color_override_and_lock : tuple[int, int, int, int] | None = None
+        ):
+        if color_override_and_lock == None and not self._condition_func() and isinstance(element, self._colored_sprites):
+            element.set_color(self._color_outline_inactive)
+        super().add_element(element, allignment, nudge, color_override_and_lock)
 
     def run_if_possible(self) -> bool:
         mods = pygame.key.get_mods()
@@ -151,6 +150,13 @@ class Button(_ButtonBase):
 
     def set_hover_fill_color(self, color : tuple[int, int, int, int]):
         self._color_fill_hover = color
+
+    def _check_element_color(self, is_possible : bool):
+        if is_possible:
+            self._set_element_color(self._color_outline)
+        else:
+            self._set_element_color(self._color_outline_inactive)
+
 
 class Switch(_ButtonBase):
     def __init__(
@@ -176,6 +182,7 @@ class Switch(_ButtonBase):
 
     def draw(self, screen):
         points = get_points(self._position, self._size, self._corners)
+        self._check_element_color()
         if self._is_hovered and self._is_active:
             pygame.gfxdraw.filled_polygon(screen, points, self._color_fill_hover_active)
         elif self._is_hovered and not self._is_active:
@@ -187,20 +194,18 @@ class Switch(_ButtonBase):
         else:
             pygame.draw.polygon(screen, self._color_outline, points, 3)
 
-        for tuple in self._elements:
-            pos = self._get_alligned_position(tuple[1], tuple[2])
+        self._draw_elements(screen)
 
-            if callable(tuple[0]):
-                element = tuple[0]()
-                if element == None:
-                    continue
-            else:
-                element = tuple[0]
-
-            if (isinstance(element, Text) or isinstance(element, SimpleSprite)) and self._is_active:
-                element.draw(screen, pos, self._color_outline_active) # pyright: ignore[reportAttributeAccessIssue]
-            else:
-                element.draw(screen, pos) # pyright: ignore[reportAttributeAccessIssue]
+    def add_element(
+            self, 
+            element, 
+            allignment : Allignment = Allignment.UPPER_LEFT_CORNER,
+            nudge : tuple[int, int] = (0, 0),
+            color_override_and_lock : tuple[int, int, int, int] | None = None
+        ):
+        if color_override_and_lock == None and self._is_active and isinstance(element, self._colored_sprites):
+            element.set_color(self._color_outline_active)
+        super().add_element(element, allignment, nudge, color_override_and_lock)
     
     def run_if_possible(self) -> bool:
         mods = pygame.key.get_mods()
@@ -208,7 +213,7 @@ class Switch(_ButtonBase):
             self._mod_key == None or (self._mod_key != None and mods & self._mod_key) # Check for modifier keys if weighted
         ):
             self._key_func()
-            self._is_active = False if self._is_active else True            
+            self._is_active = False if self._is_active else True
             return True
         return False
     
@@ -223,6 +228,13 @@ class Switch(_ButtonBase):
 
         self._color_outline_active = color
         self._color_fill_hover_active = self._get_divided_color_tuple(self._color_outline_active, 2, 150)
+
+    def _check_element_color(self):
+        if self._is_active:
+            self._set_element_color(self._color_outline_active)
+        else:
+            self._set_element_color(self._color_outline)
+            
 
 class ButtonRound(Button):
     def __init__(
@@ -257,20 +269,7 @@ class ButtonRound(Button):
         else:
             pygame.draw.circle(screen, self._color_outline_inactive, self._position, self._radius, 3)
 
-        for tuple in self._elements:
-            pos = self._get_alligned_position(tuple[1], tuple[2])
-
-            if callable(tuple[0]):
-                element = tuple[0]()
-                if element == None:
-                    continue
-            else:
-                element = tuple[0]
-
-            if (isinstance(element, Text) or isinstance(element, SimpleSprite)) and not is_possible:
-                element.draw(screen, pos, self._color_outline_inactive) # pyright: ignore[reportAttributeAccessIssue]
-            else:
-                element.draw(screen, pos) # pyright: ignore[reportAttributeAccessIssue]
+        self._draw_elements(screen)
 
     def set_corners(self, topleft : int, topright : int, bottomright : int, bottomleft : int):
         """Does nothing for round buttons."""

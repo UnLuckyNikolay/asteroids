@@ -20,10 +20,8 @@ class RoundStateManager(pygame.sprite.Sprite):
         self.score = 0
         self.round_time : float = 0 # In seconds
 
-        # pygame.font.init()
-        # self.font = pygame.font.Font(None, 36)
-        # self.position = (30, 30)
-        # self.color = (150, 150, 150)
+        self.is_new_record : bool
+        self.record_place : int
         
         self.destroyed_asteroids : int = 0
         self.destroyed_asteroids_basic : int = 0

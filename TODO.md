@@ -23,7 +23,7 @@ FIXES/TWEAKS:
 - [x] Increase alpha of background of the pause menu
 - [x] Revamp difficulty increase
 - [x] Homing isn't affected by delta
-- [ ] Check if text should be redone
+- [x] Refactor text for easier placement
 
 IDEAS:
 - [x] Graphics/color adjustments for the leaderboards for top places
@@ -45,7 +45,7 @@ IDEAS:
     - [x] Player reset method
     - [x] Profile creation
     - [x] Player info
-    - [ ] Saved unlocked ships (check ordered dict?)
+    - [x] Saved unlocked ships
     - [ ] New end screen
     - [ ] ???
     - [ ] Profit

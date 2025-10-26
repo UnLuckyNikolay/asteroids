@@ -175,10 +175,10 @@ class Game():
 
         # Saving score and going back to Main Menu
         if not self.player.is_sus and self.rsm.score > 0:
-            is_new_record = self.gsm.check_score(self.rsm.score)
+            self.rsm.is_new_record, self.rsm.record_place = self.gsm.check_score(self.rsm.score)
             self.player_stats.process_round_stats(self.rsm)
             self.gsm.save_profile()
-            if is_new_record:
+            if self.rsm.is_new_record:
                 self.is_round_end = True
                 self.gsm.switch_menu(Menu.NAME_CHECK)
                 while self.is_round_end:

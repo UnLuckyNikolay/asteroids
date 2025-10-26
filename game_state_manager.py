@@ -10,7 +10,7 @@ from json_helper.profile.validator import ValidateProfile
 
 from ui_elements.container import Container, Allignment
 from ui_elements.buttons import Button, Switch, ModKey, ButtonRound
-from ui_elements.text import Text, TextH, TextF
+from ui_elements.text import TextPlain, TextUpdated
 from ui_elements.sprites.healthbar import HealthBar
 from ui_elements.sprites.leaderboard import Leaderboard
 from ui_elements.simple_sprites.symbols import *
@@ -36,6 +36,7 @@ class Menu(Enum): # Remember not to name 2 the same ever fucking again
     HUD = "HUD"
     PAUSE_MENU = "Pause"
     NAME_CHECK = "Name check" # REDO AFTERWARDS TO ROUND_END
+    TEST_MENU = "Test Menu"
 
 class GameStateManager(pygame.sprite.Sprite):
     layer = 100 # pyright: ignore
@@ -50,7 +51,7 @@ class GameStateManager(pygame.sprite.Sprite):
         self.player : Player
         self.player_stats : PlayerStats
         self.__hovered_button : Button | Switch | None = None
-        self.__current_menu : Menu = Menu.PROFILE_SELECTION
+        self.__current_menu : Menu = Menu.PROFILE_SELECTION # Menu.PROFILE_SELECTION | Menu.TEST_MENU
 
         # Getting the font
         font_path = "./fonts/anita-semi-square.normaali.ttf" #"../../fonts/anita-semi-square.normaali.ttf"
@@ -153,6 +154,8 @@ class GameStateManager(pygame.sprite.Sprite):
                     button_list = self.__buttons_pause_menu
                 case Menu.NAME_CHECK:
                     button_list = self.__buttons_name_check
+                case Menu.TEST_MENU:
+                    button_list = self.__buttons_test_menu
                 case _:
                     print(f"Error: menu `{self.__current_menu.value}` missing in userinterface.check_hovered_button")
 
@@ -232,26 +235,29 @@ class GameStateManager(pygame.sprite.Sprite):
         self.game.initialize_new_player()
         self.switch_menu(Menu.PROFILE_SELECTION)
 
-    def check_score(self, new_score) -> bool:
-        """Returns True if new leaderboard record is set."""
+    def check_score(self, new_score) -> tuple[bool, int]:
+        """
+        Returns (True, place : int) if new leaderboard record is set.
+        
+        Otherwise (False, 0).
+        """
 
         is_updated = False
 
         while len(self.__scores) > LEADERBOARD_LENGTH:   # Shortens leaderboard if max length was reduced
             is_updated = True
             self.__scores.pop()
-        
-        if len(self.__scores) == LEADERBOARD_LENGTH and new_score > self.__scores[LEADERBOARD_LENGTH - 1]["score"]:
-            is_updated = True
-            self.__scores.pop()
-        if len(self.__scores) != LEADERBOARD_LENGTH:
-            is_updated = True
-            self.__scores.append({"name": self.player_stats.name, "score": new_score})
-            self.__scores.sort(key=lambda x: x["score"], reverse=True)
 
-        if is_updated:
-            self.__save_leaderboard()
-        return is_updated
+        for i in range(len(self.__scores)):
+            if new_score > self.__scores[i]["score"]:
+                if len(self.__scores) == LEADERBOARD_LENGTH:
+                    self.__scores.pop()
+                self.__scores.append({"name": self.player_stats.name, "score": new_score})
+                self.__scores.sort(key=lambda x: x["score"], reverse=True)
+                self.__save_leaderboard()
+                return True, i
+            
+        return False, 0
 
     def __reset_leaderboard(self):
         self.__scores = []
@@ -285,6 +291,8 @@ class GameStateManager(pygame.sprite.Sprite):
                 self.__draw_pause_menu(screen)
             case Menu.NAME_CHECK:
                 self.__draw_name_check(screen)
+            case Menu.TEST_MENU:
+                self.__draw_test_menu(screen)
             case _:
                 print(f"> Error: missing menu {self.__current_menu.value} in UserInterface.draw")
 
@@ -351,6 +359,13 @@ class GameStateManager(pygame.sprite.Sprite):
         for button in self.__buttons_name_check:
             button.draw(screen)
 
+    def __draw_test_menu(self, screen):
+        for container in self.__containers_test_menu:
+            container.draw(screen)
+
+        for button in self.__buttons_test_menu:
+            button.draw(screen)
+
     ### Buttons and containers
     # Remember to add new buttons and containers to the lists to draw them
     
@@ -374,6 +389,8 @@ class GameStateManager(pygame.sprite.Sprite):
                 self.__initialize_pause_menu()
             case Menu.NAME_CHECK:
                 self.__initialize_name_check()
+            case Menu.TEST_MENU:
+                self.__initialize_test_menu()
             case _:
                 print(f"> Error: missing menu {self.__current_menu.value} in UserInterface.initialize_current_menu")
 
@@ -387,14 +404,16 @@ class GameStateManager(pygame.sprite.Sprite):
         # # Settings
         c_settings = Container((10, res[1]-80), (90, 20), (8, 2, 8, 2))
         c_settings.add_element(
-            Text("Settings", (5, 1), self.__font_very_small, self.__color_white)
+            TextPlain("Settings", self.__font_very_small, self.__color_white),
+            Allignment.CENTER
         )
 
         if self.player_stats.found_cheats:
             # Cheats
             c_cheats = Container((res[0]-100, res[1]-80), (90, 20), (2, 8, 2, 8))
             c_cheats.add_element(
-                Text("Cheats", (13, 1), self.__font_very_small, self.__color_white)
+                TextPlain("Cheats", self.__font_very_small, self.__color_white),
+                Allignment.CENTER
             )
             
             container_list.extend(
@@ -413,10 +432,11 @@ class GameStateManager(pygame.sprite.Sprite):
             self.game.handler_regenerate_background
         )
         b_background.add_description(
-            Text("Generate new background", (0, 0), self.__font_very_small, self.__color_white)
+            TextPlain("Generate new background", self.__font_very_small, self.__color_white)
         )
         b_background.add_element(
-            Text("BG", (4, 7), self.__font_small, self.__color_blue)
+            TextPlain("BG", self.__font_small, self.__color_blue),
+            Allignment.CENTER
         )
         # Switch Fullscreen
         s_fullscreen = Switch(
@@ -425,7 +445,7 @@ class GameStateManager(pygame.sprite.Sprite):
             self.game.is_fullscreen
         )
         s_fullscreen.add_description(
-            Text("Switch the FULLSCREEN mode on/off", (0, 0), self.__font_very_small, self.__color_white)
+            TextPlain("Switch the FULLSCREEN mode on/off", self.__font_very_small, self.__color_white)
         )
         s_fullscreen.add_element(
             SymbolFullscreen(0, 0, self.__color_blue), 
@@ -438,10 +458,11 @@ class GameStateManager(pygame.sprite.Sprite):
             self.game.is_slow
         )
         s_slow.add_description(
-            Text("DEBUG: Switch max FPS between 75 and 10", (0, 0), self.__font_very_small, self.__color_white)
+            TextPlain("DEBUG: Switch max FPS between 75 and 10", self.__font_very_small, self.__color_white)
         )
         s_slow.add_element(
-            Text("SL", (4, 7), self.__font_small, self.__color_blue)
+            TextPlain("SL", self.__font_small, self.__color_blue),
+            Allignment.CENTER
         )
 
         if self.player_stats.found_cheats:
@@ -452,11 +473,12 @@ class GameStateManager(pygame.sprite.Sprite):
                 self.player_stats.cheat_hitbox
             )
             s_hitbox.add_description(
-                Text("Switch the HITBOX cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
+                TextPlain("Switch the HITBOX cheat on/off", self.__font_very_small, self.__color_white)
             )
             s_hitbox.set_active_outline_color(self.__color_golden)
             s_hitbox.add_element(
-                Text("HB", (3, 7), self.__font_small, self.__color_blue)
+                TextPlain("HB", self.__font_small, self.__color_blue),
+                Allignment.CENTER
             )
             s_hitbox.set_active_outline_color = self.__color_golden
             # Cheat - Money cheat
@@ -466,7 +488,7 @@ class GameStateManager(pygame.sprite.Sprite):
                 self.player_stats.cheat_stonks
             )
             s_money.add_description(
-                Text("Switch the STONKS cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
+                TextPlain("Switch the STONKS cheat on/off", self.__font_very_small, self.__color_white)
             )
             s_money.set_active_outline_color(self.__color_golden)
             s_money.add_element(
@@ -481,11 +503,12 @@ class GameStateManager(pygame.sprite.Sprite):
                 self.player_stats.cheat_godmode
             )
             s_godmode.add_description(
-                Text("Switch the GODMODE cheat on/off", (0, 0), self.__font_very_small, self.__color_white)
+                TextPlain("Switch the GODMODE cheat on/off", self.__font_very_small, self.__color_white)
             )
             s_godmode.set_active_outline_color(self.__color_golden)
             s_godmode.add_element(
-                Text("GM", (2, 7), self.__font_small, self.__color_blue)
+                TextPlain("GM", self.__font_small, self.__color_blue),
+                Allignment.CENTER
             )
             s_godmode.set_active_outline_color = self.__color_golden
                 
@@ -511,9 +534,8 @@ class GameStateManager(pygame.sprite.Sprite):
 
         c_menu_name = Container((offset_x+75, offset_y), (650, 60), (20, 20, 8, 8))
         c_menu_name.add_element(
-            Text(
-                "Select the Profile", (83, 4), self.__font_big, self.__color_white
-            )
+            TextPlain("Select the Profile", self.__font_big, self.__color_white),
+            Allignment.CENTER
         )
 
         self.__containers_profile_selection.extend(
@@ -530,16 +552,24 @@ class GameStateManager(pygame.sprite.Sprite):
                 lambda: self.__load_profile(0)
             )
             b_pf0.add_element(
-                TextF("{}", (35, 18), self.__font_big, self.__color_blue,
-                      self.__profiles[0]["player_stats_save"].get("name", self.__default_player_name))
+                TextPlain(
+                    "{}", self.__font_big, self.__color_blue,
+                    self.__profiles[0]["player_stats_save"].get("name", self.__default_player_name)
+                ),
+                nudge=(35, 18)
             )
             b_pf0.add_element(
-                TextF("Max Score: {}", (35, 77), self.__font_medium, self.__color_white,
-                      self.__profiles[0]["player_stats_save"].get("max_score", 0))
+                TextPlain(
+                    "Max Score: {}", self.__font_medium, self.__color_white,
+                    self.__profiles[0]["player_stats_save"].get("max_score", 0)
+                ),
+                nudge=(35, 77),
+                color_override_and_lock=self.__color_white
             )
             b_pf0.add_element(
                 Ship(self.__profiles[0]["player_stats_save"].get("ship_model_value", self.__default_ship_model_value), 0),
-                Allignment.CENTER_ON_THE_LEFT
+                Allignment.UPPER_RIGHT_CORNER,
+                nudge=(-70, 70)
             )
             personal_sprite = get_personal_sprite(self.__profiles[0]["player_stats_save"].get("name", self.__default_player_name))
             if personal_sprite != None:
@@ -556,7 +586,7 @@ class GameStateManager(pygame.sprite.Sprite):
             b_pf0_delete.set_outline_color(self.__color_red)
             b_pf0_delete.set_fill_color(self.__color_red_fill)
             b_pf0_delete.add_description(
-                Text("SHIFT+Click to DELETE the Profile", (0, 0), self.__font_very_small, self.__color_white)
+                TextPlain("SHIFT+Click to DELETE the Profile", self.__font_very_small, self.__color_white)
             )
             b_pf0_delete.add_element(
                 SymbolCross(0, 0, self.__color_red), 
@@ -573,7 +603,8 @@ class GameStateManager(pygame.sprite.Sprite):
                 lambda: self.__new_profile(0)
             )
             b_pf0.add_element(
-                Text("Null", (35, 18), self.__font_big, self.__color_blue)
+                TextPlain("Null", self.__font_big, self.__color_blue),
+                nudge=(35, 18)
             )
 
         # Profile 1
@@ -583,16 +614,24 @@ class GameStateManager(pygame.sprite.Sprite):
                 lambda: self.__load_profile(1)
             )
             b_pf1.add_element(
-                TextF("{}", (35, 18), self.__font_big, self.__color_blue,
-                      self.__profiles[1]["player_stats_save"].get("name", self.__default_player_name))
+                TextPlain(
+                    "{}", self.__font_big, self.__color_blue,
+                    self.__profiles[1]["player_stats_save"].get("name", self.__default_player_name)
+                ),
+                nudge=(35, 18)
             )
             b_pf1.add_element(
-                TextF("Max Score: {}", (35, 77), self.__font_medium, self.__color_white,
-                      self.__profiles[1]["player_stats_save"].get("max_score", 0))
+                TextPlain(
+                    "Max Score: {}", self.__font_medium, self.__color_white,
+                    self.__profiles[1]["player_stats_save"].get("max_score", 0)
+                ),
+                nudge=(35, 77),
+                color_override_and_lock=self.__color_white
             )
             b_pf1.add_element(
                 Ship(self.__profiles[1]["player_stats_save"].get("ship_model_value", self.__default_ship_model_value), 0),
-                Allignment.CENTER_ON_THE_LEFT
+                Allignment.UPPER_RIGHT_CORNER,
+                nudge=(-70, 70)
             )
             personal_sprite = get_personal_sprite(self.__profiles[1]["player_stats_save"].get("name", self.__default_player_name))
             if personal_sprite != None:
@@ -609,7 +648,7 @@ class GameStateManager(pygame.sprite.Sprite):
             b_pf1_delete.set_outline_color(self.__color_red)
             b_pf1_delete.set_fill_color(self.__color_red_fill)
             b_pf1_delete.add_description(
-                Text("SHIFT+Click to DELETE the Profile", (0, 0), self.__font_very_small, self.__color_white)
+                TextPlain("SHIFT+Click to DELETE the Profile", self.__font_very_small, self.__color_white)
             )
             b_pf1_delete.add_element(
                 SymbolCross(0, 0, self.__color_red), 
@@ -626,7 +665,8 @@ class GameStateManager(pygame.sprite.Sprite):
                 lambda: self.__new_profile(1)
             )
             b_pf1.add_element(
-                Text("Null", (35, 18), self.__font_big, self.__color_blue)
+                TextPlain("Null", self.__font_big, self.__color_blue),
+                nudge=(35, 18)
             )
 
         # Profile 2
@@ -636,16 +676,24 @@ class GameStateManager(pygame.sprite.Sprite):
                 lambda: self.__load_profile(2)
             )
             b_pf2.add_element(
-                TextF("{}", (35, 18), self.__font_big, self.__color_blue,
-                      self.__profiles[2]["player_stats_save"].get("name", self.__default_player_name))
+                TextPlain(
+                    "{}", self.__font_big, self.__color_blue,
+                    self.__profiles[2]["player_stats_save"].get("name", self.__default_player_name)
+                ),
+                nudge=(35, 18)
             )
             b_pf2.add_element(
-                TextF("Max Score: {}", (35, 77), self.__font_medium, self.__color_white,
-                      self.__profiles[2]["player_stats_save"].get("max_score", 0))
+                TextPlain(
+                    "Max Score: {}", self.__font_medium, self.__color_white,
+                    self.__profiles[2]["player_stats_save"].get("max_score", 0)
+                ),
+                nudge=(35, 77),
+                color_override_and_lock=self.__color_white
             )
             b_pf2.add_element(
                 Ship(self.__profiles[2]["player_stats_save"].get("ship_model_value", self.__default_ship_model_value), 0),
-                Allignment.CENTER_ON_THE_LEFT
+                Allignment.UPPER_RIGHT_CORNER,
+                nudge=(-70, 70)
             )
             personal_sprite = get_personal_sprite(self.__profiles[2]["player_stats_save"].get("name", self.__default_player_name))
             if personal_sprite != None:
@@ -662,7 +710,7 @@ class GameStateManager(pygame.sprite.Sprite):
             b_pf2_delete.set_outline_color(self.__color_red)
             b_pf2_delete.set_fill_color(self.__color_red_fill)
             b_pf2_delete.add_description(
-                Text("SHIFT+Click to DELETE the Profile", (0, 0), self.__font_very_small, self.__color_white)
+                TextPlain("SHIFT+Click to DELETE the Profile", self.__font_very_small, self.__color_white)
             )
             b_pf2_delete.add_element(
                 SymbolCross(0, 0, self.__color_red), 
@@ -679,7 +727,8 @@ class GameStateManager(pygame.sprite.Sprite):
                 lambda: self.__new_profile(2)
             )
             b_pf2.add_element(
-                Text("Null", (35, 18), self.__font_big, self.__color_blue)
+                TextPlain("Null", self.__font_big, self.__color_blue),
+                nudge=(35, 18)
             )
 
         self.__buttons_profile_selection.extend(
@@ -697,16 +746,21 @@ class GameStateManager(pygame.sprite.Sprite):
 
         c_background = Container((root_x, root_y), (450, 210), (10, 25, 10, 25))
         c_background.add_element(
-            TextF("Creating a new Profile.", (15, 7), self.__font_medium, self.__color_white)
+            TextPlain("Creating a new Profile.", self.__font_medium, self.__color_white),
+            nudge=(15, 7)
         )
         c_background.add_element(
-            Text("Enter your name:", (15, 47), self.__font_medium, self.__color_white)
+            TextPlain("Enter your name:", self.__font_medium, self.__color_white),
+            nudge=(15, 47)
         )
 
         c_name = Container((root_x+10, root_y+90), (430, 50), (3, 10, 3, 10))
         c_name.add_element(
-            TextH("{}", (10, 8), self.__font_medium, self.__color_white, 
-                  lambda: self.player_stats.name)
+            TextUpdated(
+                "{}", self.__font_medium, self.__color_white, 
+                lambda: self.player_stats.name
+            ),
+            nudge=(10, 8)
         )
 
         self.__containers_new_profile.extend(
@@ -720,7 +774,8 @@ class GameStateManager(pygame.sprite.Sprite):
             self.game.finish_getting_player_name
         )
         b_confirm.add_element(
-            Text("Confirm", (10, 8), self.__font_medium, self.__color_blue)
+            TextPlain("Confirm", self.__font_medium, self.__color_blue),
+            Allignment.CENTER
         )
 
         self.__buttons_new_profile.extend(
@@ -748,16 +803,23 @@ class GameStateManager(pygame.sprite.Sprite):
             (center_x-400, 10), (800, 140), (7, 7, 30, 30)
         )
         c_profile.add_element(
-            TextH("{}", (text_nudge_x+46, 18), self.__font_big, self.__color_white,
-                    lambda: self.player_stats.name)
+            TextPlain(
+                "{}", self.__font_big, self.__color_white,
+                self.player_stats.name
+            ),
+            nudge=(text_nudge_x+46, 18)
         )
         c_profile.add_element(
-            TextH("Max Score: {}", (text_nudge_x, 77), self.__font_medium, self.__color_white,
-                    lambda: self.player_stats.max_score)
+            TextPlain(
+                "Max Score: {}", self.__font_medium, self.__color_white,
+                self.player_stats.max_score
+            ),
+            nudge=(text_nudge_x, 77)
         )
         c_profile.add_element(
             Ship(self.player_stats.ship_model_value, 0),
-            Allignment.CENTER_ON_THE_LEFT
+            Allignment.UPPER_RIGHT_CORNER,
+            nudge=(-70, 70)
         )
         personal_sprite = get_personal_sprite(self.player_stats.name)
         if personal_sprite != None:
@@ -804,7 +866,8 @@ class GameStateManager(pygame.sprite.Sprite):
             self.game.game_loop
         )
         b_start.add_element(
-            Text("Start", (117, 10), self.__font_big, self.__color_blue)
+            TextPlain("Start", self.__font_big, self.__color_blue),
+            Allignment.CENTER
         )
         # Opens the Leaderboard
         b_leaderboard = Button(
@@ -812,7 +875,8 @@ class GameStateManager(pygame.sprite.Sprite):
             lambda: self.switch_menu(Menu.LEADERBOARD)
         )
         b_leaderboard.add_element(
-            Text("Leaderboard", (16, 10), self.__font_big, self.__color_blue)
+            TextPlain("Leaderboard", self.__font_big, self.__color_blue),
+            Allignment.CENTER
         )
         # Back to profile selection
         b_profiles = Button(
@@ -820,7 +884,8 @@ class GameStateManager(pygame.sprite.Sprite):
             self.__return_to_profile_selection
         )
         b_profiles.add_element(
-            Text("Profiles", (89, 10), self.__font_big, self.__color_blue)
+            TextPlain("Profiles", self.__font_big, self.__color_blue),
+            Allignment.CENTER
         )
         # Exits the game
         b_exit = Button(
@@ -828,7 +893,8 @@ class GameStateManager(pygame.sprite.Sprite):
             self.game.handler_turn_off
         )
         b_exit.add_element(
-            Text("Exit", (135, 10), self.__font_big, self.__color_blue)
+            TextPlain("Exit", self.__font_big, self.__color_blue),
+            Allignment.CENTER
         )
         
         self.__buttons_main_menu.extend(
@@ -858,95 +924,101 @@ class GameStateManager(pygame.sprite.Sprite):
         c_profile = Container(
             (root_x, root_y), (800, size_y), (7, 7, 30, 30)
         )
+        c_profile.add_element(
+            Ship(self.player_stats.ship_model_value, 0),
+            Allignment.UPPER_RIGHT_CORNER, 
+            nudge=(-70, 70)
+        )
         c_profile.add_element( # (35, 18)
-            TextH("{}", (text_nudge_x+46, 18), self.__font_big, self.__color_white,
-                    lambda: self.player_stats.name)
+            TextPlain(
+                "{}", self.__font_big, self.__color_white,
+                self.player_stats.name
+            ),
+            nudge=(text_nudge_x+46, 18)
         )
         c_profile.add_element(
-            TextH("Max Score: {}", (text_nudge_x, 77), self.__font_medium, self.__color_white,
-                    lambda: self.player_stats.max_score)
+            TextPlain(
+                "Max Score: {}", self.__font_medium, self.__color_white,
+                self.player_stats.max_score
+            ),
+            nudge=(text_nudge_x, 77)
         )
         c_profile.add_element(
-            Ship(self.player_stats.ship_model_value, 0),
-            Allignment.N_FROM_UPPER_RIGHT_CORNER, 70
+            TextPlain(
+                "Longest run: {}", self.__font_medium, self.__color_white,
+                self.player_stats.get_longest_time_as_text()
+            ),
+            nudge=(text_nudge_x, 117)
         )
         c_profile.add_element(
-            TextH("Longest run: {}", (text_nudge_x, 117), self.__font_medium, self.__color_white,
-                    self.player_stats.get_longest_time_as_text)
+            TextPlain(
+                "Asteroids destroyed: {}", self.__font_small, self.__color_white,
+                self.player_stats.destroyed_asteroids
+            ),
+            nudge=(text_nudge_x, text_start_y)
         )
         c_profile.add_element(
-            Ship(self.player_stats.ship_model_value, 0),
-            Allignment.N_FROM_UPPER_RIGHT_CORNER, 70
+            TextPlain(
+                "- Basic: {}", self.__font_small, self.__color_white,
+                self.player_stats.destroyed_asteroids_basic
+            ),
+            nudge=(text_nudge_x, text_start_y+text_row_y*1)
         )
         c_profile.add_element(
-            TextH(
-                "Asteroids destroyed: {}", (text_nudge_x, text_start_y), 
-                self.__font_small, self.__color_white,
-                lambda: self.player_stats.destroyed_asteroids
-            )
+            TextPlain(
+                "- Explosive: {}", self.__font_small, self.__color_white,
+                self.player_stats.destroyed_asteroids_explosive
+            ),
+            nudge=(text_nudge_x, text_start_y+text_row_y*2)
         )
         c_profile.add_element(
-            TextH(
-                "- Basic: {}", (text_nudge_x, text_start_y+text_row_y*1), 
-                self.__font_small, self.__color_white,
-                lambda: self.player_stats.destroyed_asteroids_basic
-            )
+            TextPlain(
+                "- Golden: {}", self.__font_small, self.__color_white,
+                self.player_stats.destroyed_asteroids_golden
+            ),
+            nudge=(text_nudge_x, text_start_y+text_row_y*3)
         )
         c_profile.add_element(
-            TextH(
-                "- Explosive: {}", (text_nudge_x, text_start_y+text_row_y*2), 
-                self.__font_small, self.__color_white,
-                lambda: self.player_stats.destroyed_asteroids_explosive
-            )
+            TextPlain(
+                "- Homing: {}", self.__font_small, self.__color_white,
+                self.player_stats.destroyed_asteroids_homing
+            ),
+            nudge=(text_nudge_x, text_start_y+text_row_y*4)
         )
         c_profile.add_element(
-            TextH(
-                "- Golden: {}", (text_nudge_x, text_start_y+text_row_y*3), 
-                self.__font_small, self.__color_white,
-                lambda: self.player_stats.destroyed_asteroids_golden
-            )
+            TextPlain(
+                "Loot collected: {}", self.__font_small, self.__color_white,
+                self.player_stats.collected_loot
+            ),
+            nudge=(text_nudge_x, text_start_y+text_row_y*5)
         )
         c_profile.add_element(
-            TextH(
-                "- Homing: {}", (text_nudge_x, text_start_y+text_row_y*4), 
-                self.__font_small, self.__color_white,
-                lambda: self.player_stats.destroyed_asteroids_homing
-            )
+            TextPlain(
+                "- Copper ore: {}", self.__font_small, self.__color_white,
+                self.player_stats.collected_ores_copper
+            ),
+            nudge=(text_nudge_x, text_start_y+text_row_y*6)
         )
         c_profile.add_element(
-            TextH(
-                "Loot collected: {}", (text_nudge_x, text_start_y+text_row_y*5), 
-                self.__font_small, self.__color_white,
-                lambda: self.player_stats.collected_loot
-            )
+            TextPlain(
+                "- Silver ore: {}", self.__font_small, self.__color_white,
+                self.player_stats.collected_ores_silver
+            ),
+            nudge=(text_nudge_x, text_start_y+text_row_y*7)
         )
         c_profile.add_element(
-            TextH(
-                "- Copper ore: {}", (text_nudge_x, text_start_y+text_row_y*6), 
-                self.__font_small, self.__color_white,
-                lambda: self.player_stats.collected_ores_copper
-            )
+            TextPlain(
+                "- Golden ore: {}", self.__font_small, self.__color_white,
+                self.player_stats.collected_ores_golden
+            ),
+            nudge=(text_nudge_x, text_start_y+text_row_y*8)
         )
         c_profile.add_element(
-            TextH(
-                "- Silver ore: {}", (text_nudge_x, text_start_y+text_row_y*7), 
-                self.__font_small, self.__color_white,
-                lambda: self.player_stats.collected_ores_silver
-            )
-        )
-        c_profile.add_element(
-            TextH(
-                "- Golden ore: {}", (text_nudge_x, text_start_y+text_row_y*8), 
-                self.__font_small, self.__color_white,
-                lambda: self.player_stats.collected_ores_golden
-            )
-        )
-        c_profile.add_element(
-            TextH(
-                "- Diamonds: {}", (text_nudge_x, text_start_y+text_row_y*9), 
-                self.__font_small, self.__color_white,
-                lambda: self.player_stats.collected_diamonds
-            )
+            TextPlain(
+                "- Diamonds: {}", self.__font_small, self.__color_white,
+                self.player_stats.collected_diamonds
+            ),
+            nudge=(text_nudge_x, text_start_y+text_row_y*9)
         )
         personal_sprite = get_personal_sprite(self.player_stats.name)
         if personal_sprite != None:
@@ -997,13 +1069,19 @@ class GameStateManager(pygame.sprite.Sprite):
 
         c_background = Container((root_x, root_y), (450, 170), (10, 25, 10, 25))
         c_background.add_element(
-            Text("Edit your name:", (15, 7), self.__font_medium, self.__color_white)
+            TextPlain("Edit your name:", self.__font_medium, self.__color_white),
+            nudge=(15, 7)
         )
 
         c_name = Container((root_x+10, root_y+50), (430, 50), (3, 10, 3, 10))
         c_name.add_element(
-            TextH("{}", (10, 8), self.__font_medium, self.__color_white, 
-                  lambda: self.player_stats.name)
+            TextUpdated(
+                "{}", self.__font_medium, self.__color_white, 
+                lambda: self.player_stats.name
+                ),
+                Allignment.LEFT_WALL,
+                nudge=(10, 0)
+
         )
 
         self.__containers_name_edit.extend(
@@ -1017,7 +1095,8 @@ class GameStateManager(pygame.sprite.Sprite):
             self.game.finish_getting_player_name
         )
         b_confirm.add_element(
-            Text("Confirm", (10, 8), self.__font_medium, self.__color_blue)
+            TextPlain("Confirm", self.__font_medium, self.__color_blue),
+            Allignment.CENTER
         )
 
         self.__buttons_name_edit.extend(
@@ -1035,7 +1114,8 @@ class GameStateManager(pygame.sprite.Sprite):
         # Name of the menu
         c_menu_name = Container((res[0] / 2 - 185, 35), (370, 72), (8, 8, 20, 20))
         c_menu_name.add_element(
-            Text("Leaderboard", (16, 10), self.__font_big, self.__color_white)
+            TextPlain("Leaderboard", self.__font_big, self.__color_white),
+            Allignment.CENTER
         )
         # List of high __scores
         c_leaderboard = Leaderboard(int(res[0]/2)-540, 145, 
@@ -1054,7 +1134,8 @@ class GameStateManager(pygame.sprite.Sprite):
             lambda: self.switch_menu(Menu.MAIN_MENU)
         )
         b_back.add_element(
-            Text("Back", (18, 5), self.__font_small, self.__color_blue)
+            TextPlain("Back", self.__font_small, self.__color_blue),
+            Allignment.CENTER
         )
         
         self.__buttons_leaderboard.extend(
@@ -1069,10 +1150,11 @@ class GameStateManager(pygame.sprite.Sprite):
         b_reset.make_weighted(ModKey.SHIFT)
         b_reset.set_outline_color(self.__color_red)
         b_reset.add_description(
-            Text("SHIFT+Click to RESET the leaderboard", (0, 0), self.__font_very_small, self.__color_white)
+            TextPlain("SHIFT+Click to RESET the leaderboard", self.__font_very_small, self.__color_white)
         )
         b_reset.add_element(
-            Text("Reset", (9, 5), self.__font_small, self.__color_red)
+            TextPlain("Reset", self.__font_small, self.__color_red),
+            Allignment.CENTER
         )
         
         self.__buttons_leaderboard.extend(
@@ -1089,7 +1171,7 @@ class GameStateManager(pygame.sprite.Sprite):
             b_ufo.set_fill_color(self.__color_green)
             b_ufo.set_hover_fill_color(self.__color_green)
             b_ufo.add_description(
-            Text("Do you want to believe?", (0, 0), self.__font_very_small, self.__color_green)
+                TextPlain("Do you want to believe?", self.__font_very_small, self.__color_green)
             )
             
             self.__buttons_leaderboard.append(b_ufo)
@@ -1104,32 +1186,50 @@ class GameStateManager(pygame.sprite.Sprite):
         # Current weapon
         c_weapon = Container((25, 25), (362, 36), (10, 5, 5, 5))
         c_weapon.add_element(
-            TextH("{}.v{}", (9, 5), self.__font_small, self.__color_white, 
-                  self.player.get_current_weapon_name,
-                  self.player.get_current_weapon_level)
+            TextUpdated(
+                "{}.v{}", self.__font_small, self.__color_white, 
+                self.player.get_current_weapon_name,
+                self.player.get_current_weapon_level
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(9, 0)
         )
         # Timer
         c_timer = Container((397, 25), (176, 36), (5, 10, 5, 5))
         c_timer.add_element(
-            TextH("Time: {}", (9, 5), self.__font_small, self.__color_white, 
-                  self.game.rsm.get_current_time_as_text)
+            TextUpdated(
+                "Time: {}", self.__font_small, self.__color_white, 
+                self.game.rsm.get_current_time_as_text
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(9, 0)
         )
         # Current score
         c_score = Container((25, 71), (176, 36), (5, 3, 5, 10))
         c_score.add_element(
-            TextH("{}pts", (9, 5), self.__font_small, self.__color_white, 
-                  lambda: self.rsm.score)
+            TextUpdated(
+                "{}pts", self.__font_small, self.__color_white, 
+                lambda: self.rsm.score
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(9, 0)
         )
         # Current money
         c_money = Container((211, 71), (176, 36), (3, 3, 3, 3))
         c_money.add_element(
-            TextH("{}g", (9, 5), self.__font_small, self.__color_golden, 
-                  self.player.get_money)
+            TextUpdated(
+                "{}g", self.__font_small, self.__color_golden, 
+                self.player.get_money
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(9, 0)
         )
         # Current health bar
         c_health = Container((397, 71), (176, 36), (3, 5, 10, 5))
         c_health.add_element(
-            Text("Lives", (9, 5), self.__font_small, self.__color_white)
+            TextPlain("Lives", self.__font_small, self.__color_white),
+            Allignment.LEFT_WALL,
+            nudge=(9, 0)
         )
         c_health.add_element(
             HealthBar(
@@ -1147,7 +1247,8 @@ class GameStateManager(pygame.sprite.Sprite):
         if self.player.is_sus:
             c_cheats = Container((self.game.screen_resolution[0]-399, self.game.screen_resolution[1]-24), (400, 25), (5, 0, 0, 0))
             c_cheats.add_element(
-                Text("Cheats enabled! Score won't be saved.", (6, 3), self.__font_very_small, self.__color_white)
+                TextPlain("Cheats enabled! Score won't be saved.", self.__font_very_small, self.__color_white),
+                Allignment.CENTER
             )
 
             self.__containers_hud.append(c_cheats)
@@ -1177,56 +1278,88 @@ class GameStateManager(pygame.sprite.Sprite):
         # List - ship
         c_model = Container((offset_x+290, offset_y+65), (455, 36), (6, 6, 6, 6))
         c_model.add_element(
-            TextH("Model: {}", (12, 5), self.__font_small, self.__color_white,
-                  self.player.ship.get_name)
+            TextUpdated(
+                "Model: {}", self.__font_small, self.__color_white,
+                self.player.ship.get_name
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
         )
         
         c_switch_model = Container((offset_x+336, offset_y+65+row_height*1), (363, 36), (3, 3, 3, 3))
         c_switch_model.add_element(
-            Text("Switch model", (12, 5), self.__font_small, self.__color_white)
+            TextPlain("Switch model", self.__font_small, self.__color_white),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
         )
 
         c_heal = Container((offset_x+290, offset_y+65+row_height*2), (409, 36), (6, 3, 3, 6))
         c_heal.add_element(
-            TextH("Heal: {}g", (12, 5), self.__font_small, self.__color_white,
-                  self.player.get_price_heal)
+            TextUpdated(
+                "Heal: {}g", self.__font_small, self.__color_white,
+                self.player.get_price_heal
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
         )
         
         c_magnet = Container((offset_x+290, offset_y+65+row_height*3), (455, 36), (6, 6, 6, 6))
         c_magnet.add_element(
-            TextH("Magnet.v{}", (12, 5), self.__font_small, self.__color_white,
-                  lambda: self.player.get_part_level(ShipPart.MAGNET))
+            TextUpdated(
+                "Magnet.v{}", self.__font_small, self.__color_white,
+                lambda: self.player.get_part_level(ShipPart.MAGNET)
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
         )
         
         c_magnet_rad = Container((offset_x+290, offset_y+65+row_height*4), (409, 36), (6, 3, 3, 6))
         c_magnet_rad.add_element(
-            TextH("Radius: {}", (12, 5), self.__font_small, self.__color_white,
-                  lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.MAGNET_RADIUS))
+            TextUpdated(
+                "Radius: {}", self.__font_small, self.__color_white,
+                lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.MAGNET_RADIUS)
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
         )
         
         c_magnet_str = Container((offset_x+290, offset_y+65+row_height*5), (409, 36), (6, 3, 3, 6))
         c_magnet_str.add_element(
-            TextH("Strength: {}", (12, 5), self.__font_small, self.__color_white,
-                  lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.MAGNET_STRENGTH))
+            TextUpdated(
+                "Strength: {}", self.__font_small, self.__color_white,
+                lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.MAGNET_STRENGTH)
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
         )
 
         # Current stats
         # Score
         c_points = Container((offset_x+760, offset_y+65), (150, 36), (6, 3, 3, 6))
         c_points.add_element(
-            TextH("{}pts", (9, 5), self.__font_small, self.__color_white, 
-                  lambda: self.rsm.score)
+            TextUpdated(
+                "{}pts", self.__font_small, self.__color_white, 
+                lambda: self.rsm.score
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(9, 0)
         )
         # Money
         c_money = Container((offset_x+920, offset_y+65), (127, 36), (3, 3, 3, 3))
         c_money.add_element(
-            TextH("{}g", (9, 5), self.__font_small, self.__color_golden, 
-                  self.player.get_money)
+            TextUpdated(
+                "{}g", self.__font_small, self.__color_golden, 
+                self.player.get_money
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(9, 0)
         )
         # Health
         c_health = Container((offset_x+1057, offset_y+65), (158, 36), (3, 6, 6, 3))
         c_health.add_element(
-            Text("Lives", (9, 5), self.__font_small, self.__color_white)
+            TextPlain("Lives", self.__font_small, self.__color_white),
+            Allignment.LEFT_WALL,
+            nudge=(9, 0)
         )
         c_health.add_element(
             HealthBar(
@@ -1239,36 +1372,60 @@ class GameStateManager(pygame.sprite.Sprite):
         # Plasma Gun
         c_weapon_1 = Container((offset_x+760, offset_y+65+row_height*1), (455, 36), (6, 6, 6, 6))
         c_weapon_1.add_element(
-            TextH("Weapon 1: {}.v{}", (12, 5), self.__font_small, self.__color_white,
-                  self.player.weapon_plasmagun.get_name,
-                  lambda: self.player.get_part_level(ShipPart.PLASMAGUN))
+            TextUpdated(
+                "Weapon 1: {}.v{}", self.__font_small, self.__color_white,
+                self.player.weapon_plasmagun.get_name,
+                lambda: self.player.get_part_level(ShipPart.PLASMAGUN)
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
         )
         c_weapon_1_proj = Container((offset_x+760, offset_y+65+row_height*2), (409, 36), (6, 3, 3, 6))
         c_weapon_1_proj.add_element(
-            TextH("Projectiles: {}", (12, 5), self.__font_small, self.__color_white,
-                  lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.PLASMAGUN_PROJECTILES))
+            TextUpdated(
+                "Projectiles: {}", self.__font_small, self.__color_white,
+                lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.PLASMAGUN_PROJECTILES)
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
         )
         c_weapon_1_cd = Container((offset_x+760, offset_y+65+row_height*3), (409, 36), (6, 3, 3, 6))
         c_weapon_1_cd.add_element(
-            TextH("Cooldown: {}", (12, 5), self.__font_small, self.__color_white,
-                  lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.PLASMAGUN_COOLDOWN))
+            TextUpdated(
+                "Cooldown: {}", self.__font_small, self.__color_white,
+                lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.PLASMAGUN_COOLDOWN)
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
         )
         #Bomb Launcher
         c_weapon_2 = Container((offset_x+760, offset_y+65+row_height*4), (455, 36), (6, 6, 6, 6))
         c_weapon_2.add_element(
-            TextH("Weapon 2: {}.v{}", (12, 5), self.__font_small, self.__color_white,
-                  self.player.weapon_bomblauncher.get_name,
-                  lambda: self.player.get_part_level(ShipPart.BOMBLAUNCHER))
+            TextUpdated(
+                "Weapon 2: {}.v{}", self.__font_small, self.__color_white,
+                self.player.weapon_bomblauncher.get_name,
+                lambda: self.player.get_part_level(ShipPart.BOMBLAUNCHER)
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
         )
         c_weapon_2_rad = Container((offset_x+760, offset_y+65+row_height*5), (409, 36), (6, 3, 3, 6))
         c_weapon_2_rad.add_element(
-            TextH("Radius: {}", (12, 5), self.__font_small, self.__color_white,
-                  lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.BOMBLAUNCHER_RADIUS))
+            TextUpdated(
+                "Radius: {}", self.__font_small, self.__color_white,
+                lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.BOMBLAUNCHER_RADIUS)
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
         )
         c_weapon_2_fuse = Container((offset_x+760, offset_y+65+row_height*6), (409, 36), (6, 3, 3, 6))
         c_weapon_2_fuse.add_element(
-            TextH("Fuse: {}", (12, 5), self.__font_small, self.__color_white,
-                  lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.BOMBLAUNCHER_FUSE))
+            TextUpdated(
+                "Fuse: {}", self.__font_small, self.__color_white,
+                lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.BOMBLAUNCHER_FUSE)
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
         )
 
         self.__containers_pause_menu.extend(
@@ -1287,11 +1444,12 @@ class GameStateManager(pygame.sprite.Sprite):
             self.player.is_auto_shooting
         )
         s_auto_shoot.add_description(
-            Text("Switch the AUTO-SHOOT on/off", (0, 0), self.__font_very_small, self.__color_white)
+            TextPlain("Switch the AUTO-SHOOT on/off", self.__font_very_small, self.__color_white)
         )
         s_auto_shoot.set_active_outline_color(self.__color_green)
         s_auto_shoot.add_element(
-            Text("AU", (1, 7), self.__font_small, self.__color_blue)
+            TextPlain("AU", self.__font_small, self.__color_blue),
+            Allignment.CENTER
         )
         s_auto_shoot.set_active_outline_color = self.__color_green
 
@@ -1301,7 +1459,8 @@ class GameStateManager(pygame.sprite.Sprite):
             self.player_stats.switch_ship_model_to_previous
         )
         b_model_left.add_element(
-            Text("<", (12, 5), self.__font_small, self.__color_blue)
+            TextPlain("<", self.__font_small, self.__color_blue),
+            Allignment.CENTER
         )
 
         b_model_right = Button(
@@ -1309,7 +1468,8 @@ class GameStateManager(pygame.sprite.Sprite):
             self.player_stats.switch_ship_model_to_next
         )
         b_model_right.add_element(
-            Text(">", (12, 5), self.__font_small, self.__color_blue)
+            TextPlain(">", self.__font_small, self.__color_blue),
+            Allignment.CENTER
         )
         # Heal
         b_heal = Button(
@@ -1319,7 +1479,8 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         b_heal.set_outline_color(self.__color_green)
         b_heal.add_element(
-            Text("/\\", (5, 5), self.__font_small, self.__color_green)
+            TextPlain("/\\", self.__font_small, self.__color_green),
+            Allignment.CENTER
         )
         # Magnet
         b_magnet_rad = Button(
@@ -1329,7 +1490,8 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         b_magnet_rad.set_outline_color(self.__color_green)
         b_magnet_rad.add_element(
-            Text("/\\", (5, 5), self.__font_small, self.__color_green)
+            TextPlain("/\\", self.__font_small, self.__color_green),
+            Allignment.CENTER
         )
 
         b_magnet_str = Button(
@@ -1339,7 +1501,8 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         b_magnet_str.set_outline_color(self.__color_green)
         b_magnet_str.add_element(
-            Text("/\\", (5, 5), self.__font_small, self.__color_green)
+            TextPlain("/\\", self.__font_small, self.__color_green),
+            Allignment.CENTER
         )
 
         # Upgrade weapons
@@ -1350,7 +1513,8 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         b_weapon_1_proj_up.set_outline_color(self.__color_green)
         b_weapon_1_proj_up.add_element(
-            Text("/\\", (5, 5), self.__font_small, self.__color_green)
+            TextPlain("/\\", self.__font_small, self.__color_green),
+            Allignment.CENTER
         )
         b_weapon_1_cd_up = Button(
             (offset_x+1179, offset_y+65+row_height*3), (36, 36), (3, 6, 6, 3),
@@ -1359,7 +1523,8 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         b_weapon_1_cd_up.set_outline_color(self.__color_green)
         b_weapon_1_cd_up.add_element(
-            Text("/\\", (5, 5), self.__font_small, self.__color_green)
+            TextPlain("/\\", self.__font_small, self.__color_green),
+            Allignment.CENTER
         )
         
         b_weapon_2_rad_up = Button(
@@ -1369,7 +1534,8 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         b_weapon_2_rad_up.set_outline_color(self.__color_green)
         b_weapon_2_rad_up.add_element(
-            Text("/\\", (5, 5), self.__font_small, self.__color_green)
+            TextPlain("/\\", self.__font_small, self.__color_green),
+            Allignment.CENTER
         )
         b_weapon_2_fuse_up = Button(
             (offset_x+1179, offset_y+65+row_height*6), (36, 36), (3, 6, 6, 3),
@@ -1378,7 +1544,8 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         b_weapon_2_fuse_up.set_outline_color(self.__color_green)
         b_weapon_2_fuse_up.add_element(
-            Text("/\\", (5, 5), self.__font_small, self.__color_green)
+            TextPlain("/\\", self.__font_small, self.__color_green),
+            Allignment.CENTER
         )
 
         # Ends the run and returns to the main menu
@@ -1390,10 +1557,11 @@ class GameStateManager(pygame.sprite.Sprite):
         b_end_run.set_outline_color(self.__color_red)
         b_end_run.set_fill_color(self.__color_red_fill)
         b_end_run.add_description(
-            Text("SHIFT+Click to end the run early", (0, 0), self.__font_very_small, self.__color_white)
+            TextPlain("SHIFT+Click to end the run early", self.__font_very_small, self.__color_white)
         )
         b_end_run.add_element(
-            Text("End Run", (54, 10), self.__font_big, self.__color_red)
+            TextPlain("End Run", self.__font_big, self.__color_red),
+            Allignment.CENTER
         )
 
         self.__buttons_pause_menu.extend(
@@ -1413,8 +1581,11 @@ class GameStateManager(pygame.sprite.Sprite):
 
         c_background = Container((root_x, root_y), (450, 210), (10, 25, 10, 25))
         c_background.add_element(
-            TextF("New record! {}pts", (15, 7), self.__font_medium, self.__color_white, 
-                  self.game.rsm.score)
+            TextPlain(
+                "New record! {}pts", self.__font_medium, self.__color_white, 
+                self.game.rsm.score
+            ),
+            nudge=(15, 7)
         )
 
         self.__containers_name_check.extend(
@@ -1428,11 +1599,34 @@ class GameStateManager(pygame.sprite.Sprite):
             self.game.finish_round
         )
         b_confirm.add_element(
-            Text("Confirm", (10, 8), self.__font_medium, self.__color_blue)
+            TextPlain("Confirm", self.__font_medium, self.__color_blue),
+            Allignment.CENTER
         )
 
         self.__buttons_name_check.extend(
             [b_confirm]
+        )
+
+    def __initialize_test_menu(self):
+        """Place stuff here and assign as starting menu to test things without breaking anything else."""
+
+        self.__containers_test_menu : list[Container] = []
+        self.__buttons_test_menu : list[Button | Switch] = []
+        
+        res = self.game.screen_resolution
+
+        # <> Containers <>
+
+        container = Container((10, 10), (res[0]-20, res[1]-20), (5, 5, 5, 5))
+
+        self.__containers_test_menu.extend(
+            [container]
+        )
+        
+        # <> Buttons <>
+
+        self.__buttons_test_menu.extend(
+            []
         )
 
     ### Template for menus
