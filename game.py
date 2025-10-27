@@ -49,12 +49,12 @@ class Game():
         self.cleanup = pygame.sprite.Group()   # This group is cleaned (object.kill()) after each round
 
         GameStateManager.containers = (self.drawable)
-        RoundStateManager.containers = (self.updatable)
+        RoundStateManager.containers = (self.updatable, self.cleanup)
 
         StarField.containers = (self.drawable)
         Explosion.containers = (self.updatable, self.drawable, self.cleanup)
 
-        Player.containers = (self.updatable, self.drawable)
+        Player.containers = (self.updatable, self.drawable) # Not part of self.cleanup, instead removed in .initialize_new_player (so only removed when swapping saves)
         ProjectilePlasma.containers = (self.projectiles, self.updatable, self.drawable, self.moving_objects, self.cleanup)
         Bomb.containers = (self.drawable, self.updatable, self.cleanup)
         BombExplosion.containers = (self.explosion_hitboxes, self.cleanup)
