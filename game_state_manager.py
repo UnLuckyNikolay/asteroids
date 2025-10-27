@@ -19,7 +19,7 @@ from ui_elements.personal_sprites.getter import get_personal_sprite
 from round_state_manager import RoundStateManager
 from player.player import Player, ShipUpgrade, ShipPart
 from player.player_stats import PlayerStats
-from player.ship import Ship, ShipType
+from player.ship import Ship, ShipModel
 
 
 # New menus should be added to:
@@ -88,7 +88,7 @@ class GameStateManager(pygame.sprite.Sprite):
 
         # Defaults used for loading save in profile selection if something is missing
         self.__default_player_name = "Player"
-        self.__default_ship_model = ShipType.HAWK3 # Value of the ShipType Enum
+        self.__default_ship_model = ShipModel.HAWK3 # Value of the ShipType Enum
 
         # Fonts
         self.__font_very_small = pygame.font.Font(font_path, 16)
@@ -567,7 +567,10 @@ class GameStateManager(pygame.sprite.Sprite):
                 color_override_and_lock=self.__color_white
             )
             b_pf0.add_element(
-                Ship(self.__profiles[0]["player_stats_save"].get("ship_model_value", self.__default_ship_model), 0),
+                Ship(
+                    self.__profiles[0]["player_stats_save"].get("ship_model_value", self.__default_ship_model),
+                    color_profile=self.__profiles[0]["player_stats_save"].get("ship_color_profile", 0)
+                ),
                 Allignment.UPPER_RIGHT_CORNER,
                 nudge=(-70, 70)
             )
@@ -629,7 +632,10 @@ class GameStateManager(pygame.sprite.Sprite):
                 color_override_and_lock=self.__color_white
             )
             b_pf1.add_element(
-                Ship(self.__profiles[1]["player_stats_save"].get("ship_model_value", self.__default_ship_model), 0),
+                Ship(
+                    self.__profiles[1]["player_stats_save"].get("ship_model_value", self.__default_ship_model),
+                    color_profile=self.__profiles[1]["player_stats_save"].get("ship_color_profile", 0)
+                ),
                 Allignment.UPPER_RIGHT_CORNER,
                 nudge=(-70, 70)
             )
@@ -691,7 +697,10 @@ class GameStateManager(pygame.sprite.Sprite):
                 color_override_and_lock=self.__color_white
             )
             b_pf2.add_element(
-                Ship(self.__profiles[2]["player_stats_save"].get("ship_model_value", self.__default_ship_model), 0),
+                Ship(
+                    self.__profiles[2]["player_stats_save"].get("ship_model_value", self.__default_ship_model),
+                    color_profile=self.__profiles[2]["player_stats_save"].get("ship_color_profile", 0)
+                ),
                 Allignment.UPPER_RIGHT_CORNER,
                 nudge=(-70, 70)
             )
@@ -817,7 +826,7 @@ class GameStateManager(pygame.sprite.Sprite):
             nudge=(text_nudge_x, 77)
         )
         c_profile.add_element(
-            Ship(self.player_stats.ship_model_value, 0),
+            Ship(self.player_stats.ship_model_value, color_profile=self.player_stats.ship_color_profile),
             Allignment.UPPER_RIGHT_CORNER,
             nudge=(-70, 70)
         )
@@ -925,7 +934,7 @@ class GameStateManager(pygame.sprite.Sprite):
             (root_x, root_y), (800, size_y), (7, 7, 30, 30)
         )
         c_profile.add_element(
-            Ship(self.player_stats.ship_model_value, 0),
+            Ship(self.player_stats.ship_model_value, color_profile=self.player_stats.ship_color_profile),
             Allignment.UPPER_RIGHT_CORNER, 
             nudge=(-70, 70)
         )
@@ -1162,10 +1171,10 @@ class GameStateManager(pygame.sprite.Sprite):
         )
 
         # UFO secret
-        if not self.player_stats.check_unlocked_ship(ShipType.UFO2):
+        if not self.player_stats.check_unlocked_ship(ShipModel.UFO2):
             b_ufo = ButtonRound(
                 (res[0]-30, res[1]-20), 6,
-                lambda: self.unlock_ship(ShipType.UFO2)
+                lambda: self.unlock_ship(ShipModel.UFO2)
             )
             b_ufo.set_outline_color(self.__color_gray)
             b_ufo.set_fill_color(self.__color_green)
@@ -1274,6 +1283,11 @@ class GameStateManager(pygame.sprite.Sprite):
         c_ship = Container((offset_x+65, offset_y+65), (210, 210), (12, 6, 6, 6))
         c_ship.add_element(
             self.player.get_ship, 
+            Allignment.CENTER
+        )
+        c_colors = Container((offset_x+65, offset_y+285), (210, 30), (6, 6, 6, 6))
+        c_colors.add_element(
+            TextPlain("Colors", self.__font_small, self.__color_white),
             Allignment.CENTER
         )
 
@@ -1464,10 +1478,49 @@ class GameStateManager(pygame.sprite.Sprite):
             [c_background, c_ship, c_model, c_switch_model, c_heal,
              c_magnet, c_magnet_rad, c_magnet_str, c_points, c_money,
              c_health, c_weapon_1, c_weapon_1_proj, c_weapon_2, c_weapon_2_rad,
-             c_weapon_2_fuse, c_weapon_1_cd, c_engine, c_engine_acc, c_engine_speed]
+             c_weapon_2_fuse, c_weapon_1_cd, c_engine, c_engine_acc, c_engine_speed,
+             c_colors]
         )
         
         # <> Buttons <>
+
+        # Color profiles # 30 for in between, 45 for button
+        b_color1 = Switch(
+            (offset_x+65, offset_y+325), (45, 30), (6, 3, 3, 6),
+            lambda: self.player.switch_color_profile(0),
+            lambda: self.player.ship.color_profile == 0
+        )
+        b_color1.add_element(
+            TextPlain("1", self.__font_small, self.__color_blue),
+            Allignment.CENTER
+        )
+        b_color2 = Switch(
+            (offset_x+120, offset_y+325), (45, 30), (3, 3, 3, 3),
+            lambda: self.player.switch_color_profile(1),
+            lambda: self.player.ship.color_profile == 1
+        )
+        b_color2.add_element(
+            TextPlain("2", self.__font_small, self.__color_blue),
+            Allignment.CENTER
+        )
+        b_color3 = Switch(
+            (offset_x+175, offset_y+325), (45, 30), (3, 3, 3, 3),
+            lambda: self.player.switch_color_profile(2),
+            lambda: self.player.ship.color_profile == 2
+        )
+        b_color3.add_element(
+            TextPlain("3", self.__font_small, self.__color_blue),
+            Allignment.CENTER
+        )
+        b_color4 = Switch(
+            (offset_x+230, offset_y+325), (45, 30), (3, 6, 6, 3),
+            lambda: self.player.switch_color_profile(3),
+            lambda: self.player.ship.color_profile == 3
+        )
+        b_color4.add_element(
+            TextPlain("4", self.__font_small, self.__color_blue),
+            Allignment.CENTER
+        )
 
         # Switch - Auto-Shoot
         s_auto_shoot = Switch(
@@ -1478,12 +1531,10 @@ class GameStateManager(pygame.sprite.Sprite):
         s_auto_shoot.add_description(
             TextPlain("Switch the AUTO-SHOOT on/off", self.__font_very_small, self.__color_white)
         )
-        s_auto_shoot.set_active_outline_color(self.__color_green)
         s_auto_shoot.add_element(
             TextPlain("AU", self.__font_small, self.__color_blue),
             Allignment.CENTER
         )
-        s_auto_shoot.set_active_outline_color = self.__color_green
 
         # Model switching
         b_model_left = Button(
@@ -1621,7 +1672,8 @@ class GameStateManager(pygame.sprite.Sprite):
         self.__buttons_pause_menu.extend(
             [b_model_left, b_model_right, b_heal, b_magnet_rad, b_magnet_str,
              b_end_run, s_auto_shoot, b_weapon_1_cd_up, b_weapon_1_proj_up, b_weapon_2_fuse_up,
-             b_weapon_2_rad_up, b_engine_speed, b_engine_acc]
+             b_weapon_2_rad_up, b_engine_speed, b_engine_acc, b_color1, b_color2,
+             b_color3, b_color4]
         )
 
     def __initialize_name_check(self):
@@ -1717,6 +1769,6 @@ class GameStateManager(pygame.sprite.Sprite):
                     else:
                         self.__konami_progress = 0
 
-    def unlock_ship(self, ship_type : ShipType):
+    def unlock_ship(self, ship_type : ShipModel):
         self.player_stats.unlock_ship(ship_type)
         self.initialize_current_menu()

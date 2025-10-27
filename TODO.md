@@ -28,7 +28,7 @@ FIXES/TWEAKS:
 IDEAS:
 - [x] Graphics/color adjustments for the leaderboards for top places
 - [x] Add auto-shoot switch
-- [ ] FOR NEXT VERSION >>> Add ship recolors
+- [x] Add ship recolors
 - [ ] Additional ship skins:
     - [x] UFO - will need new parts and 2 engines
     - [ ] Classic/cartoon-ish rocket

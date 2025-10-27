@@ -1,4 +1,4 @@
-from player.ship import ShipType
+from player.ship import ShipModel
 
 from round_state_manager import RoundStateManager
 # from asteroids.asteroid import Asteroid
@@ -19,15 +19,16 @@ class PlayerStats():
         self.longest_run : float = 0 # In seconds
 
         self.unlocked_ships : list[list[int | bool]] = [
-            [int(ShipType.POLY1.value), True],
-            [int(ShipType.HAWK1.value), True],
-            [int(ShipType.HAWK2.value), True],
-            [int(ShipType.HAWK3.value), True],
-            [int(ShipType.UFO2.value), False],
+            [int(ShipModel.POLY1.value), True],
+            [int(ShipModel.HAWK1.value), True],
+            [int(ShipModel.HAWK2.value), True],
+            [int(ShipModel.HAWK3.value), True],
+            [int(ShipModel.UFO2.value), False],
         ]
         self.unlocked_ships_amount = self.__get_amount_of_unlocked_ship()
         self.__ship_model_index : int = 3 # Index for the .unlocked_ships
         self.ship_model_value : int = self.unlocked_ships[self.ship_model_index][0] # For Profile selection ship
+        self.ship_color_profile : int = 0
 
         self.found_cheats : bool = False
         self.cheat_godmode : bool = False
@@ -57,9 +58,9 @@ class PlayerStats():
             self.__ship_model_index = value
             self.ship_model_value = self.unlocked_ships[self.__ship_model_index][0]
             if self.player != None:
-                self.player.ship.switch_model(self.unlocked_ships[self.ship_model_index][0])
+                self.player.ship.switch_model(self.unlocked_ships[self.ship_model_index][0], self.ship_color_profile)
 
-    def unlock_ship(self, ship_type : ShipType):
+    def unlock_ship(self, ship_type : ShipModel):
         id = ship_type.value
         for i in range(len(self.unlocked_ships)):
             if self.unlocked_ships[i][0] == id:
@@ -67,7 +68,7 @@ class PlayerStats():
                 self.unlocked_ships_amount = self.__get_amount_of_unlocked_ship()
                 return
             
-    def check_unlocked_ship(self, ship_type : ShipType):
+    def check_unlocked_ship(self, ship_type : ShipModel):
         id = ship_type.value
         for i in range(len(self.unlocked_ships)):
             if self.unlocked_ships[i][0] == id:
@@ -93,7 +94,8 @@ class PlayerStats():
 
     def set_player(self, player):
         self.player = player
-        self.player.ship.switch_model(self.unlocked_ships[self.ship_model_index][0])
+        self.player.ship.switch_model(self.unlocked_ships[self.ship_model_index][0], self.ship_color_profile)
+        print(f"Setting player ship to {self.unlocked_ships[self.ship_model_index][0]}, color profile to {self.ship_color_profile}")
 
     def get_save(self) -> dict:
         player_stats_save = {
@@ -107,6 +109,7 @@ class PlayerStats():
             "unlocked_ships" : self.unlocked_ships,
             "ship_model_index" : self.ship_model_index,
             "ship_model_value" : self.ship_model_value,
+            "ship_color_profile" : self.ship_color_profile,
 
             # Cheats
             "found_cheats" : self.found_cheats,
@@ -140,6 +143,7 @@ class PlayerStats():
             # Ship
             self.unlocked_ships = player_stats_save.get("unlocked_ships", self.unlocked_ships)
             self.ship_model_index = player_stats_save.get("ship_model_index", self.ship_model_index)
+            self.ship_color_profile = player_stats_save.get("ship_color_profile", self.ship_color_profile)
             self.unlocked_ships_amount = self.__get_amount_of_unlocked_ship()
 
             # Cheats
@@ -161,6 +165,9 @@ class PlayerStats():
             self.collected_ores_silver = player_stats_save.get("collected_ores_silver", self.collected_ores_silver)
             self.collected_ores_golden = player_stats_save.get("collected_ores_golden", self.collected_ores_golden)
             self.collected_diamonds = player_stats_save.get("collected_diamonds", self.collected_diamonds)
+
+        if self.player != None:
+            self.player.ship.switch_model(self.unlocked_ships[self.ship_model_index][0], self.ship_color_profile)
 
     def get_longest_time_as_text(self) -> str:
         seconds = int(self.longest_run%60)

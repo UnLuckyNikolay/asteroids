@@ -6,7 +6,7 @@ from shapes.circleshape import CircleShape
 from player.weapons.plasmagun import PlasmaGun
 from player.weapons.bomblauncher import BombLauncher
 from player.ship_parts.magnet import Magnet
-from player.ship import Ship, ShipType
+from player.ship import Ship, ShipModel
 from player.player_stats import PlayerStats
 
 
@@ -271,6 +271,10 @@ class Player(CircleShape):
                 return self.weapon_plasmagun._level
             case ShipPart.BOMBLAUNCHER:
                 return self.weapon_bomblauncher._level
+    
+    def switch_color_profile(self, number : int):
+        self.ship.switch_color_profile(number)
+        self.stats.ship_color_profile = number
     
     ### Health
     

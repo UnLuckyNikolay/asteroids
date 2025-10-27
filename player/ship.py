@@ -1,10 +1,15 @@
-import pygame, pygame.gfxdraw, copy
+import pygame, pygame.gfxdraw
 from enum import Enum
 
 from constants import *
 
 
-class ShipType(Enum):
+# New models should be added to:
+# .get_name
+# .__get_parts
+# _get_parts_*model name*
+# get_color_profile
+class ShipModel(Enum):
     POLY1 = 11
     HAWK1 = 21
     HAWK2 = 22
@@ -12,11 +17,12 @@ class ShipType(Enum):
     UFO2 = 32
 
 class Ship():
-    def __init__(self, ship_type : ShipType | int, hitbox_radius):
-        if ship_type is ShipType:
-            self.ship_type = ship_type
+    def __init__(self, ship_model : ShipModel | int, hitbox_radius : int = 0, color_profile : int = 0):
+        if ship_model is ShipModel:
+            self.model = ship_model
         else:
-            self.ship_type = ShipType(ship_type)
+            self.model = ShipModel(ship_model)
+        self.color_profile : int = color_profile
         self.time : float = 0
         self.current_parts : list[PartPolygon | PartCircle | PartEngineVfx]
         self.alpha : int = 255
@@ -29,31 +35,39 @@ class Ship():
         self.engine_vfx_current_frame : int = 0
         self.engine_vfx_frames_amount : int = 4
         
-        self.switch_model(self.ship_type)
+        self.switch_model(self.model)
 
     def update(self, dt):
         self.time += dt
         self.engine_vfx_current_frame = int((self.time // self.engine_vfx_timer) % self.engine_vfx_frames_amount)
 
     def get_name(self) -> str:
-        match self.ship_type:
-            case ShipType.POLY1:
+        match self.model:
+            case ShipModel.POLY1:
                 return "Poly.v1"
-            case ShipType.HAWK1:
+            case ShipModel.HAWK1:
                 return "Hawk.v1"
-            case ShipType.HAWK2:
+            case ShipModel.HAWK2:
                 return "Hawk.v2"
-            case ShipType.HAWK3:
+            case ShipModel.HAWK3:
                 return "Hawk.v3"
-            case ShipType.UFO2:
-                return "UFO.v1" # named v1 for the lack of Poly version
+            case ShipModel.UFO2:
+                return "UFO.v1" # named v1 for the lack of black and white version
 
-    def switch_model(self, ship_type : ShipType):
-        if ship_type is ShipType:
-            self.ship_type = ship_type
+    def switch_model(self, ship_model : ShipModel, color_profile : int | None = None):
+        if ship_model is ShipModel:
+            self.model = ship_model
         else:
-            self.ship_type = ShipType(ship_type)
-        self.current_parts = self.__get_parts(self.ship_type)
+            self.model = ShipModel(ship_model)
+        if color_profile == None:
+            self.current_parts = self.__get_parts(self.model, get_color_profile(self.model, self.color_profile))
+        else:
+            self.color_profile = color_profile
+            self.current_parts = self.__get_parts(self.model, get_color_profile(self.model, color_profile))
+
+    def switch_color_profile(self, number : int):
+        self.color_profile = number
+        self.current_parts = self.__get_parts(self.model, get_color_profile(self.model, number))
 
     def switch_hitbox_to(self, boolean : bool):
         self.show_hitbox = boolean
@@ -84,22 +98,26 @@ class Ship():
             part.draw_scaled(screen, *position, multiplier)
 
     
-    def __get_parts(self, ship_type : ShipType, hull_color_override : tuple[int, int, int] | None = None) -> list:
+    def __get_parts(
+            self, 
+            ship_model : ShipModel, 
+            color_profile
+        ) -> list:
         """Returns list of parts, tuple(x, y) indicating engine vfx anchor spot, list of engine vfx colors."""
 
-        match ship_type:
-            case ShipType.POLY1:
-                return _get_parts_poly_v1(hull_color_override)
-            case ShipType.HAWK1:
-                return _get_parts_hawk_v1(hull_color_override)
-            case ShipType.HAWK2:
-                return _get_parts_hawk_v2(hull_color_override)
-            case ShipType.HAWK3:
-                return _get_parts_hawk_v3(hull_color_override)
-            case ShipType.UFO2:
-                return _get_parts_ufo_v2(hull_color_override)
+        match ship_model:
+            case ShipModel.POLY1:
+                return _get_parts_poly_v1(*color_profile)
+            case ShipModel.HAWK1:
+                return _get_parts_hawk_v1(*color_profile)
+            case ShipModel.HAWK2:
+                return _get_parts_hawk_v2(*color_profile)
+            case ShipModel.HAWK3:
+                return _get_parts_hawk_v3(*color_profile)
+            case ShipModel.UFO2:
+                return _get_parts_ufo_v2(*color_profile)
             case _:
-                print(f"> Error: Missing `{ship_type}` in ship.__get_parts")
+                print(f"> Error: Missing `{ship_model}` in ship.__get_parts")
                 return None # pyright: ignore[reportReturnType]
 
 
@@ -122,12 +140,12 @@ class PartLine():
         self.color = color
 
     def draw_rotated(self, screen, position : pygame.Vector2, rotation : float, alpha : int, is_accelerating : bool, current_frame):
-        dots = rotate_part([self.start, self.end], position, rotation)
+        dots = _rotate_part([self.start, self.end], position, rotation)
 
         pygame.draw.line(screen, (*self.color, alpha), dots[0], dots[1], self.thickness)
         
     def draw_scaled(self, screen, x, y, multiplier):
-        dots = move_and_scale_part([self.start, self.end], (x, y), multiplier)
+        dots = _move_and_scale_part([self.start, self.end], (x, y), multiplier)
 
         pygame.draw.line(screen, self.color, dots[0], dots[1], self.thickness*multiplier)
 
@@ -149,14 +167,14 @@ class PartPolygon():
         self.color_outline = color_outline
 
     def draw_rotated(self, screen, position : pygame.Vector2, rotation : float, alpha : int, is_accelerating : bool, current_frame):
-        dots = rotate_part(self.dots, position, rotation)
+        dots = _rotate_part(self.dots, position, rotation)
 
         pygame.gfxdraw.filled_polygon(screen, dots, (*self.color_fill, alpha))
         if self.color_outline != None:
             pygame.draw.polygon(screen, (*self.color_outline, alpha), dots, 2)
         
     def draw_scaled(self, screen, x, y, multiplier):
-        dots = move_and_scale_part(self.dots, (x, y), multiplier)
+        dots = _move_and_scale_part(self.dots, (x, y), multiplier)
 
         pygame.gfxdraw.filled_polygon(screen, dots, self.color_fill)
         if self.color_outline != None:
@@ -174,7 +192,7 @@ class PartCircle():
         self.color_fill = color_fill
 
     def draw_rotated(self, screen, position : pygame.Vector2, rotation : float, alpha : int, is_accelerating : bool, current_frame):
-        center = rotate_part([self.center], position, rotation)[0]
+        center = _rotate_part([self.center], position, rotation)[0]
 
         pygame.gfxdraw.filled_circle(screen, *center, self.radius, (*self.color_fill, alpha))
         
@@ -208,14 +226,14 @@ class PartEngineVfx():
         ]
         for i in range(len(self.dots_all)):
             for j in range(len(self.dots_all[i])):
-                self.dots_all[i][j] = get_moved_part(self.dots_all[i][j], anchor)
+                self.dots_all[i][j] = _get_moved_part(self.dots_all[i][j], anchor)
 
     def draw_rotated(self, screen, position : pygame.Vector2, rotation : float, alpha : int, is_accelerating : bool, current_frame):
         if not is_accelerating:
             return
     
-        dots_outer = rotate_part(self.dots_all[current_frame][0], position, rotation)
-        dots_inner = rotate_part(self.dots_all[current_frame][1], position, rotation)
+        dots_outer = _rotate_part(self.dots_all[current_frame][0], position, rotation)
+        dots_inner = _rotate_part(self.dots_all[current_frame][1], position, rotation)
 
         if self.color_outline != None:
             pygame.gfxdraw.filled_polygon(screen, dots_outer, (*self.color_outline, alpha))
@@ -223,9 +241,9 @@ class PartEngineVfx():
         
     def draw_scaled(self, screen, x, y, multiplier):
         return # Engine VFX isn't drawn in menus
-    
 
-def rotate_part(part : list[tuple[int, int]], position : pygame.Vector2, rotation : float) -> list[tuple[int, int]]:
+
+def _rotate_part(part : list[tuple[int, int]], position : pygame.Vector2, rotation : float) -> list[tuple[int, int]]:
     """Returns a rotated copy of a part."""
 
     rotated_part = []
@@ -234,7 +252,7 @@ def rotate_part(part : list[tuple[int, int]], position : pygame.Vector2, rotatio
         rotated_part.append((int(position.x + dot_rotated.x), int(position.y + dot_rotated.y)))
     return rotated_part
 
-def move_and_scale_part(part : list[tuple[int, int]], move_xy : tuple[int, int], multiplier : int) -> list[tuple[int, int]]:
+def _move_and_scale_part(part : list[tuple[int, int]], move_xy : tuple[int, int], multiplier : int) -> list[tuple[int, int]]:
     """Returns a moved and scaled copy of a part."""
 
     new_part = []
@@ -242,14 +260,40 @@ def move_and_scale_part(part : list[tuple[int, int]], move_xy : tuple[int, int],
         new_part.append((dot[0]*multiplier+move_xy[0], dot[1]*multiplier+move_xy[1]))
     return new_part
 
-def get_moved_part(part : list[tuple[int, int]], move_xy : tuple[int, int]) -> list[tuple[int, int]]:
+def _get_moved_part(part : list[tuple[int, int]], move_xy : tuple[int, int]) -> list[tuple[int, int]]:
     moved_part = []
     for dot in part:
         moved_part.append((dot[0]+move_xy[0], dot[1]+move_xy[1]))
     return moved_part
 
-def _get_darkened_color(color : tuple[int, int, int], mp : float):
-    return((int(color[0]*mp), int(color[1]*mp), int(color[2]*mp)))
+def _get_multiplied_color(color : tuple[int, int, int], mp : float) -> tuple[int, int, int]:
+    return min(int(color[0]*mp), 255), min(int(color[1]*mp), 255), min(int(color[2]*mp), 255)
+
+def get_color_profile(
+        ship_model : ShipModel, 
+        number : int
+    ) -> tuple[tuple[int, int, int] | None, tuple[int, int, int] | None, bool]:
+    classic = [
+        ((0, 0, 0), None, False), 
+        ((20, 100, 200), None, False),
+        ((125, 0, 0), (0, 0, 0), False),
+        ((255, 255, 255), (0, 0, 0), False)
+    ]
+    colored = [
+        ((150, 150, 170), None, False),
+        ((255, 255, 255), (75, 75, 75), False),
+        ((60, 60, 45), (180, 100, 50), True),
+        ((145, 70, 130), (105, 165, 135), True),
+    ]
+    match ship_model:
+        case ShipModel.POLY1 | ShipModel.HAWK1:
+            if number >= len(classic):
+                return classic[0]
+            return classic[number]
+        case ShipModel.HAWK2 | ShipModel.HAWK3 | ShipModel.UFO2:
+            if number >= len(colored):
+                return colored[0]
+            return colored[number]
 
 ### Parts
 # Order of parts determines the order of drawing
@@ -271,51 +315,77 @@ def _get_darkened_color(color : tuple[int, int, int], mp : float):
 
 # blue_bp = (20, 100, 200)
 
-def _get_parts_poly_v1(hull_colot_override : tuple[int, int, int] | None = None) -> list:
-    hull_color = (0, 0, 0)
-    if hull_colot_override != None:
-        hull_color = hull_colot_override
+color_2_mp = 0.8
+color_3_mp = 0.6
+color_2_mp_inverted = 1.75
+color_3_mp_inverted = 2.5
 
-    white = (255, 255, 255)
+def _get_parts_poly_v1(
+        hull_color_override : tuple[int, int, int] | None = None, 
+        outline_color_override : tuple[int, int, int] | None = None,
+        inverted_colors : bool = False
+    ) -> list:
+    hull_color = (0, 0, 0)
+    if hull_color_override != None:
+        hull_color = hull_color_override
+    outline_color = (255, 255, 255)
+    if outline_color_override != None:
+        outline_color = outline_color_override
 
     parts = [
-        PartEngineVfx((0, 15), hull_color, white),
-        PartPolygon([(0, -20), (-10, 15), (10, 15)], hull_color, white),
+        PartEngineVfx((0, 15), hull_color, outline_color),
+        PartPolygon([(0, -20), (-10, 15), (10, 15)], hull_color, outline_color),
     ]
 
     return parts
 
-def _get_parts_hawk_v1(hull_colot_override : tuple[int, int, int] | None = None) -> list:
+def _get_parts_hawk_v1(
+        hull_color_override : tuple[int, int, int] | None = None, 
+        outline_color_override : tuple[int, int, int] | None = None,
+        inverted_colors : bool = False
+    ) -> list:
     hull_color = (0, 0, 0)
-    if hull_colot_override != None:
-        hull_color = hull_colot_override
-
-    white = (255, 255, 255)
+    if hull_color_override != None:
+        hull_color = hull_color_override
+    outline_color = (255, 255, 255)
+    if outline_color_override != None:
+        outline_color = outline_color_override
 
     parts = [
-        PartEngineVfx((0, 20), hull_color, white),
+        PartEngineVfx((0, 20), hull_color, outline_color),
 
-        PartLine((0, -18), (0, -23), 2, white), # Guns
-        PartLine((20, -4), (20, -9), 2, white),
-        PartLine((-20, -4), (-20, -9), 2, white),
+        PartLine((0, -18), (0, -23), 2, outline_color), # Guns
+        PartLine((20, -4), (20, -9), 2, outline_color),
+        PartLine((-20, -4), (-20, -9), 2, outline_color),
 
-        PartPolygon([(-25, -4), (25, -4), (22, 5), (0, 11), (-22, 5)], hull_color, white), # Wings
-        PartPolygon([(7, 0), (-7, 0), (-4, -18), (4, -18)], hull_color, white), # Cockpit
-        PartPolygon([(5, 3), (-5, 3), (-2, -15), (2, -15)], hull_color, white), # Cockpit window
-        PartPolygon([(15, 0), (-15, 0), (-10, 12), (10, 12)], hull_color, white), # Center part
-        PartPolygon([(-5, 12), (5, 12), (8, 20), (-8, 20)], hull_color, white), # Engine
+        PartPolygon([(-25, -4), (25, -4), (22, 5), (0, 11), (-22, 5)], hull_color, outline_color), # Wings
+        PartPolygon([(7, 0), (-7, 0), (-4, -18), (4, -18)], hull_color, outline_color), # Cockpit
+        PartPolygon([(5, 3), (-5, 3), (-2, -15), (2, -15)], hull_color, outline_color), # Cockpit window
+        PartPolygon([(15, 0), (-15, 0), (-10, 12), (10, 12)], hull_color, outline_color), # Center part
+        PartPolygon([(-5, 12), (5, 12), (8, 20), (-8, 20)], hull_color, outline_color), # Engine
     ]
 
     return parts
 
-def _get_parts_hawk_v2(hull_colot_override : tuple[int, int, int] | None = None) -> list:
+def _get_parts_hawk_v2(
+        hull_color_override : tuple[int, int, int] | None = None, 
+        glass_color_override : tuple[int, int, int] | None = None,
+        inverted_colors : bool = False
+    ) -> list:
     hull_color = (150, 150, 170)
-    if hull_colot_override != None:
-        hull_color = hull_colot_override
-    hull_color_2 = _get_darkened_color(hull_color, 0.6)
+    if hull_color_override != None:
+        hull_color = hull_color_override
+    glass_color = (90, 120, 150)
+    if inverted_colors:
+        hull_color_2 = _get_multiplied_color(hull_color, color_3_mp_inverted)
+        if glass_color_override != None:
+            glass_color = _get_multiplied_color(glass_color_override, color_2_mp_inverted)
+    else:
+        hull_color_2 = _get_multiplied_color(hull_color, color_3_mp)
+        if glass_color_override != None:
+            glass_color = _get_multiplied_color(glass_color_override, color_2_mp)
 
     white = (255, 255, 255)
-    glass_light = (90, 120, 150)
     energy_blue = (40, 170, 255)
 
     parts = [
@@ -327,24 +397,36 @@ def _get_parts_hawk_v2(hull_colot_override : tuple[int, int, int] | None = None)
 
         PartPolygon([(-25, -4), (25, -4), (22, 5), (0, 11), (-22, 5)], hull_color, hull_color_2), # Wings
         PartPolygon([(7, 0), (-7, 0), (-4, -18), (4, -18)], hull_color, hull_color_2), # Cockpit
-        PartPolygon([(5, 3), (-5, 3), (-2, -15), (2, -15)], glass_light), # Cockpit window
+        PartPolygon([(5, 3), (-5, 3), (-2, -13), (2, -13)], glass_color), # Cockpit window
         PartPolygon([(15, 0), (-15, 0), (-10, 12), (10, 12)], hull_color, hull_color_2), # Center part
         PartPolygon([(-5, 12), (5, 12), (8, 20), (-8, 20)], hull_color, hull_color_2), # Engine
     ]
 
     return parts
 
-def _get_parts_hawk_v3(hull_colot_override : tuple[int, int, int] | None = None) -> list:
+def _get_parts_hawk_v3(
+        hull_color_override : tuple[int, int, int] | None = None,
+        glass_color_override : tuple[int, int, int] | None = None,
+        inverted_colors : bool = False
+    ) -> list:
     hull_color = (150, 150, 170)
-    if hull_colot_override != None:
-        hull_color = hull_colot_override
-    hull_color_2 = _get_darkened_color(hull_color, 0.8)
-    hull_color_3 = _get_darkened_color(hull_color, 0.6)
+    if hull_color_override != None:
+        hull_color = hull_color_override
+    glass_color = (90, 120, 150)
+    if glass_color_override != None:
+        glass_color = glass_color_override
+    if inverted_colors:
+        hull_color_2 = _get_multiplied_color(hull_color, color_2_mp_inverted)
+        hull_color_3 = _get_multiplied_color(hull_color, color_3_mp_inverted)
+        glass_color_2 = _get_multiplied_color(glass_color, color_2_mp_inverted)
+        glass_color_3 = _get_multiplied_color(glass_color, color_3_mp_inverted)
+    else:
+        hull_color_2 = _get_multiplied_color(hull_color, color_2_mp)
+        hull_color_3 = _get_multiplied_color(hull_color, color_3_mp)
+        glass_color_2 = _get_multiplied_color(glass_color, color_2_mp)
+        glass_color_3 = _get_multiplied_color(glass_color, color_3_mp)
 
     white = (255, 255, 255)
-    glass_light = (90, 120, 150)
-    glass_mid = (72, 100, 128)
-    glass_dark = (50, 73, 96)
     energy_blue = (40, 170, 255)
 
     parts = [
@@ -362,22 +444,36 @@ def _get_parts_hawk_v3(hull_colot_override : tuple[int, int, int] | None = None)
                         (-4, 12), (-6, 20), (6, 20), (4, 12), (6, 3), (5, 1), (2, -16)], hull_color_2),
         PartPolygon([(-1, -15), (-3, 3), (-2, 12), (-3, 20), (3, 20), (2, 12), (3, 3), (1, -15)], hull_color),
 
-        PartPolygon([(-2, -16), (-5, 1), (-3, 3), (3, 3), (5, 1), (2, -16)], glass_dark), # Window
-        PartPolygon([(-2, -16), (-1, -15), (1, -15), (2, -16)], glass_mid),
-        PartPolygon([(-1, -15), (1, -15), (3, 3), (0, 4), (-3, 3)], glass_light),
+        PartPolygon([(-2, -16), (-5, 1), (-3, 3), (3, 3), (5, 1), (2, -16)], glass_color_3), # Window
+        PartPolygon([(-2, -16), (-1, -15), (1, -15), (2, -16)], glass_color_2),
+        PartPolygon([(-1, -15), (1, -15), (3, 3), (0, 4), (-3, 3)], glass_color),
     ]
 
     return parts
 
-def _get_parts_ufo_v2(hull_colot_override : tuple[int, int, int] | None = None) -> list:
+def _get_parts_ufo_v2(
+        hull_color_override : tuple[int, int, int] | None = None,
+        glass_color_override : tuple[int, int, int] | None = None,
+        inverted_colors : bool = False
+    ) -> list:
     hull_color = (150, 150, 170)
-    if hull_colot_override != None:
-        hull_color = hull_colot_override
-    hull_color_2 = _get_darkened_color(hull_color, 0.8)
-    hull_color_3 = _get_darkened_color(hull_color, 0.6)
+    if hull_color_override != None:
+        hull_color = hull_color_override
+    glass_color = (40, 170, 255)
+    if glass_color_override != None:
+        glass_color = glass_color_override
+    if inverted_colors:
+        hull_color_2 = _get_multiplied_color(hull_color, color_2_mp_inverted)
+        hull_color_3 = _get_multiplied_color(hull_color, color_3_mp_inverted)
+        if glass_color_override != None:
+            glass_color = _get_multiplied_color(glass_color_override, color_2_mp_inverted)
+    else:
+        hull_color_2 = _get_multiplied_color(hull_color, color_2_mp)
+        hull_color_3 = _get_multiplied_color(hull_color, color_3_mp)
+        if glass_color_override != None:
+            glass_color = _get_multiplied_color(glass_color_override, color_2_mp)
 
     white = (255, 255, 255)
-    energy_blue = (40, 170, 255)
     energy_green = (40, 255, 50)
 
     parts = [
@@ -393,24 +489,24 @@ def _get_parts_ufo_v2(hull_colot_override : tuple[int, int, int] | None = None) 
         #PartCircle((-13, -14), 2, energy_green),
         PartCircle((0, 0), 19, hull_color_2),
         PartLine((17, 0), (21, 0), 1, hull_color_3),
-        PartLine(*rotate_part([(17, 0), (21, 0)], pygame.Vector2(0, 0), 60), 1, hull_color_3), # pyright: ignore[reportCallIssue]
-        PartLine(*rotate_part([(17, 0), (21, 0)], pygame.Vector2(0, 0), 120), 1, hull_color_3), # pyright: ignore[reportCallIssue]
-        PartLine(*rotate_part([(17, 0), (21, 0)], pygame.Vector2(0, 0), 180), 1, hull_color_3), # pyright: ignore[reportCallIssue]
-        PartLine(*rotate_part([(17, 0), (21, 0)], pygame.Vector2(0, 0), 240), 1, hull_color_3), # pyright: ignore[reportCallIssue]
-        PartLine(*rotate_part([(17, 0), (21, 0)], pygame.Vector2(0, 0), 300), 1, hull_color_3), # pyright: ignore[reportCallIssue]
+        PartLine(*_rotate_part([(17, 0), (21, 0)], pygame.Vector2(0, 0), 60), 1, hull_color_3), # pyright: ignore[reportCallIssue]
+        PartLine(*_rotate_part([(17, 0), (21, 0)], pygame.Vector2(0, 0), 120), 1, hull_color_3), # pyright: ignore[reportCallIssue]
+        PartLine(*_rotate_part([(17, 0), (21, 0)], pygame.Vector2(0, 0), 180), 1, hull_color_3), # pyright: ignore[reportCallIssue]
+        PartLine(*_rotate_part([(17, 0), (21, 0)], pygame.Vector2(0, 0), 240), 1, hull_color_3), # pyright: ignore[reportCallIssue]
+        PartLine(*_rotate_part([(17, 0), (21, 0)], pygame.Vector2(0, 0), 300), 1, hull_color_3), # pyright: ignore[reportCallIssue]
 
         PartCircle((0, 0), 17, hull_color_3),
         PartCircle((0, 0), 16, hull_color),
-        PartLine(*rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 30), 1, hull_color_3), # pyright: ignore[reportCallIssue]
-        PartLine(*rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 90), 1, hull_color_3), # pyright: ignore[reportCallIssue]
-        PartLine(*rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 150), 1, hull_color_3), # pyright: ignore[reportCallIssue]
-        PartLine(*rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 210), 1, hull_color_3), # pyright: ignore[reportCallIssue]
-        PartLine(*rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 270), 1, hull_color_3), # pyright: ignore[reportCallIssue]
-        PartLine(*rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 330), 1, hull_color_3), # pyright: ignore[reportCallIssue]
+        PartLine(*_rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 30), 1, hull_color_3), # pyright: ignore[reportCallIssue]
+        PartLine(*_rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 90), 1, hull_color_3), # pyright: ignore[reportCallIssue]
+        PartLine(*_rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 150), 1, hull_color_3), # pyright: ignore[reportCallIssue]
+        PartLine(*_rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 210), 1, hull_color_3), # pyright: ignore[reportCallIssue]
+        PartLine(*_rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 270), 1, hull_color_3), # pyright: ignore[reportCallIssue]
+        PartLine(*_rotate_part([(11, 0), (17, 0)], pygame.Vector2(0, 0), 330), 1, hull_color_3), # pyright: ignore[reportCallIssue]
 
         PartCircle((0, 0), 11, hull_color_3),
         PartCircle((0, 0), 10, hull_color_2),
-        PartCircle((0, 0), 8, energy_blue),
+        PartCircle((0, 0), 8, glass_color),
         PartPolygon([(-7, 7), (-7, 6), (-1, 0), (-7, -6), (-6, -7), (0, -1), (6, -7), (7, -6), (1, 0), (7, 6), (7, 7), (0, 9)], hull_color_2),
         #PartPolygon([(3, 0), (2, 2), (0, 3), (-2, 2), (-3, 0), (-2, -2), (0, -3), (2, -2)], hull_color_3),
         PartCircle((0, 0), 5, hull_color_2),

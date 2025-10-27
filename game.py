@@ -76,11 +76,14 @@ class Game():
         self.star_field = StarField(self.screen_resolution_fullscreen)
         self.gsm = GameStateManager(self)
         self.asteroid_field = None
+        self.player = None
 
         self.initialize_new_player()
         self.gsm.initialize_current_menu()
 
     def initialize_new_player(self):
+        if self.player != None:
+            self.player.kill()
         self.player_stats : PlayerStats = PlayerStats()
         self.player : Player = Player(self, self.player_stats)
         self.player_stats.set_player(self.player)
