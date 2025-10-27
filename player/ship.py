@@ -25,8 +25,9 @@ class Ship():
         self.hitbox_radius = hitbox_radius
 
         # Engine animation
-        self.engine_vfx_timer = 0.2 # Duration of a frame in sec
+        self.engine_vfx_timer = 0.12 # Duration of a frame in sec
         self.engine_vfx_current_frame : int = 0
+        self.engine_vfx_frames_amount : int = 4
 
         # Colors for parts, WITHOUT alpha
         white = (255, 255, 255)
@@ -141,11 +142,7 @@ class Ship():
 
     def update(self, dt):
         self.time += dt
-        next_engine_frame = (self.time // self.engine_vfx_timer) % 2
-        if next_engine_frame == 0 and self.engine_vfx_current_frame != 0: # REWRITE THIS
-            self.engine_vfx_current_frame = 0
-        elif next_engine_frame == 1 and self.engine_vfx_current_frame != 1:
-            self.engine_vfx_current_frame = 1
+        self.engine_vfx_current_frame = int((self.time // self.engine_vfx_timer) % self.engine_vfx_frames_amount)
 
     def get_name(self) -> str:
         match self.ship_type:
@@ -305,10 +302,19 @@ class PartEngineVfx():
         self.color_fill = color_fill
         self.color_outline = color_outline
 
-        self.dots_all = [[[(-6, -2), (-6, 0), (-5, 4), (-4, 6), (-3, 7), (0, 8), (3, 7), (4, 6), (5, 4), (6, 0), (6, -2)], # frame 1
-                          [(-4, -2), (-4, 0), (-3, 4), (-2, 6), (-1, 7), (0, 6), (1, 7), (2, 6), (3, 4), (4, 0), (4, -2)]],
-                         [[(-5, -2), (-5, 0), (-4, 3), (-3, 5), (-2, 6), (0, 7), (2, 6), (3, 5), (4, 3), (5, 0), (5, -2)], # frame 2
-                          [(-3, -2), (-3, 0), (-2, 3), (-1, 5), (0, 6), (1, 5), (2, 3), (3, 0), (3, -2)]]]
+        self.dots_all = [
+            [[(-6, -2), (-6, 0), (-5, 4), (-4, 6), (-3, 7), (0, 8), (3, 7), (4, 6), (5, 4), (6, 0), (6, -2)], # frame 1
+             [(-4, -2), (-4, 0), (-3, 4), (-2, 6), (-1, 7), (0, 7), (1, 7), (2, 6), (3, 4), (4, 0), (4, -2)]],
+
+            [[(-5, -2), (-5, 0), (-4, 3), (-3, 5), (-2, 6), (0, 7), (2, 6), (3, 5), (4, 3), (5, 0), (5, -2)], # frame 2
+             [(-3, -2), (-3, 0), (-2, 3), (-1, 5), (0, 6), (1, 5), (2, 3), (3, 0), (3, -2)]],
+
+            [[(-6, -2), (-6, 0), (-5, 4), (-4, 6), (-3, 7), (0, 8), (3, 7), (4, 6), (5, 4), (6, 0), (6, -2)], # frame 3, same as 1
+             [(-4, -2), (-4, 0), (-3, 4), (-2, 6), (-1, 7), (0, 7), (1, 7), (2, 6), (3, 4), (4, 0), (4, -2)]],
+
+            [[(-7, -2), (-7, 0), (-6, 5), (-5, 7), (-4, 9), (0, 10), (4, 9), (5, 7), (6, 5), (7, 0), (7, -2)], # frame 4
+             [(-5, -2), (-5, 0), (-4, 5), (-3, 7), (-2, 8), (0, 8), (2, 8), (3, 7), (4, 5), (5, 0), (5, -2)]],
+        ]
         for i in range(len(self.dots_all)):
             for j in range(len(self.dots_all[i])):
                 self.dots_all[i][j] = get_moved_part(self.dots_all[i][j], anchor)
