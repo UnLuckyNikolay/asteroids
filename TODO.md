@@ -19,7 +19,7 @@ FIXES/TWEAKS:
 - [x] Revisit visible naming scheme for ship parts
 - [x] Rename and move UserInterface class to GameStateManager, rename GameStateManager to RoundStateManager
 - [x] Refactor movement
-- [ ] FOR NEXT VERSION >>> Update screenshots in README
+- [ ] Update screenshots in README
 - [x] Increase alpha of background of the pause menu
 - [x] Revamp difficulty increase
 - [x] Homing isn't affected by delta

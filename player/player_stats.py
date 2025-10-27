@@ -19,11 +19,11 @@ class PlayerStats():
         self.longest_run : float = 0 # In seconds
 
         self.unlocked_ships : list[list[int | bool]] = [
-            [int(ShipType.POLY.value), True],
-            [int(ShipType.POLY2BP.value), True],
-            [int(ShipType.POLY2.value), True],
-            [int(ShipType.POLY3.value), True],
-            [int(ShipType.UFO.value), False],
+            [int(ShipType.POLY1.value), True],
+            [int(ShipType.HAWK1.value), True],
+            [int(ShipType.HAWK2.value), True],
+            [int(ShipType.HAWK3.value), True],
+            [int(ShipType.UFO2.value), False],
         ]
         self.unlocked_ships_amount = self.__get_amount_of_unlocked_ship()
         self.__ship_model_index : int = 3 # Index for the .unlocked_ships

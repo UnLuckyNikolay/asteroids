@@ -88,7 +88,7 @@ class GameStateManager(pygame.sprite.Sprite):
 
         # Defaults used for loading save in profile selection if something is missing
         self.__default_player_name = "Player"
-        self.__default_ship_model_value = 130 # Value of the ShipType Enum
+        self.__default_ship_model = ShipType.HAWK3 # Value of the ShipType Enum
 
         # Fonts
         self.__font_very_small = pygame.font.Font(font_path, 16)
@@ -567,7 +567,7 @@ class GameStateManager(pygame.sprite.Sprite):
                 color_override_and_lock=self.__color_white
             )
             b_pf0.add_element(
-                Ship(self.__profiles[0]["player_stats_save"].get("ship_model_value", self.__default_ship_model_value), 0),
+                Ship(self.__profiles[0]["player_stats_save"].get("ship_model_value", self.__default_ship_model), 0),
                 Allignment.UPPER_RIGHT_CORNER,
                 nudge=(-70, 70)
             )
@@ -629,7 +629,7 @@ class GameStateManager(pygame.sprite.Sprite):
                 color_override_and_lock=self.__color_white
             )
             b_pf1.add_element(
-                Ship(self.__profiles[1]["player_stats_save"].get("ship_model_value", self.__default_ship_model_value), 0),
+                Ship(self.__profiles[1]["player_stats_save"].get("ship_model_value", self.__default_ship_model), 0),
                 Allignment.UPPER_RIGHT_CORNER,
                 nudge=(-70, 70)
             )
@@ -691,7 +691,7 @@ class GameStateManager(pygame.sprite.Sprite):
                 color_override_and_lock=self.__color_white
             )
             b_pf2.add_element(
-                Ship(self.__profiles[2]["player_stats_save"].get("ship_model_value", self.__default_ship_model_value), 0),
+                Ship(self.__profiles[2]["player_stats_save"].get("ship_model_value", self.__default_ship_model), 0),
                 Allignment.UPPER_RIGHT_CORNER,
                 nudge=(-70, 70)
             )
@@ -1162,10 +1162,10 @@ class GameStateManager(pygame.sprite.Sprite):
         )
 
         # UFO secret
-        if not self.player_stats.check_unlocked_ship(ShipType.UFO):
+        if not self.player_stats.check_unlocked_ship(ShipType.UFO2):
             b_ufo = ButtonRound(
                 (res[0]-30, res[1]-20), 6,
-                lambda: self.unlock_ship(ShipType.UFO)
+                lambda: self.unlock_ship(ShipType.UFO2)
             )
             b_ufo.set_outline_color(self.__color_gray)
             b_ufo.set_fill_color(self.__color_green)
