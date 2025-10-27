@@ -159,13 +159,19 @@ class Button(_ButtonBase):
 
 
 class Switch(_ButtonBase):
+    """
+    Runs the key functions on press and switches it's state between on/off.
+
+    If is_active is a function that returns boolean - it's ran every time before drawing to recheck if it's still active.
+    """
+
     def __init__(
             self,
             position : tuple[int, int], 
             size : tuple[int, int], 
             corners : tuple[int, int, int, int],
             key_func : Callable[[], None], 
-            is_active : bool,
+            is_active : bool | Callable[[], bool],
     ):
         super().__init__(
             position, 
@@ -178,9 +184,16 @@ class Switch(_ButtonBase):
         self._color_fill_hover_active = self._get_divided_color_tuple(self._color_outline_active, 2, 150)
         
         self._key_func = key_func
-        self._is_active = is_active
+        if callable(is_active):
+            self._active_func = is_active
+            self._is_active = is_active()
+        else:
+            self._active_func = None
+            self._is_active = is_active
 
     def draw(self, screen):
+        if self._active_func != None:
+            self._is_active = self._active_func()
         points = get_points(self._position, self._size, self._corners)
         self._check_element_color()
         if self._is_hovered and self._is_active:
