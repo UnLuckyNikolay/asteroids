@@ -35,13 +35,10 @@ class ShipPart(Enum):
 class Player(CircleShape):
     layer = 50 # pyright: ignore
     def __init__(self, game, stats):
-        super().__init__(pygame.Vector2(-100, -100), (0,0), PLAYER_RADIUS)
-        self.rotation = 180
-        self.rotation_inertia = self.rotation
-        self.inertia = pygame.Vector2(0, 0)
-        self.__speed = 0
-        self.__turning_speed = 0
-        self.last_dt = 0
+        super().__init__(pygame.Vector2(-100, -100), pygame.Vector2(0,0), PLAYER_RADIUS)
+        self.velocity_target = pygame.Vector2(0, 0)
+        self.rotation : float = 180
+        self.__turning_speed : float = 0
 
         # For controls in game.handle_event_for_ship_controls()
         self.state_movement : int = 0 # -1 - going backwards, 0 - nothing, 1 - going forward
@@ -51,22 +48,22 @@ class Player(CircleShape):
         self.game = game
         self.stats : PlayerStats = stats
 
-        self.timer_invul = 0
+        self.timer_invul : float = 0
         self.is_invul : bool = False
         self.is_alive : bool = True
         self.is_accelerating : bool = False
         self.is_auto_shooting : bool = False
 
-        self.money = 0
-        self.lives = 3
-        self.lives_max = 3
-        self.times_healed = 0
+        self.money : int = 0
+        self.lives : int = 3
+        self.lives_max : int = 3
+        self.times_healed : int = 0
 
-        self.ship = Ship(self.stats.unlocked_ships[self.stats.ship_model_index][0], self.radius)
-        self.magnet = Magnet(self.position)
-        self.weapon_plasmagun = PlasmaGun()
-        self.weapon_bomblauncher = BombLauncher()
-        self.time_since_last_shot = 0
+        self.ship : Ship = Ship(self.stats.unlocked_ships[self.stats.ship_model_index][0], self.radius)
+        self.magnet : Magnet = Magnet(self.position)
+        self.weapon_plasmagun : PlasmaGun = PlasmaGun()
+        self.weapon_bomblauncher : BombLauncher = BombLauncher()
+        self.time_since_last_shot : float = 0
         self.weapon_current = self.weapon_plasmagun
 
         self.is_sus : bool = False
@@ -85,39 +82,24 @@ class Player(CircleShape):
         else:
             self.__turning_speed = value
 
-    @property
-    def speed(self):
-        return self.__speed
-
-    @speed.setter
-    def speed(self, value):
-        if value < -PLAYER_SPEED_MAX:
-            self.__speed = -PLAYER_SPEED_MAX
-        elif value > PLAYER_SPEED_MAX:
-            self.__speed = PLAYER_SPEED_MAX
-        else:
-            self.__speed = value
-
 
     def reset(self):
-        self.position = pygame.Vector2(-100, -100)
+        self.velocity_target.update(0, 0)
+        self.velocity.update(0, 0)
+        self.position.update(-100, -100)
         self.rotation = 180
-        self.rotation_inertia = self.rotation
-        self.inertia = pygame.Vector2(0, 0)
-        self.__speed = 0
         self.__turning_speed = 0
-        self.last_dt = 0
 
         # For controls in game.handle_event_for_ship_controls()
-        self.state_movement : int = 0 # -1 - going backwards, 0 - nothing, 1 - going forward
-        self.state_rotation : int = 0 # -1 - rotating left, 0 - nothing, 1 - rotating right
-        self.is_shooting : bool = False
+        self.state_movement = 0 # -1 - going backwards, 0 - nothing, 1 - going forward
+        self.state_rotation = 0 # -1 - rotating left, 0 - nothing, 1 - rotating right
+        self.is_shooting = False
 
         self.timer_invul = 0
-        self.is_invul : bool = False
-        self.is_alive : bool = True
-        self.is_accelerating : bool = False
-        self.is_auto_shooting : bool = False
+        self.is_invul = False
+        self.is_alive = True
+        self.is_accelerating = False
+        self.is_auto_shooting = False
 
         self.magnet = Magnet(self.position)
         
@@ -132,7 +114,7 @@ class Player(CircleShape):
         self.weapon_current = self.weapon_plasmagun
 
     def teleport_and_prepare_for_round(self, position : tuple[int, int]):
-        self.position = pygame.Vector2(position)
+        self.position.update(position)
         self.magnet = Magnet(self.position)
 
         if self.stats.cheat_godmode or self.stats.cheat_hitbox or self.stats.cheat_stonks:
@@ -143,7 +125,7 @@ class Player(CircleShape):
             self.money = 9999
         self.ship.switch_hitbox_to(self.stats.cheat_hitbox)
 
-    def draw(self, screen):
+    def draw(self, screen : pygame.Surface):
         self.ship.draw_rotated(
             screen, 
             self.position,
@@ -153,30 +135,39 @@ class Player(CircleShape):
             self.timer_invul
         )
 
-    def rotate(self, dt):
+    def rotate(self, dt : float):
         self.rotation += self.turning_speed * dt
 
-    def move(self, dt):
-        self.inertia = self.inertia * ((100 - PLAYER_ACCELERATION * dt) / 100) + pygame.Vector2(0, 1).rotate(self.rotation_inertia) * (PLAYER_ACCELERATION * dt / 100)
-        self.position += self.inertia * self.speed * dt
+    def move(self, dt : float):
+        if self.state_movement == 1:
+            self.velocity_target.update(0, 1)
+            self.velocity_target.rotate_ip(self.rotation)
+            self.velocity.move_towards_ip(self.velocity_target, PLAYER_ACCELERATION_MP * 1.5 * dt)
+        elif self.state_movement == -1:
+            self.velocity_target.update(0, -0.5)
+            self.velocity_target.rotate_ip(self.rotation)
+            self.velocity.move_towards_ip(self.velocity_target, PLAYER_ACCELERATION_MP * 0.8 * dt)
+        else:
+            self.velocity_target.update(0, 0)
+            self.velocity.move_towards_ip(self.velocity_target, 0.65 * dt)
+        self.position += self.velocity * PLAYER_SPEED_MAX * dt
 
-        screen_resolution = self.game.screen_resolution
         # Teleports player if off-screen
+        res = self.game.screen_resolution
         if self.position.x < -ASTEROID_MAX_RADIUS:
-            self.position.x = screen_resolution[0] + ASTEROID_MAX_RADIUS
-        elif self.position.x > screen_resolution[0] + ASTEROID_MAX_RADIUS:
+            self.position.x = res[0] + ASTEROID_MAX_RADIUS
+        elif self.position.x > res[0] + ASTEROID_MAX_RADIUS:
             self.position.x = -ASTEROID_MAX_RADIUS
         if self.position.y < -ASTEROID_MAX_RADIUS:
-            self.position.y = screen_resolution[1] + ASTEROID_MAX_RADIUS
-        elif self.position.y > screen_resolution[1] + ASTEROID_MAX_RADIUS:
+            self.position.y = res[1] + ASTEROID_MAX_RADIUS
+        elif self.position.y > res[1] + ASTEROID_MAX_RADIUS:
             self.position.y = -ASTEROID_MAX_RADIUS
 
-    def attempt_shot(self, time_since_last_shot) -> bool:
+    def attempt_shot(self, time_since_last_shot : float) -> bool:
         return self.weapon_current.attempt_shot(self.position, self.rotation, time_since_last_shot)
 
-    def update(self, dt):
+    def update(self, dt : float):
         self.ship.update(dt) # For animations
-        self.last_dt = dt
         self.time_since_last_shot += dt
 
         # Turning
@@ -201,32 +192,8 @@ class Player(CircleShape):
                         self.turning_speed += amount
 
         # Movement
-        if self.speed != 0:
-            self.move(dt)
-        match self.state_movement:
-            case 1:
-                self.is_accelerating = True # For drawing engine animation
-                self.rotation_inertia = self.rotation
-                self.speed += PLAYER_ACCELERATION * dt
-            case -1:
-                self.is_accelerating = False
-                self.rotation_inertia = self.rotation
-                self.speed -= PLAYER_ACCELERATION * dt
-            case 0: # Deceleration
-                amount = PLAYER_ACCELERATION * dt / 2
-                self.is_accelerating = False
-                if self.speed > 0:
-                    if self.speed < amount:
-                        self.speed = 0
-                        self.inertia = pygame.Vector2(0, 0)
-                    else:
-                        self.speed -= amount
-                elif self.speed < 0:
-                    if self.speed > -amount:
-                        self.speed = 0
-                        self.inertia = pygame.Vector2(0, 0)
-                    else:
-                        self.speed += amount
+        self.move(dt)
+        self.is_accelerating = True if self.state_movement == 1 else False # For drawing engine animation
 
         # Shooting
         if (
@@ -244,7 +211,7 @@ class Player(CircleShape):
                 self.timer_invul = 0
                 self.is_invul = False
 
-    def take_damage_and_check_if_alive(self, gsm) -> bool:
+    def take_damage_and_check_if_alive(self) -> bool:
         if self.stats.cheat_godmode:
             return self.is_alive
         elif self.lives > 1:
@@ -255,10 +222,9 @@ class Player(CircleShape):
         else:
             self.lives -= 1
             self.is_alive = False
-            print(f"Game over! Final score: {gsm.score}")
             return self.is_alive
 
-    def collect_loot(self, price):
+    def collect_loot(self, price : int):
         self.money += price
 
     ### Getters

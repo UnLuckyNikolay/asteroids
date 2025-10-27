@@ -170,7 +170,7 @@ class Ship():
     def switch_hitbox_to(self, boolean : bool):
         self.show_hitbox = boolean
 
-    def draw_rotated(self, screen, position : pygame.Vector2, rotation : int, magnet_radius : int, is_accelerating : bool, timer_invul=0):
+    def draw_rotated(self, screen, position : pygame.Vector2, rotation : float, magnet_radius : int, is_accelerating : bool, timer_invul : float=0.0):
         """Used to draw ships during gameplay."""
 
         if self.current_parts == None:
@@ -233,7 +233,7 @@ class PartLine():
         self.thickness = thickness
         self.color = color
 
-    def draw_rotated(self, screen, position : pygame.Vector2, rotation : int, alpha : int, is_accelerating : bool, current_frame):
+    def draw_rotated(self, screen, position : pygame.Vector2, rotation : float, alpha : int, is_accelerating : bool, current_frame):
         dots = rotate_part([self.start, self.end], position, rotation)
 
         pygame.draw.line(screen, (*self.color, alpha), dots[0], dots[1], self.thickness)
@@ -260,7 +260,7 @@ class PartPolygon():
         self.color_fill = color_fill
         self.color_outline = color_outline
 
-    def draw_rotated(self, screen, position : pygame.Vector2, rotation : int, alpha : int, is_accelerating : bool, current_frame):
+    def draw_rotated(self, screen, position : pygame.Vector2, rotation : float, alpha : int, is_accelerating : bool, current_frame):
         dots = rotate_part(self.dots, position, rotation)
 
         pygame.gfxdraw.filled_polygon(screen, dots, (*self.color_fill, alpha))
@@ -285,7 +285,7 @@ class PartCircle():
         self.radius = radius
         self.color_fill = color_fill
 
-    def draw_rotated(self, screen, position : pygame.Vector2, rotation : int, alpha : int, is_accelerating : bool, current_frame):
+    def draw_rotated(self, screen, position : pygame.Vector2, rotation : float, alpha : int, is_accelerating : bool, current_frame):
         center = rotate_part([self.center], position, rotation)[0]
 
         pygame.gfxdraw.filled_circle(screen, *center, self.radius, (*self.color_fill, alpha))
@@ -313,7 +313,7 @@ class PartEngineVfx():
             for j in range(len(self.dots_all[i])):
                 self.dots_all[i][j] = get_moved_part(self.dots_all[i][j], anchor)
 
-    def draw_rotated(self, screen, position : pygame.Vector2, rotation : int, alpha : int, is_accelerating : bool, current_frame):
+    def draw_rotated(self, screen, position : pygame.Vector2, rotation : float, alpha : int, is_accelerating : bool, current_frame):
         if not is_accelerating:
             return
     

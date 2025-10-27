@@ -136,7 +136,7 @@ class Game():
                 # Player hit
                 for asteroid in self.asteroids:
                     if asteroid.check_colision(self.player) and not self.player.is_invul: # No check for dead asteroids because first loop, only off-screen ones are dead
-                        if self.player.take_damage_and_check_if_alive(self.rsm):
+                        if self.player.take_damage_and_check_if_alive():
                             self.asteroid_field.kill_asteroid(asteroid)
                             explosion = Explosion(asteroid.position, asteroid.radius)
                     

@@ -18,7 +18,7 @@ FIXES/TWEAKS:
 - [x] Change how max level upgrades are displayed
 - [x] Revisit visible naming scheme for ship parts
 - [x] Rename and move UserInterface class to GameStateManager, rename GameStateManager to RoundStateManager
-- [ ] FOR NEXT VERSION >>> Upgrade movement to properly handle turning of vectors, something is broken when turning without moving
+- [x] Refactor movement
 - [ ] FOR NEXT VERSION >>> Update screenshots in README
 - [x] Increase alpha of background of the pause menu
 - [x] Revamp difficulty increase
@@ -70,3 +70,4 @@ DISTANT/POSSIBLE IDEAS:
 - [ ] Enemy ships/bosses
 - [ ] Achievements
 - [ ] Better asteroid sprite
+    - [ ] Add holes
