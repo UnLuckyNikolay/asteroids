@@ -62,6 +62,18 @@ A classic game of Asteroids built using Pygame as a Boot.dev project and then en
 
 ![Gameplay Showcase 3](https://imgur.com/NBmQYrB.png)
 
+## Hints for secrets
+
+<details> 
+	<summary>Cheats</summary>
+	There is a famous sequence that needs to be inputed while in the main menu.
+</details>
+
+<details> 
+	<summary>Suspicious saucer-looking ship</summary>
+	There were reports of a stange ship that can be barely seen from a certain menu.
+</details>
+
 ## Technical Features
 
 * Movement system that implements inertia and speed-up time for both moving and turning
