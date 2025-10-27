@@ -34,7 +34,8 @@ IDEAS:
     - [ ] Classic/cartoon-ish rocket
 - [ ] Additional weapons:
 - [ ] Additional ship upgrades:
-    - [ ] Speed (will need ship vectors tweaked)
+    - [x] Speed
+    - [x] Acceleration
     - [ ] Rotation
 - [x] Additional weapon upgrades:
     - [x] Short fuse for the Bomb Launcher

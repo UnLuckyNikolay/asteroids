@@ -16,21 +16,24 @@ from player.player_stats import PlayerStats
 class ShipUpgrade(Enum):
     """List of player upgrades"""
 
+    ENGINE_SPEED = "Engine: Speed"
+    ENGINE_ACCELERATION = "Engine: Acceleration"
+    MAGNET_RADIUS = "Magnet: Radius"
+    MAGNET_STRENGTH = "Magnet: Strength"
     PLASMAGUN_PROJECTILES = "Plasma Gun: Projectiles"
     PLASMAGUN_COOLDOWN = "Plasma Gun: Cooldown"
     BOMBLAUNCHER_RADIUS = "Bomb Launcher: Radius"
     BOMBLAUNCHER_FUSE = "Bomb Launcher: Fuse"
-    MAGNET_RADIUS = "Magnet: Radius"
-    MAGNET_STRENGTH = "Magnet: Strength"
 
 # New parts should be added to 
 # - .get_part_level
 class ShipPart(Enum):
     """List of player parts"""
 
+    ENGINE = "Engine"
+    MAGNET = "Magnet"
     PLASMAGUN = "Plasma Gun"
     BOMBLAUNCHER = "Bomb Launcher"
-    MAGNET = "Magnet"
 
 class Player(CircleShape):
     layer = 50 # pyright: ignore
@@ -60,6 +63,11 @@ class Player(CircleShape):
         self.times_healed : int = 0
 
         self.ship : Ship = Ship(self.stats.unlocked_ships[self.stats.ship_model_index][0], self.radius)
+        self.__level_engine : int = 1
+        self.__level_engine_speed : int = 1
+        self.__engine_speed : int = 200
+        self.__level_engine_acceleration : int = 1
+        self.__engine_acceleration_mp : float = 0.8
         self.magnet : Magnet = Magnet(self.position)
         self.weapon_plasmagun : PlasmaGun = PlasmaGun()
         self.weapon_bomblauncher : BombLauncher = BombLauncher()
@@ -102,6 +110,11 @@ class Player(CircleShape):
         self.is_auto_shooting = False
 
         self.magnet = Magnet(self.position)
+        self.__level_engine = 1
+        self.__level_engine_speed = 1
+        self.__engine_speed = 250
+        self.__level_engine_acceleration = 1
+        self.__engine_acceleration_mp = 1.0
         
         self.money = 0
         self.lives = 3
@@ -142,15 +155,15 @@ class Player(CircleShape):
         if self.state_movement == 1:
             self.velocity_target.update(0, 1)
             self.velocity_target.rotate_ip(self.rotation)
-            self.velocity.move_towards_ip(self.velocity_target, PLAYER_ACCELERATION_MP * 1.5 * dt)
+            self.velocity.move_towards_ip(self.velocity_target, self.__engine_acceleration_mp * 1.5 * dt)
         elif self.state_movement == -1:
             self.velocity_target.update(0, -0.5)
             self.velocity_target.rotate_ip(self.rotation)
-            self.velocity.move_towards_ip(self.velocity_target, PLAYER_ACCELERATION_MP * 0.8 * dt)
+            self.velocity.move_towards_ip(self.velocity_target, self.__engine_acceleration_mp * 0.8 * dt)
         else:
             self.velocity_target.update(0, 0)
             self.velocity.move_towards_ip(self.velocity_target, 0.65 * dt)
-        self.position += self.velocity * PLAYER_SPEED_MAX * dt
+        self.position += self.velocity * self.__engine_speed * dt
 
         # Teleports player if off-screen
         res = self.game.screen_resolution
@@ -250,12 +263,14 @@ class Player(CircleShape):
 
     def get_part_level(self, part : ShipPart) -> int:
         match part:
+            case ShipPart.ENGINE:
+                return self.__level_engine
+            case ShipPart.MAGNET:
+                return self.magnet._level
             case ShipPart.PLASMAGUN:
                 return self.weapon_plasmagun._level
             case ShipPart.BOMBLAUNCHER:
                 return self.weapon_bomblauncher._level
-            case ShipPart.MAGNET:
-                return self.magnet._level
     
     ### Health
     
@@ -279,6 +294,14 @@ class Player(CircleShape):
 
     def get_upgrade_level(self, ship_part : ShipUpgrade) -> int:
         match ship_part:
+            case ShipUpgrade.ENGINE_SPEED:
+                return self.__level_engine_speed
+            case ShipUpgrade.ENGINE_ACCELERATION:
+                return self.__level_engine_acceleration
+            case ShipUpgrade.MAGNET_RADIUS:
+                return self.magnet._level_radius
+            case ShipUpgrade.MAGNET_STRENGTH:
+                return self.magnet._level_strength
             case ShipUpgrade.PLASMAGUN_PROJECTILES:
                 return self.weapon_plasmagun._level_projectiles
             case ShipUpgrade.PLASMAGUN_COOLDOWN:
@@ -287,10 +310,6 @@ class Player(CircleShape):
                 return self.weapon_bomblauncher._level_radius
             case ShipUpgrade.BOMBLAUNCHER_FUSE:
                 return self.weapon_bomblauncher._level_fuse
-            case ShipUpgrade.MAGNET_RADIUS:
-                return self.magnet._level_radius
-            case ShipUpgrade.MAGNET_STRENGTH:
-                return self.magnet._level_strength
             
     def get_upgrade_price(self, ship_part : ShipUpgrade) -> int | None:
         level = self.get_upgrade_level(ship_part)
@@ -326,6 +345,10 @@ class Player(CircleShape):
 
         self.money -= price
         match ship_part:
+            case ShipUpgrade.ENGINE_SPEED:
+                self.__upgrade_engine_speed()
+            case ShipUpgrade.ENGINE_ACCELERATION:
+                self.__upgrade_engine_acceleration()
             case ShipUpgrade.PLASMAGUN_PROJECTILES:
                 self.weapon_plasmagun.upgrade_projectiles()
             case ShipUpgrade.PLASMAGUN_COOLDOWN:
@@ -338,3 +361,26 @@ class Player(CircleShape):
                 self.magnet.upgrade_radius()
             case ShipUpgrade.MAGNET_STRENGTH:
                 self.magnet.upgrade_strength()
+
+    def __upgrade_engine_speed(self):
+        match self.__level_engine_speed:
+            case 1:
+                self.__level_engine += 1
+                self.__level_engine_speed += 1
+                self.__engine_speed = 250
+            case 2:
+                self.__level_engine += 1
+                self.__level_engine_speed += 1
+                self.__engine_speed = 300
+
+    def __upgrade_engine_acceleration(self):
+        match self.__level_engine_acceleration:
+            case 1:
+                self.__level_engine += 1
+                self.__level_engine_acceleration += 1
+                self.__engine_acceleration_mp = 1
+            case 2:
+                self.__level_engine += 1
+                self.__level_engine_acceleration += 1
+                self.__engine_acceleration_mp = 1.2
+    

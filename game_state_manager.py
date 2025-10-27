@@ -1261,6 +1261,8 @@ class GameStateManager(pygame.sprite.Sprite):
         offset_x = int((self.game.screen_resolution[0] - 1280)/2)
         offset_y = int((self.game.screen_resolution[1] - 720)/2)
         row_height = 51
+        column_1 = 290
+        column_2 = 760
         
         # <> Containers <>
 
@@ -1276,7 +1278,7 @@ class GameStateManager(pygame.sprite.Sprite):
         )
 
         # List - ship
-        c_model = Container((offset_x+290, offset_y+65), (455, 36), (6, 6, 6, 6))
+        c_model = Container((offset_x+column_1, offset_y+65), (455, 36), (6, 6, 6, 6))
         c_model.add_element(
             TextUpdated(
                 "Model: {}", self.__font_small, self.__color_white,
@@ -1286,24 +1288,44 @@ class GameStateManager(pygame.sprite.Sprite):
             nudge=(12, 0)
         )
         
-        c_switch_model = Container((offset_x+336, offset_y+65+row_height*1), (363, 36), (3, 3, 3, 3))
+        c_switch_model = Container((offset_x+column_1+46, offset_y+65+row_height*1), (363, 36), (3, 3, 3, 3))
         c_switch_model.add_element(
             TextPlain("Switch model", self.__font_small, self.__color_white),
             Allignment.LEFT_WALL,
             nudge=(12, 0)
         )
-
-        c_heal = Container((offset_x+290, offset_y+65+row_height*2), (409, 36), (6, 3, 3, 6))
-        c_heal.add_element(
+        
+        c_engine = Container((offset_x+column_1, offset_y+65+row_height*2), (455, 36), (6, 6, 6, 6))
+        c_engine.add_element(
             TextUpdated(
-                "Heal: {}g", self.__font_small, self.__color_white,
-                self.player.get_price_heal
+                "Engine.v{}", self.__font_small, self.__color_white,
+                lambda: self.player.get_part_level(ShipPart.ENGINE)
             ),
             Allignment.LEFT_WALL,
             nudge=(12, 0)
         )
         
-        c_magnet = Container((offset_x+290, offset_y+65+row_height*3), (455, 36), (6, 6, 6, 6))
+        c_engine_speed = Container((offset_x+column_1, offset_y+65+row_height*3), (409, 36), (6, 3, 3, 6))
+        c_engine_speed.add_element(
+            TextUpdated(
+                "Speed: {}", self.__font_small, self.__color_white,
+                lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.ENGINE_SPEED)
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
+        )
+        
+        c_engine_acc = Container((offset_x+column_1, offset_y+65+row_height*4), (409, 36), (6, 3, 3, 6))
+        c_engine_acc.add_element(
+            TextUpdated(
+                "Acceleration: {}", self.__font_small, self.__color_white,
+                lambda: self.player.get_upgrade_price_as_text(ShipUpgrade.ENGINE_ACCELERATION)
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
+        )
+        
+        c_magnet = Container((offset_x+column_1, offset_y+65+row_height*5), (455, 36), (6, 6, 6, 6))
         c_magnet.add_element(
             TextUpdated(
                 "Magnet.v{}", self.__font_small, self.__color_white,
@@ -1313,7 +1335,7 @@ class GameStateManager(pygame.sprite.Sprite):
             nudge=(12, 0)
         )
         
-        c_magnet_rad = Container((offset_x+290, offset_y+65+row_height*4), (409, 36), (6, 3, 3, 6))
+        c_magnet_rad = Container((offset_x+column_1, offset_y+65+row_height*6), (409, 36), (6, 3, 3, 6))
         c_magnet_rad.add_element(
             TextUpdated(
                 "Radius: {}", self.__font_small, self.__color_white,
@@ -1323,7 +1345,7 @@ class GameStateManager(pygame.sprite.Sprite):
             nudge=(12, 0)
         )
         
-        c_magnet_str = Container((offset_x+290, offset_y+65+row_height*5), (409, 36), (6, 3, 3, 6))
+        c_magnet_str = Container((offset_x+column_1, offset_y+65+row_height*7), (409, 36), (6, 3, 3, 6))
         c_magnet_str.add_element(
             TextUpdated(
                 "Strength: {}", self.__font_small, self.__color_white,
@@ -1335,7 +1357,7 @@ class GameStateManager(pygame.sprite.Sprite):
 
         # Current stats
         # Score
-        c_points = Container((offset_x+760, offset_y+65), (150, 36), (6, 3, 3, 6))
+        c_points = Container((offset_x+column_2, offset_y+65), (150, 36), (6, 3, 3, 6))
         c_points.add_element(
             TextUpdated(
                 "{}pts", self.__font_small, self.__color_white, 
@@ -1345,7 +1367,7 @@ class GameStateManager(pygame.sprite.Sprite):
             nudge=(9, 0)
         )
         # Money
-        c_money = Container((offset_x+920, offset_y+65), (127, 36), (3, 3, 3, 3))
+        c_money = Container((offset_x+column_2+160, offset_y+65), (127, 36), (3, 3, 3, 3))
         c_money.add_element(
             TextUpdated(
                 "{}g", self.__font_small, self.__color_golden, 
@@ -1355,7 +1377,7 @@ class GameStateManager(pygame.sprite.Sprite):
             nudge=(9, 0)
         )
         # Health
-        c_health = Container((offset_x+1057, offset_y+65), (158, 36), (3, 6, 6, 3))
+        c_health = Container((offset_x+column_2+297, offset_y+65), (158, 36), (3, 6, 6, 3))
         c_health.add_element(
             TextPlain("Lives", self.__font_small, self.__color_white),
             Allignment.LEFT_WALL,
@@ -1368,9 +1390,19 @@ class GameStateManager(pygame.sprite.Sprite):
                 self.player_stats.cheat_godmode
             )
         )
+        # Heal
+        c_heal = Container((offset_x+column_2, offset_y+65+row_height*1), (409, 36), (6, 3, 3, 6))
+        c_heal.add_element(
+            TextUpdated(
+                "Heal: {}g", self.__font_small, self.__color_white,
+                self.player.get_price_heal
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
+        )
         # List - weapons
         # Plasma Gun
-        c_weapon_1 = Container((offset_x+760, offset_y+65+row_height*1), (455, 36), (6, 6, 6, 6))
+        c_weapon_1 = Container((offset_x+column_2, offset_y+65+row_height*2), (455, 36), (6, 6, 6, 6))
         c_weapon_1.add_element(
             TextUpdated(
                 "Weapon 1: {}.v{}", self.__font_small, self.__color_white,
@@ -1380,7 +1412,7 @@ class GameStateManager(pygame.sprite.Sprite):
             Allignment.LEFT_WALL,
             nudge=(12, 0)
         )
-        c_weapon_1_proj = Container((offset_x+760, offset_y+65+row_height*2), (409, 36), (6, 3, 3, 6))
+        c_weapon_1_proj = Container((offset_x+column_2, offset_y+65+row_height*3), (409, 36), (6, 3, 3, 6))
         c_weapon_1_proj.add_element(
             TextUpdated(
                 "Projectiles: {}", self.__font_small, self.__color_white,
@@ -1389,7 +1421,7 @@ class GameStateManager(pygame.sprite.Sprite):
             Allignment.LEFT_WALL,
             nudge=(12, 0)
         )
-        c_weapon_1_cd = Container((offset_x+760, offset_y+65+row_height*3), (409, 36), (6, 3, 3, 6))
+        c_weapon_1_cd = Container((offset_x+column_2, offset_y+65+row_height*4), (409, 36), (6, 3, 3, 6))
         c_weapon_1_cd.add_element(
             TextUpdated(
                 "Cooldown: {}", self.__font_small, self.__color_white,
@@ -1399,7 +1431,7 @@ class GameStateManager(pygame.sprite.Sprite):
             nudge=(12, 0)
         )
         #Bomb Launcher
-        c_weapon_2 = Container((offset_x+760, offset_y+65+row_height*4), (455, 36), (6, 6, 6, 6))
+        c_weapon_2 = Container((offset_x+column_2, offset_y+65+row_height*5), (455, 36), (6, 6, 6, 6))
         c_weapon_2.add_element(
             TextUpdated(
                 "Weapon 2: {}.v{}", self.__font_small, self.__color_white,
@@ -1409,7 +1441,7 @@ class GameStateManager(pygame.sprite.Sprite):
             Allignment.LEFT_WALL,
             nudge=(12, 0)
         )
-        c_weapon_2_rad = Container((offset_x+760, offset_y+65+row_height*5), (409, 36), (6, 3, 3, 6))
+        c_weapon_2_rad = Container((offset_x+column_2, offset_y+65+row_height*6), (409, 36), (6, 3, 3, 6))
         c_weapon_2_rad.add_element(
             TextUpdated(
                 "Radius: {}", self.__font_small, self.__color_white,
@@ -1418,7 +1450,7 @@ class GameStateManager(pygame.sprite.Sprite):
             Allignment.LEFT_WALL,
             nudge=(12, 0)
         )
-        c_weapon_2_fuse = Container((offset_x+760, offset_y+65+row_height*6), (409, 36), (6, 3, 3, 6))
+        c_weapon_2_fuse = Container((offset_x+column_2, offset_y+65+row_height*7), (409, 36), (6, 3, 3, 6))
         c_weapon_2_fuse.add_element(
             TextUpdated(
                 "Fuse: {}", self.__font_small, self.__color_white,
@@ -1432,7 +1464,7 @@ class GameStateManager(pygame.sprite.Sprite):
             [c_background, c_ship, c_model, c_switch_model, c_heal,
              c_magnet, c_magnet_rad, c_magnet_str, c_points, c_money,
              c_health, c_weapon_1, c_weapon_1_proj, c_weapon_2, c_weapon_2_rad,
-             c_weapon_2_fuse, c_weapon_1_cd]
+             c_weapon_2_fuse, c_weapon_1_cd, c_engine, c_engine_acc, c_engine_speed]
         )
         
         # <> Buttons <>
@@ -1455,7 +1487,7 @@ class GameStateManager(pygame.sprite.Sprite):
 
         # Model switching
         b_model_left = Button(
-            (offset_x+290, offset_y+65+row_height*1), (36, 36), (6, 3, 3, 6), 
+            (offset_x+column_1, offset_y+65+row_height*1), (36, 36), (6, 3, 3, 6), 
             self.player_stats.switch_ship_model_to_previous
         )
         b_model_left.add_element(
@@ -1464,27 +1496,38 @@ class GameStateManager(pygame.sprite.Sprite):
         )
 
         b_model_right = Button(
-            (offset_x+709, offset_y+65+row_height*1), (36, 36), (3, 6, 6, 3), 
+            (offset_x+column_1+419, offset_y+65+row_height*1), (36, 36), (3, 6, 6, 3), 
             self.player_stats.switch_ship_model_to_next
         )
         b_model_right.add_element(
             TextPlain(">", self.__font_small, self.__color_blue),
             Allignment.CENTER
         )
-        # Heal
-        b_heal = Button(
-           (offset_x+709, offset_y+65+row_height*2), (36, 36), (3, 6, 6, 3),
-            self.player.buy_heal,
-            self.player.can_heal
+        # Engine
+        b_engine_speed = Button(
+            (offset_x+column_1+419, offset_y+65+row_height*3), (36, 36), (3, 6, 6, 3),
+            lambda: self.player.buy_upgrade(ShipUpgrade.ENGINE_SPEED),
+            lambda: self.player.can_buy_upgrade(ShipUpgrade.ENGINE_SPEED)
         )
-        b_heal.set_outline_color(self.__color_green)
-        b_heal.add_element(
+        b_engine_speed.set_outline_color(self.__color_green)
+        b_engine_speed.add_element(
+            TextPlain("/\\", self.__font_small, self.__color_green),
+            Allignment.CENTER
+        )
+
+        b_engine_acc = Button(
+            (offset_x+column_1+419, offset_y+65+row_height*4), (36, 36), (3, 6, 6, 3),
+            lambda: self.player.buy_upgrade(ShipUpgrade.ENGINE_ACCELERATION),
+            lambda: self.player.can_buy_upgrade(ShipUpgrade.ENGINE_ACCELERATION)
+        )
+        b_engine_acc.set_outline_color(self.__color_green)
+        b_engine_acc.add_element(
             TextPlain("/\\", self.__font_small, self.__color_green),
             Allignment.CENTER
         )
         # Magnet
         b_magnet_rad = Button(
-            (offset_x+709, offset_y+65+row_height*4), (36, 36), (3, 6, 6, 3),
+            (offset_x+column_1+419, offset_y+65+row_height*6), (36, 36), (3, 6, 6, 3),
             lambda: self.player.buy_upgrade(ShipUpgrade.MAGNET_RADIUS),
             lambda: self.player.can_buy_upgrade(ShipUpgrade.MAGNET_RADIUS)
         )
@@ -1495,7 +1538,7 @@ class GameStateManager(pygame.sprite.Sprite):
         )
 
         b_magnet_str = Button(
-            (offset_x+709, offset_y+65+row_height*5), (36, 36), (3, 6, 6, 3),
+            (offset_x+column_1+419, offset_y+65+row_height*7), (36, 36), (3, 6, 6, 3),
             lambda: self.player.buy_upgrade(ShipUpgrade.MAGNET_STRENGTH),
             lambda: self.player.can_buy_upgrade(ShipUpgrade.MAGNET_STRENGTH)
         )
@@ -1505,9 +1548,20 @@ class GameStateManager(pygame.sprite.Sprite):
             Allignment.CENTER
         )
 
+        # Heal
+        b_heal = Button(
+           (offset_x+column_2+419, offset_y+65+row_height*1), (36, 36), (3, 6, 6, 3),
+            self.player.buy_heal,
+            self.player.can_heal
+        )
+        b_heal.set_outline_color(self.__color_green)
+        b_heal.add_element(
+            TextPlain("/\\", self.__font_small, self.__color_green),
+            Allignment.CENTER
+        )
         # Upgrade weapons
         b_weapon_1_proj_up = Button(
-            (offset_x+1179, offset_y+65+row_height*2), (36, 36), (3, 6, 6, 3),
+            (offset_x+column_2+419, offset_y+65+row_height*3), (36, 36), (3, 6, 6, 3),
             lambda: self.player.buy_upgrade(ShipUpgrade.PLASMAGUN_PROJECTILES),
             lambda: self.player.can_buy_upgrade(ShipUpgrade.PLASMAGUN_PROJECTILES)
         )
@@ -1517,7 +1571,7 @@ class GameStateManager(pygame.sprite.Sprite):
             Allignment.CENTER
         )
         b_weapon_1_cd_up = Button(
-            (offset_x+1179, offset_y+65+row_height*3), (36, 36), (3, 6, 6, 3),
+            (offset_x+column_2+419, offset_y+65+row_height*4), (36, 36), (3, 6, 6, 3),
             lambda: self.player.buy_upgrade(ShipUpgrade.PLASMAGUN_COOLDOWN),
             lambda: self.player.can_buy_upgrade(ShipUpgrade.PLASMAGUN_COOLDOWN)
         )
@@ -1528,7 +1582,7 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         
         b_weapon_2_rad_up = Button(
-            (offset_x+1179, offset_y+65+row_height*5), (36, 36), (3, 6, 6, 3),
+            (offset_x+column_2+419, offset_y+65+row_height*6), (36, 36), (3, 6, 6, 3),
             lambda: self.player.buy_upgrade(ShipUpgrade.BOMBLAUNCHER_RADIUS),
             lambda: self.player.can_buy_upgrade(ShipUpgrade.BOMBLAUNCHER_RADIUS)
         )
@@ -1538,7 +1592,7 @@ class GameStateManager(pygame.sprite.Sprite):
             Allignment.CENTER
         )
         b_weapon_2_fuse_up = Button(
-            (offset_x+1179, offset_y+65+row_height*6), (36, 36), (3, 6, 6, 3),
+            (offset_x+column_2+419, offset_y+65+row_height*7), (36, 36), (3, 6, 6, 3),
             lambda: self.player.buy_upgrade(ShipUpgrade.BOMBLAUNCHER_FUSE),
             lambda: self.player.can_buy_upgrade(ShipUpgrade.BOMBLAUNCHER_FUSE)
         )
@@ -1567,7 +1621,7 @@ class GameStateManager(pygame.sprite.Sprite):
         self.__buttons_pause_menu.extend(
             [b_model_left, b_model_right, b_heal, b_magnet_rad, b_magnet_str,
              b_end_run, s_auto_shoot, b_weapon_1_cd_up, b_weapon_1_proj_up, b_weapon_2_fuse_up,
-             b_weapon_2_rad_up]
+             b_weapon_2_rad_up, b_engine_speed, b_engine_acc]
         )
 
     def __initialize_name_check(self):
