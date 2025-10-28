@@ -314,7 +314,7 @@ class InfoButton(ButtonBase):
             corners,
         )
         self._color_outline = (100, 100, 100, 255)
-        self._color_outline_active = (0, 255, 0, 255)
+        self._color_outline_active = (255, 215, 0, 255)
         self._color_fill_hover = self._get_divided_color_tuple(self._color_outline, 2, 150)
         self._color_fill_hover_active = self._get_divided_color_tuple(self._color_outline_active, 2, 150)
         

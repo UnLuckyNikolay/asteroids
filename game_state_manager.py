@@ -1770,20 +1770,20 @@ class GameStateManager(pygame.sprite.Sprite):
         
         res = self.game.screen_resolution
         size_x = 900
-        size_y = 365
+        size_y = 375
         root_x = res[0]/2-size_x/2
         root_y = res[1]/2-size_y/2
 
-        nudge_x_1 = 35
+        nudge_x_1 = 36
         nudge_x_2 = int(nudge_x_1+size_x/2)
 
-        text_start_y = 143
+        text_start_y = 50
         text_row_y = 30
 
         # <> Containers <>
 
         # Profile
-        c_round_stats = Container(
+        c_background = Container(
             (root_x, root_y), (size_x, size_y), (30, 30, 30, 30)
         )
         c_title = Container(
@@ -1796,84 +1796,87 @@ class GameStateManager(pygame.sprite.Sprite):
             ),
             Allignment.CENTER
         )
-        c_round_stats.add_element(
+        c_stats = Container(
+            (root_x+10, root_y+95), (size_x-20, size_y-165), (10, 10, 10, 10)
+        )
+        c_stats.add_element(
             TextPlain(
                 "Score: {}", self.__font_medium, self.__color_white,
                 self.rsm.score
             ),
-            nudge=(nudge_x_1, 100)
+            nudge=(nudge_x_1, 11)
         )
-        c_round_stats.add_element(
+        c_stats.add_element(
             TextPlain(
                 "Time: {}", self.__font_medium, self.__color_white,
                 self.rsm.get_time_as_text()
             ),
-            nudge=(nudge_x_2, 100)
+            nudge=(nudge_x_2, 11)
         )
-        c_round_stats.add_element(
+        c_stats.add_element(
             TextPlain(
                 "Asteroids destroyed: {}", self.__font_small, self.__color_white,
                 self.rsm.destroyed_asteroids
             ),
             nudge=(nudge_x_1, text_start_y)
         )
-        c_round_stats.add_element(
+        c_stats.add_element(
             TextPlain(
                 "- Basic: {}", self.__font_small, self.__color_white,
                 self.rsm.destroyed_asteroids_basic
             ),
             nudge=(nudge_x_1, text_start_y+text_row_y*1)
         )
-        c_round_stats.add_element(
+        c_stats.add_element(
             TextPlain(
                 "- Explosive: {}", self.__font_small, self.__color_white,
                 self.rsm.destroyed_asteroids_explosive
             ),
             nudge=(nudge_x_1, text_start_y+text_row_y*2)
         )
-        c_round_stats.add_element(
+        c_stats.add_element(
             TextPlain(
                 "- Golden: {}", self.__font_small, self.__color_white,
                 self.rsm.destroyed_asteroids_golden
             ),
             nudge=(nudge_x_1, text_start_y+text_row_y*3)
         )
-        c_round_stats.add_element(
+        c_stats.add_element(
             TextPlain(
                 "- Homing: {}", self.__font_small, self.__color_white,
                 self.rsm.destroyed_asteroids_homing
             ),
             nudge=(nudge_x_1, text_start_y+text_row_y*4)
         )
-        c_round_stats.add_element(
+        c_stats.add_element(
             TextPlain(
                 "Loot collected: {}", self.__font_small, self.__color_white,
                 self.rsm.collected_loot
             ),
             nudge=(nudge_x_2, text_start_y)
         )
-        c_round_stats.add_element(
+        c_stats.add_element(
             TextPlain(
                 "- Copper ore: {}", self.__font_small, self.__color_white,
                 self.rsm.collected_ores_copper
             ),
             nudge=(nudge_x_2, text_start_y+text_row_y*1)
         )
-        c_round_stats.add_element(
+        c_stats.add_element(
             TextPlain(
                 "- Silver ore: {}", self.__font_small, self.__color_white,
                 self.rsm.collected_ores_silver
             ),
             nudge=(nudge_x_2, text_start_y+text_row_y*2)
         )
-        c_round_stats.add_element(
+        c_stats.add_element(
             TextPlain(
                 "- Golden ore: {}", self.__font_small, self.__color_white,
                 self.rsm.collected_ores_golden
             ),
             nudge=(nudge_x_2, text_start_y+text_row_y*3)
         )
-        c_round_stats.add_element(
+        c_stats.add_element(
             TextPlain(
                 "- Diamonds: {}", self.__font_small, self.__color_white,
                 self.rsm.collected_diamonds
@@ -1888,7 +1891,7 @@ class GameStateManager(pygame.sprite.Sprite):
         #     )
 
         self.__containers_round_end.extend(
-            [c_round_stats, c_title]
+            [c_background, c_stats, c_title]
         )
         
         # <> Buttons <>
