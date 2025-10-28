@@ -78,7 +78,8 @@ class ExplosionRound(ExplosionBase):
         self.explosion_count : int = 5
 
         self.explosion_time : float = 2
-        self.explosion_pause : float = 0.3
+        self.explosion_pause : float = 0.15
+        self.phase_pause : float = 0.3
 
         self.max_radius : int = 30
         self.max_explosion_radius : int = 30
@@ -112,7 +113,7 @@ class ExplosionRound(ExplosionBase):
         next_frame.set_colorkey(empty)
         next_frame.fill(empty)
 
-        mp = 25
+        mp = 100
 
         phase_pause = 0
         for color in colors:
@@ -128,6 +129,6 @@ class ExplosionRound(ExplosionBase):
                         min(self.max_explosion_radius, radius), 
                         color
                     )
-            phase_pause += 1
+            phase_pause += self.phase_pause
 
         screen.blit(next_frame, (self.position.x-self.size, self.position.y-self.size))

@@ -1,6 +1,6 @@
 # pyright: reportAttributeAccessIssue=false
 
-import pygame, time
+import pygame
 
 from constants import *
 from game_state_manager import GameStateManager, Menu
@@ -185,8 +185,8 @@ class Game():
         ExplosionRound(self.player.position)
         death_timer = 0.0
         is_player_teleported = False
-        while self.is_running and death_timer < 6:
-            if not is_player_teleported and death_timer > 3:
+        while self.is_running and death_timer < 2:
+            if not is_player_teleported and death_timer > 1:
                 self.player.is_hidden = True
                 is_player_teleported = True
             dt = self.process_and_refresh()
@@ -195,15 +195,14 @@ class Game():
                 object.update(self.dt)
 
         # Saving score and going back to Main Menu
+        self.is_round_end = True
+        self.gsm.switch_menu(Menu.ROUND_END)
         if not self.player.is_sus and self.rsm.score > 0:
             self.rsm.is_new_record, self.rsm.record_place = self.gsm.check_score(self.rsm.score)
             self.player_stats.process_round_stats(self.rsm)
             self.gsm.save_profile()
-            if self.rsm.is_new_record:
-                self.is_round_end = True
-                self.gsm.switch_menu(Menu.NAME_CHECK)
-                while self.is_round_end:
-                    self.process_and_refresh()
+        while self.is_round_end:
+            self.process_and_refresh()
         self.gsm.switch_menu(Menu.MAIN_MENU)
 
         self.player.reset()
