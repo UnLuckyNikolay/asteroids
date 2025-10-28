@@ -1283,12 +1283,12 @@ class GameStateManager(pygame.sprite.Sprite):
         c_background.set_fill_color((75, 75, 100, 150))
                 
         # Current ship
-        c_ship = Container((offset_x+65, offset_y+65), (210, 210), (12, 6, 6, 6))
+        c_ship = Container((offset_x+65, offset_y+65), (210, 189), (12, 6, 6, 6))
         c_ship.add_element(
             self.player.get_ship, 
             Allignment.CENTER
         )
-        c_colors = Container((offset_x+65, offset_y+285), (210, 30), (6, 6, 6, 6))
+        c_colors = Container((offset_x+65, offset_y+269), (210, 36), (6, 6, 6, 6))
         c_colors.add_element(
             TextPlain("Colors", self.__font_small, self.__color_white),
             Allignment.CENTER
@@ -1489,7 +1489,7 @@ class GameStateManager(pygame.sprite.Sprite):
 
         # Color profiles # 30 for in between, 45 for button
         b_color1 = Switch(
-            (offset_x+65, offset_y+325), (45, 30), (6, 3, 3, 6),
+            (offset_x+65, offset_y+320), (45, 36), (6, 3, 3, 6),
             lambda: self.player.switch_color_profile(0),
             lambda: self.player.ship.color_profile == 0
         )
@@ -1498,7 +1498,7 @@ class GameStateManager(pygame.sprite.Sprite):
             Allignment.CENTER
         )
         b_color2 = Switch(
-            (offset_x+120, offset_y+325), (45, 30), (3, 3, 3, 3),
+            (offset_x+120, offset_y+320), (45, 36), (3, 3, 3, 3),
             lambda: self.player.switch_color_profile(1),
             lambda: self.player.ship.color_profile == 1
         )
@@ -1507,7 +1507,7 @@ class GameStateManager(pygame.sprite.Sprite):
             Allignment.CENTER
         )
         b_color3 = Switch(
-            (offset_x+175, offset_y+325), (45, 30), (3, 3, 3, 3),
+            (offset_x+175, offset_y+320), (45, 36), (3, 3, 3, 3),
             lambda: self.player.switch_color_profile(2),
             lambda: self.player.ship.color_profile == 2
         )
@@ -1516,7 +1516,7 @@ class GameStateManager(pygame.sprite.Sprite):
             Allignment.CENTER
         )
         b_color4 = Switch(
-            (offset_x+230, offset_y+325), (45, 30), (3, 6, 6, 3),
+            (offset_x+230, offset_y+320), (45, 36), (3, 6, 6, 3),
             lambda: self.player.switch_color_profile(3),
             lambda: self.player.ship.color_profile == 3
         )
@@ -1527,15 +1527,15 @@ class GameStateManager(pygame.sprite.Sprite):
 
         # Switch - Auto-Shoot
         s_auto_shoot = Switch(
-            (offset_x+65, offset_y+535), (40, 40), (8, 8, 8, 8),
+            (offset_x+65, offset_y+371), (210, 36), (6, 6, 6, 6),
             self.player.switch_auto_shoot,
             self.player.is_auto_shooting
         )
-        s_auto_shoot.add_description(
-            TextPlain("Switch the AUTO-SHOOT on/off", self.__font_very_small, self.__color_white)
-        )
+        # s_auto_shoot.add_description(
+        #     TextPlain("Switch the AUTO-SHOOT on/off", self.__font_very_small, self.__color_white)
+        # )
         s_auto_shoot.add_element(
-            TextPlain("AU", self.__font_small, self.__color_blue),
+            TextPlain("Auto-shoot", self.__font_small, self.__color_blue),
             Allignment.CENTER
         )
 
