@@ -121,6 +121,9 @@ class GameStateManager(pygame.sprite.Sprite):
         self.switch_menu(Menu.HUD)
 
     def switch_menu(self, menu : Menu):
+        if self.__current_menu == menu:
+            return
+        
         self.__current_menu = menu
         if self.__hovered_button != None and self.__hovered_button._is_hovered:
             self.__hovered_button.switch_hovered_state()
@@ -1655,18 +1658,19 @@ class GameStateManager(pygame.sprite.Sprite):
 
         # Ends the run and returns to the main menu
         b_end_run = Button(
-            (offset_x+890, offset_y+600), (340, 72), (8, 8, 20, 20),
+            (offset_x+730, offset_y+600), (500, 72), (8, 8, 20, 20),
             self.game.handler_finish_round
         )
         b_end_run.make_weighted(ModKey.SHIFT)
         b_end_run.set_outline_color(self.__color_red)
         b_end_run.set_fill_color(self.__color_red_fill)
         b_end_run.add_description(
-            TextPlain("SHIFT+Click to end the run early", self.__font_very_small, self.__color_white)
+            TextPlain("SHIFT+Click to self-destruct", self.__font_very_small, self.__color_white)
         )
         b_end_run.add_element(
-            TextPlain("End Run", self.__font_big, self.__color_red),
-            Allignment.CENTER
+            TextPlain("SELF-DESTRUCT", self.__font_big, self.__color_red),
+            Allignment.CENTER,
+            nudge=(2, 0)
         )
 
         self.__buttons_pause_menu.extend(

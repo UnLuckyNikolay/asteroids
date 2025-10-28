@@ -2,7 +2,7 @@ import pygame, math, pygame.gfxdraw
 
 from shapes.circleshape import CircleShape
 from player.weapons.projectiles.bombexplosion import BombExplosion
-from vfx.explosion import Explosion
+from vfx.explosions import ExplosionSpiky
 
 
 class Bomb(CircleShape):
@@ -26,7 +26,7 @@ class Bomb(CircleShape):
                                          (int(155 + self.color_change * 50), int(self.color_change / 2 * 255), int(self.color_change / 2 * 255)))
             pygame.draw.circle(screen, (115, 0, 0), self.position, self.radius + 2, 3)
         else: 
-            explosion = Explosion(self.position, self.explosion_radius)
+            explosion = ExplosionSpiky(self.position, self.explosion_radius)
             hitbox = BombExplosion(self.position, self.explosion_radius)
             self.kill()
             

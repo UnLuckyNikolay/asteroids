@@ -49,6 +49,8 @@ class Player(CircleShape):
         self.is_shooting : bool = False
 
         self.game = game
+        self.is_hidden : bool = True
+        """Used as a check when teleporting the player if off-screen."""
         self.stats : PlayerStats = stats
 
         self.timer_invul : float = 0
@@ -129,6 +131,7 @@ class Player(CircleShape):
     def teleport_and_prepare_for_round(self, position : tuple[int, int]):
         self.position.update(position)
         self.magnet = Magnet(self.position)
+        self.is_hidden = False
 
         if self.stats.cheat_godmode or self.stats.cheat_hitbox or self.stats.cheat_stonks:
             self.is_sus = True
@@ -139,6 +142,8 @@ class Player(CircleShape):
         self.ship.switch_hitbox_to(self.stats.cheat_hitbox)
 
     def draw(self, screen : pygame.Surface):
+        if self.is_hidden:
+            return
         self.ship.draw_rotated(
             screen, 
             self.position,
@@ -166,15 +171,16 @@ class Player(CircleShape):
         self.position += self.velocity * self.__engine_speed * dt
 
         # Teleports player if off-screen
-        res = self.game.screen_resolution
-        if self.position.x < -ASTEROID_MAX_RADIUS:
-            self.position.x = res[0] + ASTEROID_MAX_RADIUS
-        elif self.position.x > res[0] + ASTEROID_MAX_RADIUS:
-            self.position.x = -ASTEROID_MAX_RADIUS
-        if self.position.y < -ASTEROID_MAX_RADIUS:
-            self.position.y = res[1] + ASTEROID_MAX_RADIUS
-        elif self.position.y > res[1] + ASTEROID_MAX_RADIUS:
-            self.position.y = -ASTEROID_MAX_RADIUS
+        if not self.is_hidden:
+            res = self.game.screen_resolution
+            if self.position.x < -ASTEROID_MAX_RADIUS:
+                self.position.x = res[0] + ASTEROID_MAX_RADIUS
+            elif self.position.x > res[0] + ASTEROID_MAX_RADIUS:
+                self.position.x = -ASTEROID_MAX_RADIUS
+            if self.position.y < -ASTEROID_MAX_RADIUS:
+                self.position.y = res[1] + ASTEROID_MAX_RADIUS
+            elif self.position.y > res[1] + ASTEROID_MAX_RADIUS:
+                self.position.y = -ASTEROID_MAX_RADIUS
 
     def attempt_shot(self, time_since_last_shot : float) -> bool:
         return self.weapon_current.attempt_shot(self.position, self.rotation, time_since_last_shot)
@@ -236,6 +242,10 @@ class Player(CircleShape):
             self.lives -= 1
             self.is_alive = False
             return self.is_alive
+        
+    def end_round(self):
+        self.state_movement = 0
+        self.state_rotation = 0
 
     def collect_loot(self, price : int):
         self.money += price

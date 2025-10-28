@@ -53,7 +53,7 @@ IDEAS:
     - [ ] Profit
 - [x] Show current timer
 - [ ] Show difficulty modifier
-- [ ] Bubble explosion vfx (for bombs or better for player death)
+- [x] Bubble explosion vfx for player death
 - [x] Add amount limit to certain asteroids (mainly Homing)
 - [x] Condition to activate cheat switches
 - [x] Check how to save crash logs

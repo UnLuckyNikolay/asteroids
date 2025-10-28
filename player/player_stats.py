@@ -95,7 +95,6 @@ class PlayerStats():
     def set_player(self, player):
         self.player = player
         self.player.ship.switch_model(self.unlocked_ships[self.ship_model_index][0], self.ship_color_profile)
-        print(f"Setting player ship to {self.unlocked_ships[self.ship_model_index][0]}, color profile to {self.ship_color_profile}")
 
     def get_save(self) -> dict:
         player_stats_save = {

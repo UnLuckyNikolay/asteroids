@@ -12,8 +12,9 @@ class AsteroidHoming(Asteroid):
 
     
     def update(self, dt):
-        direction_vector = (self.target.position - self.position).normalize() * self.max_speed
-        self.velocity = self.velocity.move_towards(direction_vector, HOMING_SPEED*dt)
+        if self.target.is_alive:
+            direction_vector = (self.target.position - self.position).normalize() * self.max_speed
+            self.velocity = self.velocity.move_towards(direction_vector, HOMING_SPEED*dt)
         self.position += self.velocity * dt
 
 

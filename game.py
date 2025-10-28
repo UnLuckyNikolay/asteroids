@@ -1,6 +1,6 @@
 # pyright: reportAttributeAccessIssue=false
 
-import pygame
+import pygame, time
 
 from constants import *
 from game_state_manager import GameStateManager, Menu
@@ -11,7 +11,7 @@ from player.player_stats import PlayerStats
 from player.weapons.projectiles.projectileplasma import ProjectilePlasma
 from player.weapons.projectiles.bomb import Bomb
 from player.weapons.projectiles.bombexplosion import BombExplosion
-from vfx.explosion import Explosion
+from vfx.explosions import ExplosionBase, ExplosionSpiky, ExplosionRound
 
 from world.starfield import StarField
 from world.asteroidfield import AsteroidField
@@ -52,7 +52,7 @@ class Game():
         RoundStateManager.containers = (self.updatable, self.cleanup)
 
         StarField.containers = (self.drawable)
-        Explosion.containers = (self.updatable, self.drawable, self.cleanup)
+        ExplosionBase.containers = (self.updatable, self.drawable, self.cleanup)
 
         Player.containers = (self.updatable, self.drawable) # Not part of self.cleanup, instead removed in .initialize_new_player (so only removed when swapping saves)
         ProjectilePlasma.containers = (self.projectiles, self.updatable, self.drawable, self.moving_objects, self.cleanup)
@@ -71,6 +71,7 @@ class Game():
         # 40 - Loot
         # 50 - Player
         # 60 - ProjectilePlasma
+        # 90 - ExplosionRound (overwritten, used as player's death animation)
         # 100 - UserInterface
 
         self.star_field = StarField(self.screen_resolution_fullscreen)
@@ -139,16 +140,17 @@ class Game():
                 # Player hit
                 for asteroid in self.asteroids:
                     if asteroid.check_colision(self.player) and not self.player.is_invul: # No check for dead asteroids because first loop, only off-screen ones are dead
-                        if self.player.take_damage_and_check_if_alive():
-                            self.asteroid_field.kill_asteroid(asteroid)
-                            explosion = Explosion(asteroid.position, asteroid.radius)
+                        # if self.player.take_damage_and_check_if_alive():
+                        self.player.take_damage_and_check_if_alive()
+                        self.asteroid_field.kill_asteroid(asteroid)
+                        explosion = ExplosionSpiky(asteroid.position, asteroid.radius)
                     
                     # Asteroid shot
                     for projectile in self.projectiles:
                         if projectile.check_colision(asteroid) and not asteroid.is_dead:
                             projectile.kill()
                             self.asteroid_field.split_asteroid(asteroid)
-                            explosion = Explosion(asteroid.position, asteroid.radius)
+                            explosion = ExplosionSpiky(asteroid.position, asteroid.radius)
                             self.rsm.score += asteroid.reward
                             if not self.player.is_sus:
                                 self.rsm.increase_count_stat(type(asteroid))
@@ -178,6 +180,21 @@ class Game():
             # Screen update - Pause Menu
             else:
                 self.redraw_objects_and_ui()
+
+        # Death enimation
+        self.player.end_round()
+        ExplosionRound(self.player.position)
+        death_timer = 0.0
+        is_player_teleported = False
+        print("Starting death animation")
+        while self.is_running and death_timer < 6:
+            if not is_player_teleported and death_timer > 3:
+                self.player.is_hidden = True
+                is_player_teleported = True
+            dt = self.process_and_refresh()
+            death_timer += dt
+            for object in self.updatable:
+                object.update(self.dt)
 
         # Saving score and going back to Main Menu
         if not self.player.is_sus and self.rsm.score > 0:
@@ -357,8 +374,8 @@ class Game():
         self.is_running = False
 
     def handler_finish_round(self):
-        if self.player.is_alive:
-            self.player.is_alive = False
+        self.player.is_alive = False
+        self.gsm.switch_menu(Menu.HUD)
 
     def handler_regenerate_background(self):
         self.star_field.regenerate()

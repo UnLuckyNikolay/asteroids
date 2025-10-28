@@ -37,7 +37,8 @@ class RoundStateManager(pygame.sprite.Sprite):
 
 
     def update(self, delta : float):
-        self.round_time += delta
+        if self.player.is_alive:
+            self.round_time += delta
 
     def get_current_time_as_text(self) -> str:
         seconds = int(self.round_time%60)
