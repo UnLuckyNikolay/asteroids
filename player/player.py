@@ -65,6 +65,7 @@ class Player(CircleShape):
         self.times_healed : int = 0
 
         self.ship : Ship = Ship(self.stats.unlocked_ships[self.stats.ship_model_index][0], self.radius)
+        self.is_hitbox_shown : bool = False
         self.__level_engine : int = 1
         self.__level_engine_speed : int = 1
         self.__engine_speed : int = 200
@@ -133,13 +134,13 @@ class Player(CircleShape):
         self.magnet = Magnet(self.position)
         self.is_hidden = False
 
-        if self.stats.cheat_godmode or self.stats.cheat_hitbox or self.stats.cheat_stonks:
+        if self.stats.cheat_godmode or self.stats.cheat_stonks:
             self.is_sus = True
         else:
             self.is_sus = False
         if self.stats.cheat_stonks:
             self.money = 9999
-        self.ship.switch_hitbox_to(self.stats.cheat_hitbox)
+        self.ship.switch_hitbox_to(self.is_hitbox_shown)
 
     def draw(self, screen : pygame.Surface):
         if self.is_hidden:
@@ -265,6 +266,9 @@ class Player(CircleShape):
 
     def switch_auto_shoot(self):
         self.is_auto_shooting = False if self.is_auto_shooting else True
+
+    def switch_hitbox(self):
+        self.is_hitbox_shown = False if self.is_hitbox_shown else True
     
     ### Ship
 

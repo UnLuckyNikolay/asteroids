@@ -461,8 +461,8 @@ class GameStateManager(pygame.sprite.Sprite):
         # Cheat - Show hitbox
         s_hitbox = Switch(
             (10, res[1]-offset_y*4), button_size, left_corners,
-            self.player_stats.switch_hitbox,
-            self.player_stats.cheat_hitbox
+            self.player.switch_hitbox,
+            self.player.is_hitbox_shown
         )
         s_hitbox.add_description(
             TextPlain("DEBUG: Switches the player hitbox visibility on/off", self.__font_very_small, self.__color_white)
