@@ -12,7 +12,9 @@ class ModKey(Enum):
     CTRL = "Ctrl"
     ALT = "Alt"
 
-class _ButtonBase(Container):
+class ButtonBase(Container):
+    """Used as parent for other buttons and isinstance checks."""
+
     def __init__(
             self,
             position : tuple[int, int], 
@@ -81,7 +83,7 @@ class _ButtonBase(Container):
         self._description = text
 
 
-class Button(_ButtonBase):
+class Button(ButtonBase):
     def __init__(
             self,
             position : tuple[int, int], 
@@ -158,7 +160,7 @@ class Button(_ButtonBase):
             self._set_element_color(self._color_outline_inactive)
 
 
-class Switch(_ButtonBase):
+class Switch(ButtonBase):
     """
     Runs the key functions on press and switches it's state between on/off.
 
@@ -287,4 +289,68 @@ class ButtonRound(Button):
     def set_corners(self, topleft : int, topright : int, bottomright : int, bottomleft : int):
         """Does nothing for round buttons."""
         return
+    
+
+class InfoButton(ButtonBase):
+    """
+    Is a button. Does nothing. Just exists.
+
+    Takes a bool/func -> bool as the active condition.
+    Gray it False, Green if True.
+    
+    Use it as a container with desctiption.
+    """
+
+    def __init__(
+            self,
+            position : tuple[int, int], 
+            size : tuple[int, int], 
+            corners : tuple[int, int, int, int],
+            active_condition : bool | Callable[[], bool]
+    ):
+        super().__init__(
+            position, 
+            size,
+            corners,
+        )
+        self._color_outline = (100, 100, 100, 255)
+        self._color_outline_active = (0, 255, 0, 255)
+        self._color_fill_hover = self._get_divided_color_tuple(self._color_outline, 2, 150)
+        self._color_fill_hover_active = self._get_divided_color_tuple(self._color_outline_active, 2, 150)
+        
+        if callable(active_condition):
+            self._active_func = active_condition
+            self._is_active = active_condition()
+        else:
+            self._active_func = None
+            self._is_active = active_condition
+
+    def run_is_possible(self) -> bool:
+        """Not possible."""
+
+        return False
+
+    def draw(self, screen):
+        # if self._active_func != None:
+        #     self._is_active = self._active_func()
+        points = get_points(self._position, self._size, self._corners)
+        self._check_element_color()
+        if self._is_hovered and self._is_active:
+            pygame.gfxdraw.filled_polygon(screen, points, self._color_fill_hover_active)
+        elif self._is_hovered and not self._is_active:
+            pygame.gfxdraw.filled_polygon(screen, points, self._color_fill_hover)
+        else:
+            pygame.gfxdraw.filled_polygon(screen, points, self._color_fill)
+        if self._is_active:
+            pygame.draw.polygon(screen, self._color_outline_active, points, 3)
+        else:
+            pygame.draw.polygon(screen, self._color_outline, points, 3)
+
+        self._draw_elements(screen)
+
+    def _check_element_color(self):
+        if self._is_active:
+            self._set_element_color(self._color_outline_active)
+        else:
+            self._set_element_color(self._color_outline)
     

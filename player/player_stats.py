@@ -62,11 +62,11 @@ class PlayerStats():
                 self.unlocked_ships_amount = self.__get_amount_of_unlocked_ship()
                 return
             
-    def check_unlocked_ship(self, ship_type : ShipModel):
+    def check_unlocked_ship(self, ship_type : ShipModel) -> bool: # pyright: ignore[reportReturnType]
         id = ship_type.value
         for i in range(len(self.unlocked_ships)):
             if self.unlocked_ships[i][0] == id:
-                return self.unlocked_ships[i][1]   
+                return self.unlocked_ships[i][1] # pyright: ignore[reportReturnType]
 
     def process_round_stats(self, rsm : RoundStateManager):
         if rsm.score > self.max_score:

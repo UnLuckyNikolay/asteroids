@@ -9,7 +9,7 @@ from json_helper.leaderboard.validator import ValidateLeaderboard
 from json_helper.profile.validator import ValidateProfile
 
 from ui_elements.container import Container, Allignment
-from ui_elements.buttons import Button, Switch, ModKey, ButtonRound
+from ui_elements.buttons import ButtonBase, Button, Switch, ModKey, ButtonRound, InfoButton
 from ui_elements.text import TextPlain, TextUpdated
 from ui_elements.sprites.healthbar import HealthBar
 from ui_elements.sprites.leaderboard import Leaderboard
@@ -161,12 +161,13 @@ class GameStateManager(pygame.sprite.Sprite):
                     button_list = self.__buttons_test_menu
                 case _:
                     print(f"Error: menu `{self.__current_menu.value}` missing in userinterface.check_hovered_button")
+                    return
 
             # Check for a button hover
             for i in range(len(button_list)):
                 if button_list[i].check_cursor_hover(position):
                     self.__hovered_button = button_list[i]
-                    self.__hovered_button.switch_hovered_state()
+                    self.__hovered_button.switch_hovered_state() # pyright: ignore[reportOptionalMemberAccess]
                     return
         
         # Check if cursor moved off the button
@@ -841,7 +842,7 @@ class GameStateManager(pygame.sprite.Sprite):
         center_x = int((res[0])/2)
         center_y = int((res[1])/2)
 
-        root_x = center_x-400
+        root_x = center_x-425
         root_y = 10
         text_nudge_x = 35
         
@@ -849,7 +850,7 @@ class GameStateManager(pygame.sprite.Sprite):
         
         # Profile
         c_profile = Container(
-            (center_x-400, 10), (800, 140), (7, 7, 30, 30)
+            (root_x, 10), (850, 140), (7, 7, 30, 30)
         )
         c_profile.add_element(
             TextPlain(
@@ -955,23 +956,27 @@ class GameStateManager(pygame.sprite.Sprite):
     
     def __initialize_player_info(self):
         self.__containers_player_info : list[Container] = []
-        self.__buttons_player_info : list[Button | Switch] = []
+        self.__buttons_player_info : list[ButtonBase] = []
         
         res = self.game.screen_resolution
         center_x = int(res[0]/2)
-        root_x = center_x-400
+        root_x = center_x-425
         root_y = 10
+        size_x = 850
         size_y = 483
 
         text_start_y = 157
         text_row_y = 30
         text_nudge_x = 35
 
+        root_secrets_x = int(root_x+size_x*0.75-120)
+        root_secrets_y = 150
+
         # <> Containers <>
 
         # Profile
         c_profile = Container(
-            (root_x, root_y), (800, size_y), (7, 7, 30, 30)
+            (root_x, root_y), (size_x, size_y), (7, 7, 30, 30)
         )
         c_profile.add_element(
             Ship(self.player_stats.ship_model_value, color_profile=self.player_stats.ship_color_profile),
@@ -1075,9 +1080,14 @@ class GameStateManager(pygame.sprite.Sprite):
                 personal_sprite(10, -10),
                 Allignment.BOTTOM_LEFT_CORNER
             )
+        c_secrets = Container((root_secrets_x, root_secrets_y), (240, 30), (5, 5, 5, 5))
+        c_secrets.add_element(
+            TextPlain("Secrets", self.__font_small, self.__color_white),
+            Allignment.CENTER
+        )
 
         self.__containers_player_info.extend(
-            [c_profile]
+            [c_profile, c_secrets]
         )
         
         # <> Buttons <>
@@ -1100,9 +1110,33 @@ class GameStateManager(pygame.sprite.Sprite):
             SymbolPencil(0, 0, self.__color_blue),
             Allignment.CENTER
         )
+        # Secret - Cheats
+        ib_cheats = InfoButton(
+            (root_secrets_x, root_secrets_y+50), (240, 30), (5, 5, 5, 5),
+            self.player_stats.found_cheats
+        )
+        ib_cheats.add_element(
+            TextPlain("Cheats", self.__font_small, self.__color_white),
+            Allignment.CENTER
+        )
+        ib_cheats.add_description(
+            TextPlain("There is a famous sequence that needs to be inputed while in the main menu.", self.__font_very_small, self.__color_white)
+        )
+        # Secret - UFO
+        ib_ufo = InfoButton(
+            (root_secrets_x, root_secrets_y+100), (240, 30), (5, 5, 5, 5),
+            lambda: self.player_stats.check_unlocked_ship(ShipModel.UFO2)
+        )
+        ib_ufo.add_element(
+            TextPlain("Suspicious ship", self.__font_small, self.__color_white),
+            Allignment.CENTER
+        )
+        ib_ufo.add_description(
+            TextPlain("There were reports of a stange ship that can be barely seen from a certain menu.", self.__font_very_small, self.__color_white)
+        )
 
         self.__buttons_player_info.extend(
-            [b_close_info, b_rename]
+            [b_close_info, b_rename, ib_cheats, ib_ufo]
         )
 
         self.__add_mini_settings_and_cheats(self.__containers_player_info, self.__buttons_player_info)

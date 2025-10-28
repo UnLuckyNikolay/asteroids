@@ -37,9 +37,10 @@ IDEAS:
     - [x] Speed
     - [x] Acceleration
     - [ ] Rotation
-- [x] Additional weapon upgrades:
+- [ ] Additional weapon upgrades:
     - [x] Short fuse for the Bomb Launcher
     - [x] Faster fire rate for Plasma Gun
+    - [ ] Trajectory for Plasma Gun
 - [ ] Additional cheats:
     - [ ] BIG cheat
     - [ ] Hidden joke weapon
