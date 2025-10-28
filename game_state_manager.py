@@ -247,10 +247,18 @@ class GameStateManager(pygame.sprite.Sprite):
 
         is_updated = False
 
+        # Overfilled
         while len(self.__scores) > LEADERBOARD_LENGTH:   # Shortens leaderboard if max length was reduced
             is_updated = True
             self.__scores.pop()
 
+        # Empty
+        if len(self.__scores) == 0:
+            self.__scores.append({"name": self.player_stats.name, "score": new_score})
+            self.__save_leaderboard()
+            return True, 1
+
+        # Full/Partially filled
         for i in range(len(self.__scores)):
             if new_score > self.__scores[i]["score"]:
                 if len(self.__scores) == LEADERBOARD_LENGTH:
@@ -258,8 +266,17 @@ class GameStateManager(pygame.sprite.Sprite):
                 self.__scores.append({"name": self.player_stats.name, "score": new_score})
                 self.__scores.sort(key=lambda x: x["score"], reverse=True)
                 self.__save_leaderboard()
-                return True, i
+                return True, i+1
             
+        # New lowest :sadge:
+        if len(self.__scores) < LEADERBOARD_LENGTH:
+                self.__scores.append({"name": self.player_stats.name, "score": new_score})
+                self.__save_leaderboard()
+                return True, len(self.__scores)
+            
+        # No new record
+        if is_updated: # In case was overfilled
+            self.__save_leaderboard()
         return False, 0
 
     def __reset_leaderboard(self):

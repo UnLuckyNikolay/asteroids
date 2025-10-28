@@ -22,8 +22,8 @@ class RoundStateManager(pygame.sprite.Sprite):
         self.old_pb = player.stats.max_score
         self.round_time : float = 0 # In seconds
 
-        self.is_new_record : bool
-        self.record_place : int
+        self.is_new_record : bool = False
+        self.record_place : int = 0
         
         self.destroyed_asteroids : int = 0
         self.destroyed_asteroids_basic : int = 0
