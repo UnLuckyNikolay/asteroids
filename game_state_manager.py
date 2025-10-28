@@ -401,127 +401,156 @@ class GameStateManager(pygame.sprite.Sprite):
         """Adds some options and cheats (if found at the buttom part of the screen)."""
 
         res = self.game.screen_resolution
+        offset_y = 30
+        container_size = (95, 20)
+        button_size = (120, 20)
+        button_corners = (6, 6, 6, 6)
+        left_corners = (8, 2, 8, 2)
+        right_corners = (2, 8, 2, 8)
         
         # <> Containers <>        
 
-        # # Settings
-        c_settings = Container((10, res[1]-80), (90, 20), (8, 2, 8, 2))
+        # Debug
+        c_debug = Container((10, res[1]-offset_y*6), container_size, left_corners)
+        c_debug.add_element(
+            TextPlain("Debug", self.__font_very_small, self.__color_white),
+            Allignment.LEFT_WALL,
+            nudge=(5, 0)
+        )
+        # Settings
+        c_settings = Container((10, res[1]-offset_y*3), container_size, left_corners)
         c_settings.add_element(
             TextPlain("Settings", self.__font_very_small, self.__color_white),
-            Allignment.CENTER
+            Allignment.LEFT_WALL,
+            nudge=(5, 0)
+        )
+
+        container_list.extend(
+            [c_settings, c_debug]
         )
 
         if self.player_stats.found_cheats:
             # Cheats
-            c_cheats = Container((res[0]-100, res[1]-80), (90, 20), (2, 8, 2, 8))
+            c_cheats = Container((res[0]-10-container_size[0], res[1]-offset_y*3), container_size, right_corners)
             c_cheats.add_element(
                 TextPlain("Cheats", self.__font_very_small, self.__color_white),
-                Allignment.CENTER
+                Allignment.RIGHT_WALL,
+                nudge=(-5, 0)
             )
             
             container_list.extend(
                 [c_cheats]
             )
-
-        container_list.extend(
-            [c_settings]
-        )
         
         # <> Buttons <>
         
-        # Regenerate background
-        b_background = Button(
-            (10, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
-            self.game.handler_regenerate_background
-        )
-        b_background.add_description(
-            TextPlain("Generate new background", self.__font_very_small, self.__color_white)
-        )
-        b_background.add_element(
-            TextPlain("BG", self.__font_small, self.__color_blue),
-            Allignment.CENTER
-        )
-        # Switch Fullscreen
-        s_fullscreen = Switch(
-            (60, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
-            self.game.switch_fullscreen,
-            self.game.is_fullscreen
-        )
-        s_fullscreen.add_description(
-            TextPlain("Switch the FULLSCREEN mode on/off", self.__font_very_small, self.__color_white)
-        )
-        s_fullscreen.add_element(
-            SymbolFullscreen(0, 0, self.__color_blue), 
-            Allignment.CENTER
-        )
         # Low FPS
         s_slow = Switch(
-            (110, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
+            (10, res[1]-offset_y*5), button_size, left_corners,
             self.game.switch_low_fps,
             self.game.is_slow
         )
         s_slow.add_description(
-            TextPlain("DEBUG: Switch max FPS between 75 and 10", self.__font_very_small, self.__color_white)
+            TextPlain("DEBUG: Switches max FPS between 75 and 10", self.__font_very_small, self.__color_white)
         )
         s_slow.add_element(
-            TextPlain("SL", self.__font_small, self.__color_blue),
-            Allignment.CENTER
+            TextPlain("Low FPS", self.__font_very_small, self.__color_blue),
+            Allignment.LEFT_WALL,
+            nudge=(5, 0)
+        )
+        # Cheat - Show hitbox
+        s_hitbox = Switch(
+            (10, res[1]-offset_y*4), button_size, left_corners,
+            self.player_stats.switch_hitbox,
+            self.player_stats.cheat_hitbox
+        )
+        s_hitbox.add_description(
+            TextPlain("DEBUG: Switches the player hitbox visibility on/off", self.__font_very_small, self.__color_white)
+        )
+        # s_hitbox.set_active_outline_color(self.__color_golden)
+        s_hitbox.add_element(
+            TextPlain("Hitbox", self.__font_very_small, self.__color_blue),
+            Allignment.LEFT_WALL,
+            nudge=(5, 0)
+        )
+        s_hitbox.set_active_outline_color = self.__color_golden
+        # Switch Fullscreen
+        s_fullscreen = Switch(
+            (10, res[1]-offset_y*2), button_size, left_corners,
+            self.game.switch_fullscreen,
+            self.game.is_fullscreen
+        )
+        s_fullscreen.add_description(
+            TextPlain("Switches the FULLSCREEN mode on/off", self.__font_very_small, self.__color_white)
+        )
+        # s_fullscreen.add_element(
+        #     SymbolFullscreen(0, 0, self.__color_blue), 
+        #     Allignment.CENTER
+        # )
+        s_fullscreen.add_element(
+            TextPlain("Fullscreen", self.__font_very_small, self.__color_blue),
+            Allignment.LEFT_WALL,
+            nudge=(5, 0)
+        )
+        # Regenerate background
+        b_background = Button(
+            (10, res[1]-offset_y*1), button_size, left_corners,
+            self.game.handler_regenerate_background
+        )
+        b_background.add_description(
+            TextPlain("Generates new background", self.__font_very_small, self.__color_white)
+        )
+        b_background.add_element(
+            TextPlain("New BG", self.__font_very_small, self.__color_blue),
+            Allignment.LEFT_WALL,
+            nudge=(5, 0)
+        )
+
+        button_list.extend(
+            [b_background, s_fullscreen, s_slow, s_hitbox]
         )
 
         if self.player_stats.found_cheats:
-            # Cheat - Show hitbox
-            s_hitbox = Switch(
-                (self.game.screen_resolution[0]-150, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
-                self.player_stats.switch_hitbox,
-                self.player_stats.cheat_hitbox
-            )
-            s_hitbox.add_description(
-                TextPlain("Switch the HITBOX cheat on/off", self.__font_very_small, self.__color_white)
-            )
-            s_hitbox.set_active_outline_color(self.__color_golden)
-            s_hitbox.add_element(
-                TextPlain("HB", self.__font_small, self.__color_blue),
-                Allignment.CENTER
-            )
-            s_hitbox.set_active_outline_color = self.__color_golden
-            # Cheat - Money cheat
-            s_money = Switch(
-                (self.game.screen_resolution[0]-100, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
-                self.player_stats.switch_stonks,
-                self.player_stats.cheat_stonks
-            )
-            s_money.add_description(
-                TextPlain("Switch the STONKS cheat on/off", self.__font_very_small, self.__color_white)
-            )
-            s_money.set_active_outline_color(self.__color_golden)
-            s_money.add_element(
-                SymbolStonks(0, 0, self.__color_blue),
-                Allignment.CENTER
-            )
-            s_money.set_active_outline_color = self.__color_golden
             # Cheat - Godmode
             s_godmode = Switch(
-                (self.game.screen_resolution[0]-50, self.game.screen_resolution[1]-50), (40, 40), (8, 8, 8, 8),
+                (res[0]-10-button_size[0], res[1]-offset_y*2), button_size, right_corners,
                 self.player_stats.switch_godmode,
                 self.player_stats.cheat_godmode
             )
             s_godmode.add_description(
-                TextPlain("Switch the GODMODE cheat on/off", self.__font_very_small, self.__color_white)
+                TextPlain("Say `No!` to all damage!", self.__font_very_small, self.__color_white)
             )
             s_godmode.set_active_outline_color(self.__color_golden)
             s_godmode.add_element(
-                TextPlain("GM", self.__font_small, self.__color_blue),
-                Allignment.CENTER
+                TextPlain("Godmode", self.__font_very_small, self.__color_blue),
+                Allignment.RIGHT_WALL,
+                nudge=(-5, 0)
             )
             s_godmode.set_active_outline_color = self.__color_golden
+            # Cheat - Money cheat
+            s_money = Switch(
+                (res[0]-10-button_size[0], res[1]-offset_y*1), button_size, right_corners,
+                self.player_stats.switch_stonks,
+                self.player_stats.cheat_stonks
+            )
+            s_money.add_description(
+                TextPlain("Sells your Bitcoin before starting a round", self.__font_very_small, self.__color_white)
+            )
+            s_money.set_active_outline_color(self.__color_golden)
+            s_money.add_element(
+                TextPlain("Stonks", self.__font_very_small, self.__color_blue),
+                Allignment.RIGHT_WALL,
+                nudge=(-5, 0)
+            )
+            # s_money.add_element(
+            #     SymbolStonks(0, 0, self.__color_blue),
+            #     Allignment.CENTER
+            # )
+            s_money.set_active_outline_color = self.__color_golden
                 
             button_list.extend(
-                [s_hitbox, s_money, s_godmode]
+                [s_money, s_godmode]
             )
-
-        button_list.extend(
-            [b_background, s_fullscreen, s_slow]
-        )
 
     def __initialize_profile_selection(self):
         self.__containers_profile_selection : list[Container] = []
