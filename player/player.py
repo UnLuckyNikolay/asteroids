@@ -57,7 +57,8 @@ class Player(CircleShape):
         self.is_invul : bool = False
         self.is_alive : bool = True
         self.is_accelerating : bool = False
-        self.is_auto_shooting : bool = False
+        self.is_auto_shooting : bool = False # not reset between rounds
+        self.is_auto_healing : bool = False
 
         self.money : int = 0
         self.lives : int = 3
@@ -110,7 +111,7 @@ class Player(CircleShape):
         self.is_invul = False
         self.is_alive = True
         self.is_accelerating = False
-        self.is_auto_shooting = False
+        self.is_auto_healing = False
 
         self.magnet = Magnet(self.position)
         self.__level_engine = 1
@@ -238,6 +239,9 @@ class Player(CircleShape):
             self.lives -= 1
             self.timer_invul = 2
             self.is_invul = True
+            # Auto-heal
+            if self.is_auto_healing and self.can_heal():
+                self.buy_heal()
             return self.is_alive
         else:
             self.lives -= 1
@@ -250,6 +254,9 @@ class Player(CircleShape):
 
     def collect_loot(self, price : int):
         self.money += price
+        # Auto-heal
+        if self.is_auto_healing and self.can_heal():
+            self.buy_heal()
 
     ### Getters
     
@@ -266,6 +273,9 @@ class Player(CircleShape):
 
     def switch_auto_shoot(self):
         self.is_auto_shooting = False if self.is_auto_shooting else True
+
+    def switch_auto_heal(self):
+        self.is_auto_healing = False if self.is_auto_healing else True
 
     def switch_hitbox(self):
         self.is_hitbox_shown = False if self.is_hitbox_shown else True
@@ -303,10 +313,11 @@ class Player(CircleShape):
                 and self.lives < self.lives_max)
     
     def buy_heal(self):
+        if self.lives >= self.lives_max:
+            return
         self.money = self.money - self.get_price_heal()
         self.times_healed += 1
-        if self.lives < self.lives_max:
-            self.lives += 1
+        self.lives += 1
     
     ### Upgrades
 

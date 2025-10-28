@@ -1551,11 +1551,24 @@ class GameStateManager(pygame.sprite.Sprite):
             self.player.switch_auto_shoot,
             self.player.is_auto_shooting
         )
-        # s_auto_shoot.add_description(
-        #     TextPlain("Switch the AUTO-SHOOT on/off", self.__font_very_small, self.__color_white)
-        # )
+        s_auto_shoot.add_description(
+            TextPlain("Automatically shoots current weapon", self.__font_very_small, self.__color_white)
+        )
         s_auto_shoot.add_element(
             TextPlain("Auto-shoot", self.__font_small, self.__color_blue),
+            Allignment.CENTER
+        )
+        # Switch - Auto-Heal
+        s_auto_heal = Switch(
+            (offset_x+65, offset_y+422), (210, 36), (6, 6, 6, 6),
+            self.player.switch_auto_heal,
+            self.player.is_auto_healing
+        )
+        s_auto_heal.add_description(
+            TextPlain("Automatically heals if you have enough gold", self.__font_very_small, self.__color_white)
+        )
+        s_auto_heal.add_element(
+            TextPlain("Auto-heal", self.__font_small, self.__color_blue),
             Allignment.CENTER
         )
 
@@ -1697,7 +1710,7 @@ class GameStateManager(pygame.sprite.Sprite):
             [b_model_left, b_model_right, b_heal, b_magnet_rad, b_magnet_str,
              b_end_run, s_auto_shoot, b_weapon_1_cd_up, b_weapon_1_proj_up, b_weapon_2_fuse_up,
              b_weapon_2_rad_up, b_engine_speed, b_engine_acc, b_color1, b_color2,
-             b_color3, b_color4]
+             b_color3, b_color4, s_auto_heal]
         )
 
     def __initialize_name_check(self):
