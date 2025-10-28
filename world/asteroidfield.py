@@ -107,14 +107,14 @@ class AsteroidField(pygame.sprite.Sprite):
         roll = random.randint(1, 100)
         if roll <= CHANCE_GOLDEN:
             velocity = velocity * 3
-            asteroid = AsteroidGolden(position, velocity, speed*3)
+            AsteroidGolden(position, velocity, speed*3)
         elif roll <= CHANCE_HOMING and self.__amount_homing < self.__amount_homing_max:
             self.__amount_homing += 1
             velocity = velocity * 2
-            asteroid = AsteroidHoming(position, velocity, speed*2, self.player)
+            AsteroidHoming(position, velocity, speed*2, self.player)
         elif roll <= CHANCE_EXPLOSIVE:
             velocity = velocity
-            asteroid = AsteroidExplosive(position, velocity, speed)
+            AsteroidExplosive(position, velocity, speed)
         else:
             velocity = velocity
-            asteroid = AsteroidBasic(position, velocity, speed, radius)
+            AsteroidBasic(position, velocity, speed, radius)

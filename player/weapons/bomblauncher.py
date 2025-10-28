@@ -47,5 +47,5 @@ class BombLauncher(Weapon):
     
     def _spawn_bomb(self, dot, position, rotation):
         spawn = pygame.Vector2(dot).rotate(rotation)
-        bomb = Bomb(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), pygame.Vector2(0, 0), self._explosion_radius, self._fuse_timer)
+        Bomb(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), pygame.Vector2(0, 0), self._explosion_radius, self._fuse_timer)
                 

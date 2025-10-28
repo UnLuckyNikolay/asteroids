@@ -18,25 +18,25 @@ class AsteroidBasic(Asteroid):
 
             if loot_quality > 99:
                 velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
-                loot = Diamond(self.position, velocity)
+                Diamond(self.position, velocity)
             elif loot_quality > 95:
                 velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
-                loot = GoldenOre(self.position, velocity)
+                GoldenOre(self.position, velocity)
             elif loot_quality > 85:
                 velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
-                loot = SilverOre(self.position, velocity)
+                SilverOre(self.position, velocity)
             elif loot_quality > 60:
                 velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
-                loot = CopperOre(self.position, velocity)
+                CopperOre(self.position, velocity)
 
         else:
             split_angle = random.uniform(20, 50)
             new_radius = self.radius - ASTEROID_MIN_RADIUS
 
             velocity = self.velocity.rotate(split_angle) * 1.3
-            asteroid_1 = AsteroidBasic(self.position, velocity, int(self.max_speed * 1.3), new_radius)
+            AsteroidBasic(self.position, velocity, int(self.max_speed * 1.3), new_radius)
             
             velocity = self.velocity.rotate(-split_angle) * 1.3
-            asteroid_2 = AsteroidBasic(self.position, velocity, int(self.max_speed * 1.3), new_radius)
+            AsteroidBasic(self.position, velocity, int(self.max_speed * 1.3), new_radius)
 
         self.kill()

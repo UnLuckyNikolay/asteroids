@@ -24,15 +24,15 @@ class AsteroidHoming(Asteroid):
 
         if loot_quality > 90:
             velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
-            loot = Diamond(self.position, velocity)
+            Diamond(self.position, velocity)
         elif loot_quality > 50:
             velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
-            loot = GoldenOre(self.position, velocity)
+            GoldenOre(self.position, velocity)
         elif loot_quality > 25:
             velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
-            loot = SilverOre(self.position, velocity)
+            SilverOre(self.position, velocity)
         else:
             velocity = self.velocity.rotate(angle) * LOOT_SLOWDOWN
-            loot = CopperOre(self.position, velocity)
+            CopperOre(self.position, velocity)
 
         self.kill()

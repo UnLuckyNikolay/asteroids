@@ -140,17 +140,16 @@ class Game():
                 # Player hit
                 for asteroid in self.asteroids:
                     if asteroid.check_colision(self.player) and not self.player.is_invul: # No check for dead asteroids because first loop, only off-screen ones are dead
-                        # if self.player.take_damage_and_check_if_alive():
                         self.player.take_damage_and_check_if_alive()
                         self.asteroid_field.kill_asteroid(asteroid)
-                        explosion = ExplosionSpiky(asteroid.position, asteroid.radius)
+                        ExplosionSpiky(asteroid.position, asteroid.radius)
                     
                     # Asteroid shot
                     for projectile in self.projectiles:
                         if projectile.check_colision(asteroid) and not asteroid.is_dead:
                             projectile.kill()
                             self.asteroid_field.split_asteroid(asteroid)
-                            explosion = ExplosionSpiky(asteroid.position, asteroid.radius)
+                            ExplosionSpiky(asteroid.position, asteroid.radius)
                             self.rsm.score += asteroid.reward
                             if not self.player.is_sus:
                                 self.rsm.increase_count_stat(type(asteroid))
@@ -186,7 +185,6 @@ class Game():
         ExplosionRound(self.player.position)
         death_timer = 0.0
         is_player_teleported = False
-        print("Starting death animation")
         while self.is_running and death_timer < 6:
             if not is_player_teleported and death_timer > 3:
                 self.player.is_hidden = True

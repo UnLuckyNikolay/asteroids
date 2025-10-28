@@ -467,7 +467,6 @@ class GameStateManager(pygame.sprite.Sprite):
         s_hitbox.add_description(
             TextPlain("DEBUG: Switches the player hitbox visibility on/off", self.__font_very_small, self.__color_white)
         )
-        # s_hitbox.set_active_outline_color(self.__color_golden)
         s_hitbox.add_element(
             TextPlain("Hitbox", self.__font_very_small, self.__color_blue),
             Allignment.LEFT_WALL,
@@ -483,10 +482,6 @@ class GameStateManager(pygame.sprite.Sprite):
         s_fullscreen.add_description(
             TextPlain("Switches the FULLSCREEN mode on/off", self.__font_very_small, self.__color_white)
         )
-        # s_fullscreen.add_element(
-        #     SymbolFullscreen(0, 0, self.__color_blue), 
-        #     Allignment.CENTER
-        # )
         s_fullscreen.add_element(
             TextPlain("Fullscreen", self.__font_very_small, self.__color_blue),
             Allignment.LEFT_WALL,
@@ -542,10 +537,6 @@ class GameStateManager(pygame.sprite.Sprite):
                 Allignment.RIGHT_WALL,
                 nudge=(-5, 0)
             )
-            # s_money.add_element(
-            #     SymbolStonks(0, 0, self.__color_blue),
-            #     Allignment.CENTER
-            # )
             s_money.set_active_outline_color = self.__color_golden
                 
             button_list.extend(

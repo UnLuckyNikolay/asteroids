@@ -26,7 +26,7 @@ class Bomb(CircleShape):
                                          (int(155 + self.color_change * 50), int(self.color_change / 2 * 255), int(self.color_change / 2 * 255)))
             pygame.draw.circle(screen, (115, 0, 0), self.position, self.radius + 2, 3)
         else: 
-            explosion = ExplosionSpiky(self.position, self.explosion_radius)
-            hitbox = BombExplosion(self.position, self.explosion_radius)
+            ExplosionSpiky(self.position, self.explosion_radius)
+            BombExplosion(self.position, self.explosion_radius)
             self.kill()
             
