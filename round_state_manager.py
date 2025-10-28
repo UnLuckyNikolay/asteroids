@@ -1,6 +1,7 @@
 import pygame
 
 from constants import *
+from ui_elements.helpers import get_time_as_text
 from asteroids.asteroid import Asteroid
 from asteroids.asteroidbasic import AsteroidBasic
 from asteroids.asteroidexplosive import AsteroidExplosive
@@ -18,6 +19,7 @@ class RoundStateManager(pygame.sprite.Sprite):
 
         self.player = player
         self.score = 0
+        self.old_pb = player.stats.max_score
         self.round_time : float = 0 # In seconds
 
         self.is_new_record : bool
@@ -40,12 +42,8 @@ class RoundStateManager(pygame.sprite.Sprite):
         if self.player.is_alive:
             self.round_time += delta
 
-    def get_current_time_as_text(self) -> str:
-        seconds = int(self.round_time%60)
-        seconds = str(seconds) if seconds >= 10 else f"0{str(seconds)}"
-        minutes = int(self.round_time//60)
-
-        return f"{minutes}:{seconds}"
+    def get_time_as_text(self) -> str:
+        return get_time_as_text(self.round_time)
     
     def increase_count_stat(self, entity_type : type):
         """Used for destroying asteroids and collecting loot."""
@@ -76,3 +74,30 @@ class RoundStateManager(pygame.sprite.Sprite):
                 print(f"ERROR: Loot `{entity_type}` is missing from PlayerStats.increase_count_stat.")
         else:
             print(f"ERROR: `{entity_type}` is missing from PlayerStats.increase_count_stat.")
+
+    def get_round_title(self) -> str:
+        """Returns the Title for the Round end screen."""
+
+        if self.score == 69:
+            return "Nice!"
+        
+        if self.score == 420:
+            return "Blaze it!"
+        
+        if self.score == 1337:
+            return "Leet!"
+
+        if self.player.is_sus:
+            return "Having fun?"
+        
+        if self.record_place > 0 and self.record_place < 5:
+            return f"Top {self.record_place}!"
+        
+        if self.score > self.old_pb:
+            return "New PB!"
+        
+        if self.score > 500:
+            return "Good run!"
+        
+        return "You tried"
+    

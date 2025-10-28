@@ -48,7 +48,7 @@ IDEAS:
     - [x] Profile creation
     - [x] Player info
     - [x] Saved unlocked ships
-    - [ ] New end screen
+    - [x] New end screen
     - [ ] ???
     - [ ] Profit
 - [x] Show current timer

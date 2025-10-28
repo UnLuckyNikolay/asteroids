@@ -49,3 +49,10 @@ def draw_polygon(
 
     points = get_points(position, size, corners)
     pygame.gfxdraw.filled_polygon(screen, points, color)
+
+def get_time_as_text(time : float) -> str:
+        seconds = int(time%60)
+        seconds = str(seconds) if seconds >= 10 else f"0{str(seconds)}"
+        minutes = int(time//60)
+
+        return f"{minutes}:{seconds}"

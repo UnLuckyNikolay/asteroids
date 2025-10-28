@@ -18,6 +18,8 @@ class Allignment(Enum):
     """Places text at the left wall without additional nudging."""
     RIGHT_WALL = 11
     """Places text at the right wall without additional nudging."""
+    UPPER_WALL = 12
+    """Places text at the upper wall without additional nudging."""
 
     CENTER = 20
     """Places text in the middle without additional nudging."""
@@ -105,6 +107,8 @@ class Container(pygame.sprite.Sprite):
                 return (self._position[0] + nudge[0], int(self._position[1] + self._size[1]/2 + nudge[1] - text_size[1]/2))
             case Allignment.RIGHT_WALL:
                 return (self._position[0] + self._size[0] - text_size[0] + nudge[0], int(self._position[1] + self._size[1]/2 + nudge[1] - text_size[1]/2))
+            case Allignment.UPPER_WALL:
+                return (int(self._position[0] + self._size[0]/2 + nudge[0] - text_size[0]/2), self._position[1] + nudge[1])
             case Allignment.CENTER:
                 return (int(self._position[0] + self._size[0]/2 + nudge[0] - text_size[0]/2), int(self._position[1] + self._size[1]/2 + nudge[1] - text_size[1]/2))
             case Allignment.CENTER_ON_THE_LEFT:

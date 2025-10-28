@@ -35,7 +35,7 @@ class Menu(Enum): # Remember not to name 2 the same ever fucking again
     LEADERBOARD = "Leaderboard"
     HUD = "HUD"
     PAUSE_MENU = "Pause"
-    NAME_CHECK = "Name check" # REDO AFTERWARDS TO ROUND_END
+    ROUND_END = "Round End"
     TEST_MENU = "Test Menu"
 
 class GameStateManager(pygame.sprite.Sprite):
@@ -155,8 +155,8 @@ class GameStateManager(pygame.sprite.Sprite):
                     return # No buttons currently planned for HUD
                 case Menu.PAUSE_MENU:
                     button_list = self.__buttons_pause_menu
-                case Menu.NAME_CHECK:
-                    button_list = self.__buttons_name_check
+                case Menu.ROUND_END:
+                    button_list = self.__buttons_round_end
                 case Menu.TEST_MENU:
                     button_list = self.__buttons_test_menu
                 case _:
@@ -292,8 +292,8 @@ class GameStateManager(pygame.sprite.Sprite):
                 self.__draw_hud(screen)
             case Menu.PAUSE_MENU:
                 self.__draw_pause_menu(screen)
-            case Menu.NAME_CHECK:
-                self.__draw_name_check(screen)
+            case Menu.ROUND_END:
+                self.__draw_round_end(screen)
             case Menu.TEST_MENU:
                 self.__draw_test_menu(screen)
             case _:
@@ -355,11 +355,11 @@ class GameStateManager(pygame.sprite.Sprite):
         for button in self.__buttons_pause_menu:
             button.draw(screen)
 
-    def __draw_name_check(self, screen):
-        for container in self.__containers_name_check:
+    def __draw_round_end(self, screen):
+        for container in self.__containers_round_end:
             container.draw(screen)
 
-        for button in self.__buttons_name_check:
+        for button in self.__buttons_round_end:
             button.draw(screen)
 
     def __draw_test_menu(self, screen):
@@ -390,8 +390,8 @@ class GameStateManager(pygame.sprite.Sprite):
                 self.__initialize_hud()
             case Menu.PAUSE_MENU:
                 self.__initialize_pause_menu()
-            case Menu.NAME_CHECK:
-                self.__initialize_name_check()
+            case Menu.ROUND_END:
+                self.__initialize_round_end()
             case Menu.TEST_MENU:
                 self.__initialize_test_menu()
             case _:
@@ -1231,7 +1231,7 @@ class GameStateManager(pygame.sprite.Sprite):
         c_timer.add_element(
             TextUpdated(
                 "Time: {}", self.__font_small, self.__color_white, 
-                self.game.rsm.get_current_time_as_text
+                self.rsm.get_time_as_text
             ),
             Allignment.LEFT_WALL,
             nudge=(9, 0)
@@ -1713,32 +1713,137 @@ class GameStateManager(pygame.sprite.Sprite):
              b_color3, b_color4, s_auto_heal]
         )
 
-    def __initialize_name_check(self):
-        self.__containers_name_check : list[Container] = []
-        self.__buttons_name_check : list[Button | Switch] = []
-
-        root_x = self.game.screen_resolution[0]/2-225
-        root_y = self.game.screen_resolution[1]/2-105
+    def __initialize_round_end(self):
+        self.__containers_round_end : list[Container] = []
+        self.__buttons_round_end : list[Button | Switch] = []
         
+        res = self.game.screen_resolution
+        size_x = 900
+        size_y = 365
+        root_x = res[0]/2-size_x/2
+        root_y = res[1]/2-size_y/2
+
+        nudge_x_1 = 35
+        nudge_x_2 = int(nudge_x_1+size_x/2)
+
+        text_start_y = 143
+        text_row_y = 30
+
         # <> Containers <>
 
-        c_background = Container((root_x, root_y), (450, 210), (10, 25, 10, 25))
-        c_background.add_element(
-            TextPlain(
-                "New record! {}pts", self.__font_medium, self.__color_white, 
-                self.game.rsm.score
-            ),
-            nudge=(15, 7)
+        # Profile
+        c_round_stats = Container(
+            (root_x, root_y), (size_x, size_y), (30, 30, 30, 30)
         )
+        c_title = Container(
+            (root_x+size_x/2-250, root_y+10), (500, 75), (10, 10, 10, 10)
+        )
+        c_title.set_outline_color(self.__color_golden)
+        c_title.add_element(
+            TextPlain(
+                self.rsm.get_round_title(), self.__font_big, self.__color_golden
+            ),
+            Allignment.CENTER
+        )
+        c_round_stats.add_element(
+            TextPlain(
+                "Score: {}", self.__font_medium, self.__color_white,
+                self.rsm.score
+            ),
+            nudge=(nudge_x_1, 100)
+        )
+        c_round_stats.add_element(
+            TextPlain(
+                "Time: {}", self.__font_medium, self.__color_white,
+                self.rsm.get_time_as_text()
+            ),
+            nudge=(nudge_x_2, 100)
+        )
+        c_round_stats.add_element(
+            TextPlain(
+                "Asteroids destroyed: {}", self.__font_small, self.__color_white,
+                self.rsm.destroyed_asteroids
+            ),
+            nudge=(nudge_x_1, text_start_y)
+        )
+        c_round_stats.add_element(
+            TextPlain(
+                "- Basic: {}", self.__font_small, self.__color_white,
+                self.rsm.destroyed_asteroids_basic
+            ),
+            nudge=(nudge_x_1, text_start_y+text_row_y*1)
+        )
+        c_round_stats.add_element(
+            TextPlain(
+                "- Explosive: {}", self.__font_small, self.__color_white,
+                self.rsm.destroyed_asteroids_explosive
+            ),
+            nudge=(nudge_x_1, text_start_y+text_row_y*2)
+        )
+        c_round_stats.add_element(
+            TextPlain(
+                "- Golden: {}", self.__font_small, self.__color_white,
+                self.rsm.destroyed_asteroids_golden
+            ),
+            nudge=(nudge_x_1, text_start_y+text_row_y*3)
+        )
+        c_round_stats.add_element(
+            TextPlain(
+                "- Homing: {}", self.__font_small, self.__color_white,
+                self.rsm.destroyed_asteroids_homing
+            ),
+            nudge=(nudge_x_1, text_start_y+text_row_y*4)
+        )
+        c_round_stats.add_element(
+            TextPlain(
+                "Loot collected: {}", self.__font_small, self.__color_white,
+                self.rsm.collected_loot
+            ),
+            nudge=(nudge_x_2, text_start_y)
+        )
+        c_round_stats.add_element(
+            TextPlain(
+                "- Copper ore: {}", self.__font_small, self.__color_white,
+                self.rsm.collected_ores_copper
+            ),
+            nudge=(nudge_x_2, text_start_y+text_row_y*1)
+        )
+        c_round_stats.add_element(
+            TextPlain(
+                "- Silver ore: {}", self.__font_small, self.__color_white,
+                self.rsm.collected_ores_silver
+            ),
+            nudge=(nudge_x_2, text_start_y+text_row_y*2)
+        )
+        c_round_stats.add_element(
+            TextPlain(
+                "- Golden ore: {}", self.__font_small, self.__color_white,
+                self.rsm.collected_ores_golden
+            ),
+            nudge=(nudge_x_2, text_start_y+text_row_y*3)
+        )
+        c_round_stats.add_element(
+            TextPlain(
+                "- Diamonds: {}", self.__font_small, self.__color_white,
+                self.rsm.collected_diamonds
+            ),
+            nudge=(nudge_x_2, text_start_y+text_row_y*4)
+        )
+        # personal_sprite = get_personal_sprite(self.player_stats.name)
+        # if personal_sprite != None:
+        #     c_round_stats.add_element(
+        #         personal_sprite(10, -10),
+        #         Allignment.BOTTOM_LEFT_CORNER
+        #     )
 
-        self.__containers_name_check.extend(
-            [c_background]
+        self.__containers_round_end.extend(
+            [c_round_stats, c_title]
         )
         
         # <> Buttons <>
 
         b_confirm = Button(
-            (root_x+125, root_y+150), (200, 50), (3, 10, 3, 10),
+            (root_x+size_x/2-100, root_y+size_y-60), (200, 50), (3, 10, 3, 10),
             self.game.finish_round
         )
         b_confirm.add_element(
@@ -1746,7 +1851,7 @@ class GameStateManager(pygame.sprite.Sprite):
             Allignment.CENTER
         )
 
-        self.__buttons_name_check.extend(
+        self.__buttons_round_end.extend(
             [b_confirm]
         )
 

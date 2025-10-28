@@ -1,12 +1,7 @@
 from player.ship import ShipModel
 
+from ui_elements.helpers import get_time_as_text
 from round_state_manager import RoundStateManager
-# from asteroids.asteroid import Asteroid
-# from asteroids.asteroidbasic import AsteroidBasic
-# from asteroids.asteroidexplosive import AsteroidExplosive
-# from asteroids.asteroidgolden import AsteroidGolden
-# from asteroids.asteroidhoming import AsteroidHoming
-# from asteroids.ores import Ore, CopperOre, SilverOre, GoldenOre, Diamond
 
 
 class PlayerStats():
@@ -166,11 +161,7 @@ class PlayerStats():
             self.player.ship.switch_model(self.unlocked_ships[self.ship_model_index][0], self.ship_color_profile)
 
     def get_longest_time_as_text(self) -> str:
-        seconds = int(self.longest_run%60)
-        seconds = str(seconds) if seconds >= 10 else f"0{str(seconds)}"
-        minutes = int(self.longest_run//60)
-
-        return f"{minutes}:{seconds}"
+        return get_time_as_text(self.longest_run)
 
     def switch_godmode(self):
         self.cheat_godmode = False if self.cheat_godmode else True
