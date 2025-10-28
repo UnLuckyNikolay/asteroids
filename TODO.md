@@ -65,7 +65,6 @@ DISTANT/POSSIBLE IDEAS:
 - [ ] Music
 - [ ] Temporary boosts as loot
 - [ ] Difficulty selection (speed of difficulty ramp-up, max amount of special asteroids)
-- [ ] Persistent upgrades
 - [ ] Game modes 
     - [ ] Classic with only normal asteroids and white/black graphics
     - [ ] Drift mode with no shooting and only homing asteroid
@@ -73,3 +72,4 @@ DISTANT/POSSIBLE IDEAS:
 - [ ] Achievements
 - [ ] Better asteroid sprite
     - [ ] Add holes
+    - [ ] Rename Homing to Void

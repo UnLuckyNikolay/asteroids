@@ -82,6 +82,14 @@ class Game():
         self.initialize_new_player()
         self.gsm.initialize_current_menu()
 
+        # For player controls
+        self.is_k_down : dict[str, bool] = {
+            "up" : False,
+            "down" : False,
+            "left" : False,
+            "right" : False
+        }
+
     def initialize_new_player(self):
         if self.player != None:
             self.player.kill()
@@ -102,6 +110,9 @@ class Game():
         self.asteroid_field = AsteroidField(self, self.player, self.screen_resolution)
         self.gsm.rsm = self.rsm
         self.is_paused = False
+
+        for key in self.is_k_down:
+            self.is_k_down[key] = False
         
         self.player.teleport_and_prepare_for_round((int(self.screen_resolution[0] / 2), int(self.screen_resolution[1] / 2)))
         self.gsm.start_round(self.rsm)
@@ -226,32 +237,40 @@ class Game():
 
         match event.scancode:
             # Movement
-            case 26: # W
-                if event.type == pygame.KEYDOWN:
+            case 26 | 82: # W | ArrowUp
+                if event.type == pygame.KEYDOWN and not self.is_k_down["up"]:
+                    self.is_k_down["up"] = True
                     self.player.state_movement += 1
-                if event.type == pygame.KEYUP:
+                if event.type == pygame.KEYUP and self.is_k_down["up"]:
+                    self.is_k_down["up"] = False
                     self.player.state_movement -= 1
                     if self.player.state_movement > 0: # Checks in case WASD where pressed while starting the round
                         self.player.state_movement = 0
-            case 22: # S
-                if event.type == pygame.KEYDOWN:
+            case 22 | 81: # S | ArrowDown
+                if event.type == pygame.KEYDOWN and not self.is_k_down["down"]:
+                    self.is_k_down["down"] = True
                     self.player.state_movement -= 1
-                if event.type == pygame.KEYUP:
+                if event.type == pygame.KEYUP and self.is_k_down["down"]:
+                    self.is_k_down["down"] = False
                     self.player.state_movement += 1
                     if self.player.state_movement < 0:
                         self.player.state_movement = 0
             # Rotation
-            case 4: # A
-                if event.type == pygame.KEYDOWN:
+            case 4 | 80: # A | ArrowLeft
+                if event.type == pygame.KEYDOWN and not self.is_k_down["left"]:
+                    self.is_k_down["left"] = True
                     self.player.state_rotation -= 1
-                if event.type == pygame.KEYUP:
+                if event.type == pygame.KEYUP and self.is_k_down["left"]:
+                    self.is_k_down["left"] = False
                     self.player.state_rotation += 1
                     if self.player.state_rotation < 0:
                         self.player.state_rotation = 0
-            case 7: # D
-                if event.type == pygame.KEYDOWN:
+            case 7 | 79: # D | ArrowRight
+                if event.type == pygame.KEYDOWN and not self.is_k_down["right"]:
+                    self.is_k_down["right"] = True
                     self.player.state_rotation += 1
-                if event.type == pygame.KEYUP:
+                if event.type == pygame.KEYUP and self.is_k_down["right"]:
+                    self.is_k_down["right"] = False
                     self.player.state_rotation -= 1
                     if self.player.state_rotation > 0:
                         self.player.state_rotation = 0
