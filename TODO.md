@@ -44,14 +44,14 @@ IDEAS:
 - [ ] Additional cheats:
     - [ ] BIG cheat
     - [ ] Hidden joke weapon
-- [ ] FOR NEXT VERSION >>> Profiles
+- [x] Profiles
     - [x] Player reset method
     - [x] Profile creation
     - [x] Player info
     - [x] Saved unlocked ships
     - [x] New end screen
-    - [ ] ???
-    - [ ] Profit
+    - [x] ???
+    - [x] Profit
 - [x] Show current timer
 - [ ] Show difficulty modifier
 - [x] Bubble explosion vfx for player death

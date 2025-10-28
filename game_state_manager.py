@@ -428,13 +428,17 @@ class GameStateManager(pygame.sprite.Sprite):
         
         # <> Containers <>        
 
-        # Debug
-        c_debug = Container((10, res[1]-offset_y*6), container_size, left_corners)
-        c_debug.add_element(
-            TextPlain("Debug", self.__font_very_small, self.__color_white),
-            Allignment.LEFT_WALL,
-            nudge=(5, 0)
-        )
+        if DEBUG:
+            # Debug
+            c_debug = Container((10, res[1]-offset_y*6), container_size, left_corners)
+            c_debug.add_element(
+                TextPlain("Debug", self.__font_very_small, self.__color_white),
+                Allignment.LEFT_WALL,
+                nudge=(5, 0)
+            )
+
+            container_list.append(c_debug)
+
         # Settings
         c_settings = Container((10, res[1]-offset_y*3), container_size, left_corners)
         c_settings.add_element(
@@ -444,7 +448,7 @@ class GameStateManager(pygame.sprite.Sprite):
         )
 
         container_list.extend(
-            [c_settings, c_debug]
+            [c_settings]
         )
 
         if self.player_stats.found_cheats:
@@ -462,35 +466,39 @@ class GameStateManager(pygame.sprite.Sprite):
         
         # <> Buttons <>
         
-        # Low FPS
-        s_slow = Switch(
-            (10, res[1]-offset_y*5), button_size, left_corners,
-            self.game.switch_low_fps,
-            self.game.is_slow
-        )
-        s_slow.add_description(
-            TextPlain("DEBUG: Switches max FPS between 75 and 10", self.__font_very_small, self.__color_white)
-        )
-        s_slow.add_element(
-            TextPlain("Low FPS", self.__font_very_small, self.__color_blue),
-            Allignment.LEFT_WALL,
-            nudge=(5, 0)
-        )
-        # Cheat - Show hitbox
-        s_hitbox = Switch(
-            (10, res[1]-offset_y*4), button_size, left_corners,
-            self.player.switch_hitbox,
-            self.player.is_hitbox_shown
-        )
-        s_hitbox.add_description(
-            TextPlain("DEBUG: Switches the player hitbox visibility on/off", self.__font_very_small, self.__color_white)
-        )
-        s_hitbox.add_element(
-            TextPlain("Hitbox", self.__font_very_small, self.__color_blue),
-            Allignment.LEFT_WALL,
-            nudge=(5, 0)
-        )
-        s_hitbox.set_active_outline_color = self.__color_golden
+
+        if DEBUG:
+            # Low FPS
+            s_slow = Switch(
+                (10, res[1]-offset_y*5), button_size, left_corners,
+                self.game.switch_low_fps,
+                self.game.is_slow
+            )
+            s_slow.add_description(
+                TextPlain("DEBUG: Switches max FPS between 75 and 10", self.__font_very_small, self.__color_white)
+            )
+            s_slow.add_element(
+                TextPlain("Low FPS", self.__font_very_small, self.__color_blue),
+                Allignment.LEFT_WALL,
+                nudge=(5, 0)
+            )
+            # Show hitbox
+            s_hitbox = Switch(
+                (10, res[1]-offset_y*4), button_size, left_corners,
+                self.player.switch_hitbox,
+                self.player.is_hitbox_shown
+            )
+            s_hitbox.add_description(
+                TextPlain("DEBUG: Switches the player hitbox visibility on/off", self.__font_very_small, self.__color_white)
+            )
+            s_hitbox.add_element(
+                TextPlain("Hitbox", self.__font_very_small, self.__color_blue),
+                Allignment.LEFT_WALL,
+                nudge=(5, 0)
+            )
+
+            button_list.extend([s_slow, s_hitbox])
+
         # Switch Fullscreen
         s_fullscreen = Switch(
             (10, res[1]-offset_y*2), button_size, left_corners,
@@ -520,7 +528,7 @@ class GameStateManager(pygame.sprite.Sprite):
         )
 
         button_list.extend(
-            [b_background, s_fullscreen, s_slow, s_hitbox]
+            [b_background, s_fullscreen]
         )
 
         if self.player_stats.found_cheats:
@@ -842,7 +850,7 @@ class GameStateManager(pygame.sprite.Sprite):
         center_x = int((res[0])/2)
         center_y = int((res[1])/2)
 
-        root_x = center_x-425
+        root_x = center_x-475
         root_y = 10
         text_nudge_x = 35
         
@@ -850,7 +858,7 @@ class GameStateManager(pygame.sprite.Sprite):
         
         # Profile
         c_profile = Container(
-            (root_x, 10), (850, 140), (7, 7, 30, 30)
+            (root_x, 10), (950, 140), (7, 7, 30, 30)
         )
         c_profile.add_element(
             TextPlain(
@@ -896,7 +904,7 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         # Open
         b_open_info = Button(
-            (center_x-15, 125), (50, 20), (3, 3, 3, 3),
+            (center_x-50, 125), (100, 20), (3, 3, 3, 3),
             lambda: self.switch_menu(Menu.PLAYER_INFO)
         )
         b_open_info.add_element(
@@ -960,14 +968,17 @@ class GameStateManager(pygame.sprite.Sprite):
         
         res = self.game.screen_resolution
         center_x = int(res[0]/2)
-        root_x = center_x-425
+        size_x = 950
+        size_y = 520
+        root_x = int(center_x-size_x/2)
         root_y = 10
-        size_x = 850
-        size_y = 483
 
-        text_start_y = 157
+        text_start_y = 10
         text_row_y = 30
-        text_nudge_x = 35
+        text_nudge_x = 15
+
+        root_stats_x = root_x + 20
+        root_stats_y = root_y + 125
 
         root_secrets_x = int(root_x+size_x*0.75-120)
         root_secrets_y = 150
@@ -988,91 +999,96 @@ class GameStateManager(pygame.sprite.Sprite):
                 "{}", self.__font_big, self.__color_white,
                 self.player_stats.name
             ),
-            nudge=(text_nudge_x+46, 18)
+            nudge=(81, 18)
         )
         c_profile.add_element(
             TextPlain(
                 "Max Score: {}", self.__font_medium, self.__color_white,
                 self.player_stats.max_score
             ),
-            nudge=(text_nudge_x, 77)
+            nudge=(35, 77)
         )
-        c_profile.add_element(
+        c_stats = Container(
+            (root_stats_x, root_stats_y), 
+            (int(size_x/2-30), size_y-root_secrets_y-20), 
+            (5, 5, 5, 5)
+        )
+        c_stats.add_element(
             TextPlain(
-                "Longest run: {}", self.__font_medium, self.__color_white,
+                "Longest run: {}", self.__font_small, self.__color_white,
                 self.player_stats.get_longest_time_as_text()
             ),
-            nudge=(text_nudge_x, 117)
+            nudge=(text_nudge_x, text_start_y)
         )
-        c_profile.add_element(
+        c_stats.add_element(
             TextPlain(
                 "Asteroids destroyed: {}", self.__font_small, self.__color_white,
                 self.player_stats.destroyed_asteroids
             ),
-            nudge=(text_nudge_x, text_start_y)
+            nudge=(text_nudge_x, text_start_y+text_row_y*1)
         )
-        c_profile.add_element(
+        c_stats.add_element(
             TextPlain(
                 "- Basic: {}", self.__font_small, self.__color_white,
                 self.player_stats.destroyed_asteroids_basic
             ),
-            nudge=(text_nudge_x, text_start_y+text_row_y*1)
+            nudge=(text_nudge_x, text_start_y+text_row_y*2)
         )
-        c_profile.add_element(
+        c_stats.add_element(
             TextPlain(
                 "- Explosive: {}", self.__font_small, self.__color_white,
                 self.player_stats.destroyed_asteroids_explosive
             ),
-            nudge=(text_nudge_x, text_start_y+text_row_y*2)
+            nudge=(text_nudge_x, text_start_y+text_row_y*3)
         )
-        c_profile.add_element(
+        c_stats.add_element(
             TextPlain(
                 "- Golden: {}", self.__font_small, self.__color_white,
                 self.player_stats.destroyed_asteroids_golden
             ),
-            nudge=(text_nudge_x, text_start_y+text_row_y*3)
+            nudge=(text_nudge_x, text_start_y+text_row_y*4)
         )
-        c_profile.add_element(
+        c_stats.add_element(
             TextPlain(
                 "- Homing: {}", self.__font_small, self.__color_white,
                 self.player_stats.destroyed_asteroids_homing
             ),
-            nudge=(text_nudge_x, text_start_y+text_row_y*4)
+            nudge=(text_nudge_x, text_start_y+text_row_y*5)
         )
-        c_profile.add_element(
+        c_stats.add_element(
             TextPlain(
                 "Loot collected: {}", self.__font_small, self.__color_white,
                 self.player_stats.collected_loot
             ),
-            nudge=(text_nudge_x, text_start_y+text_row_y*5)
+            nudge=(text_nudge_x, text_start_y+text_row_y*6)
         )
-        c_profile.add_element(
+        c_stats.add_element(
             TextPlain(
                 "- Copper ore: {}", self.__font_small, self.__color_white,
                 self.player_stats.collected_ores_copper
             ),
-            nudge=(text_nudge_x, text_start_y+text_row_y*6)
+            nudge=(text_nudge_x, text_start_y+text_row_y*7)
         )
-        c_profile.add_element(
+        c_stats.add_element(
             TextPlain(
                 "- Silver ore: {}", self.__font_small, self.__color_white,
                 self.player_stats.collected_ores_silver
             ),
-            nudge=(text_nudge_x, text_start_y+text_row_y*7)
+            nudge=(text_nudge_x, text_start_y+text_row_y*8)
         )
-        c_profile.add_element(
+        c_stats.add_element(
             TextPlain(
                 "- Golden ore: {}", self.__font_small, self.__color_white,
                 self.player_stats.collected_ores_golden
             ),
-            nudge=(text_nudge_x, text_start_y+text_row_y*8)
+            nudge=(text_nudge_x, text_start_y+text_row_y*9)
         )
-        c_profile.add_element(
+        c_stats.add_element(
             TextPlain(
                 "- Diamonds: {}", self.__font_small, self.__color_white,
                 self.player_stats.collected_diamonds
             ),
-            nudge=(text_nudge_x, text_start_y+text_row_y*9)
+            nudge=(text_nudge_x, text_start_y+text_row_y*10)
         )
         personal_sprite = get_personal_sprite(self.player_stats.name)
         if personal_sprite != None:
@@ -1080,6 +1096,11 @@ class GameStateManager(pygame.sprite.Sprite):
                 personal_sprite(10, -10),
                 Allignment.BOTTOM_LEFT_CORNER
             )
+        c_secrets_bg = Container(
+            (int(root_x+size_x/2)+10, root_stats_y), 
+            (int(size_x/2-30), size_y-root_secrets_y-20), 
+            (5, 5, 5, 5)
+        )
         c_secrets = Container((root_secrets_x, root_secrets_y), (240, 30), (5, 5, 5, 5))
         c_secrets.add_element(
             TextPlain("Secrets", self.__font_small, self.__color_white),
@@ -1087,14 +1108,14 @@ class GameStateManager(pygame.sprite.Sprite):
         )
 
         self.__containers_player_info.extend(
-            [c_profile, c_secrets]
+            [c_profile, c_stats, c_secrets_bg, c_secrets]
         )
         
         # <> Buttons <>
 
         # Close
         b_close_info = Button(
-            (center_x-15, size_y-15), (50, 20), (3, 3, 3, 3),
+            (center_x-50, size_y-15), (100, 20), (3, 3, 3, 3),
             lambda: self.switch_menu(Menu.MAIN_MENU)
         )
         b_close_info.add_element(
@@ -1103,7 +1124,7 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         # Rename
         b_rename = Button(
-            (root_x+text_nudge_x, root_y+26), (35, 35), (3, 3, 3, 3),
+            (root_x+35, root_y+26), (35, 35), (3, 3, 3, 3),
             lambda: self.__rename_player(Menu.PLAYER_INFO)
         )
         b_rename.add_element(
