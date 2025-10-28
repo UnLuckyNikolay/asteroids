@@ -218,6 +218,7 @@ class Player(CircleShape):
 
         # Shooting
         if (
+            self.is_alive and
             (self.is_shooting or self.is_auto_shooting) and 
             self.attempt_shot(self.time_since_last_shot)
         ):
@@ -276,6 +277,8 @@ class Player(CircleShape):
 
     def switch_auto_heal(self):
         self.is_auto_healing = False if self.is_auto_healing else True
+        while self.is_auto_healing and self.can_heal():
+            self.buy_heal()
 
     def switch_hitbox(self):
         self.is_hitbox_shown = False if self.is_hitbox_shown else True
