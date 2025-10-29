@@ -325,7 +325,7 @@ class InfoButton(ButtonBase):
             self._active_func = None
             self._is_active = active_condition
 
-    def run_is_possible(self) -> bool:
+    def run_if_possible(self) -> bool:
         """Not possible."""
 
         return False
