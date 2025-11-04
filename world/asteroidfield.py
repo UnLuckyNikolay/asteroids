@@ -34,6 +34,10 @@ class AsteroidField(pygame.sprite.Sprite):
         self.__speed_mod_increase : int = 2
         self.__speed_mod_max : int = 40
 
+        self.__chance_golden = CHANCE_GOLDEN
+        self.__chance_homing = self.__chance_golden + CHANCE_HOMING
+        self.__chance_explosive = self.__chance_homing + CHANCE_EXPLOSIVE
+
         self.update_spawns(screen_resolution)
 
 
@@ -105,14 +109,14 @@ class AsteroidField(pygame.sprite.Sprite):
 
     def __spawn(self, radius, position, velocity, speed):
         roll = random.randint(1, 100)
-        if roll <= CHANCE_GOLDEN:
+        if roll <= self.__chance_golden:
             velocity = velocity * 3
             AsteroidGolden(position, velocity, speed*3)
-        elif roll <= CHANCE_HOMING and self.__amount_homing < self.__amount_homing_max:
+        elif roll <= self.__chance_homing and self.__amount_homing < self.__amount_homing_max:
             self.__amount_homing += 1
             velocity = velocity * 2
             AsteroidHoming(position, velocity, speed*2, self.player)
-        elif roll <= CHANCE_EXPLOSIVE:
+        elif roll <= self.__chance_explosive:
             velocity = velocity
             AsteroidExplosive(position, velocity, speed)
         else:

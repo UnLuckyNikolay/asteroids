@@ -26,24 +26,26 @@ FIXES/TWEAKS:
 - [x] Refactor text for easier placement
 
 IDEAS:
-- [x] Graphics/color adjustments for the leaderboards for top places
-- [x] Add auto-shoot switch
-- [x] Add ship recolors
-- [ ] Additional ship skins:
+- Additional ship skins:
     - [x] UFO - will need new parts and 2 engines
     - [ ] Classic/cartoon-ish rocket
-- [ ] Additional weapons:
-- [ ] Additional ship upgrades:
+- Additional weapons:
+- Additional ship upgrades:
     - [x] Speed
     - [x] Acceleration
     - [ ] Rotation
-- [ ] Additional weapon upgrades:
+- Additional weapon upgrades:
     - [x] Short fuse for the Bomb Launcher
     - [x] Faster fire rate for Plasma Gun
     - [ ] Trajectory for Plasma Gun
-- [ ] Additional cheats:
+- Additional cheats:
     - [ ] BIG cheat
     - [ ] Hidden joke weapon
+- Additional asteroids:
+    - [ ] Bouncy
+- [x] Graphics/color adjustments for the leaderboards for top places
+- [x] Add auto-shoot switch
+- [x] Add ship recolors
 - [x] Profiles
     - [x] Player reset method
     - [x] Profile creation
@@ -58,6 +60,7 @@ IDEAS:
 - [x] Add amount limit to certain asteroids (mainly Homing)
 - [x] Condition to activate cheat switches
 - [x] Check how to save crash logs
+- [ ] Find a way to open fullscreen
 
 DISTANT/POSSIBLE IDEAS:
 - [ ] Save backups
@@ -73,3 +76,4 @@ DISTANT/POSSIBLE IDEAS:
 - [ ] Better asteroid sprite
     - [ ] Add holes
     - [ ] Rename Homing to Void
+        - [ ] Move them up in player info
