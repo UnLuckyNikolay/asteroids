@@ -34,8 +34,9 @@ A classic game of Asteroids built using Pygame as a Boot.dev project and then en
 * Two weapons:
 	* Plasma Gun - shoots balls of plasma
 	* Bomb Launcher - leaves bombs that explode after a short interval
-* Four types of asteroids:
+* Five types of asteroids:
 	* Normal - 3 sizes, breaks into 2 smaller asteroids
+	* Bouncy - same as Normal, bounces off the screen borders
 	* Explosive - always big, breaks into 8 small asteroids in all directions
 	* Golden - always small, increased speed and point value
 	* Homing - always small, follows the player

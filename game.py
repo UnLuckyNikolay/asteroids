@@ -162,8 +162,7 @@ class Game():
                             self.asteroid_field.split_asteroid(asteroid)
                             ExplosionSpiky(asteroid.position, asteroid.radius)
                             self.rsm.score += asteroid.reward
-                            if not self.player.is_sus:
-                                self.rsm.increase_count_stat(type(asteroid))
+                            self.rsm.increase_count_stat(type(asteroid))
                     
                 # Asteroid exploded
                 for hitbox in self.explosion_hitboxes:
@@ -171,16 +170,14 @@ class Game():
                         if hitbox.check_colision(asteroid) and not asteroid.is_dead:
                             self.asteroid_field.split_asteroid(asteroid)
                             self.rsm.score += asteroid.reward
-                            if not self.player.is_sus:
-                                self.rsm.increase_count_stat(type(asteroid))
+                            self.rsm.increase_count_stat(type(asteroid))
                     hitbox.kill()
 
                 # Loot collected
                 for loot in self.loot:
                     if loot.check_colision(self.player):
                         self.player.collect_loot(loot.price)
-                        if not self.player.is_sus:
-                            self.rsm.increase_count_stat(type(loot))
+                        self.rsm.increase_count_stat(type(loot))
                         loot.kill()
                     elif loot.check_colision(self.player.magnet):
                         loot.home_towards(self.dt, self.player.position, self.player.magnet.get_strength())

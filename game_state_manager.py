@@ -969,7 +969,7 @@ class GameStateManager(pygame.sprite.Sprite):
         res = self.game.screen_resolution
         center_x = int(res[0]/2)
         size_x = 950
-        size_y = 520
+        size_y = 550
         root_x = int(center_x-size_x/2)
         root_y = 10
 
@@ -1036,15 +1036,15 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         c_stats.add_element(
             TextPlain(
-                "- Explosive: {}", self.__font_small, self.__color_white,
-                self.player_stats.destroyed_asteroids_explosive
+                "- Bouncy: {}", self.__font_small, self.__color_white,
+                self.player_stats.destroyed_asteroids_bouncy
             ),
             nudge=(text_nudge_x, text_start_y+text_row_y*3)
         )
         c_stats.add_element(
             TextPlain(
-                "- Golden: {}", self.__font_small, self.__color_white,
-                self.player_stats.destroyed_asteroids_golden
+                "- Explosive: {}", self.__font_small, self.__color_white,
+                self.player_stats.destroyed_asteroids_explosive
             ),
             nudge=(text_nudge_x, text_start_y+text_row_y*4)
         )
@@ -1057,38 +1057,45 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         c_stats.add_element(
             TextPlain(
+                "- Golden: {}", self.__font_small, self.__color_white,
+                self.player_stats.destroyed_asteroids_golden
+            ),
+            nudge=(text_nudge_x, text_start_y+text_row_y*6)
+        )
+        c_stats.add_element(
+            TextPlain(
                 "Loot collected: {}", self.__font_small, self.__color_white,
                 self.player_stats.collected_loot
             ),
-            nudge=(text_nudge_x, text_start_y+text_row_y*6)
+            nudge=(text_nudge_x, text_start_y+text_row_y*7)
         )
         c_stats.add_element(
             TextPlain(
                 "- Copper ore: {}", self.__font_small, self.__color_white,
                 self.player_stats.collected_ores_copper
             ),
-            nudge=(text_nudge_x, text_start_y+text_row_y*7)
+            nudge=(text_nudge_x, text_start_y+text_row_y*8)
         )
         c_stats.add_element(
             TextPlain(
                 "- Silver ore: {}", self.__font_small, self.__color_white,
                 self.player_stats.collected_ores_silver
             ),
-            nudge=(text_nudge_x, text_start_y+text_row_y*8)
+            nudge=(text_nudge_x, text_start_y+text_row_y*9)
         )
         c_stats.add_element(
             TextPlain(
                 "- Golden ore: {}", self.__font_small, self.__color_white,
                 self.player_stats.collected_ores_golden
             ),
-            nudge=(text_nudge_x, text_start_y+text_row_y*9)
+            nudge=(text_nudge_x, text_start_y+text_row_y*10)
         )
         c_stats.add_element(
             TextPlain(
                 "- Diamonds: {}", self.__font_small, self.__color_white,
                 self.player_stats.collected_diamonds
             ),
-            nudge=(text_nudge_x, text_start_y+text_row_y*10)
+            nudge=(text_nudge_x, text_start_y+text_row_y*11)
         )
         personal_sprite = get_personal_sprite(self.player_stats.name)
         if personal_sprite != None:
@@ -1791,7 +1798,7 @@ class GameStateManager(pygame.sprite.Sprite):
         
         res = self.game.screen_resolution
         size_x = 900
-        size_y = 375
+        size_y = 405
         root_x = res[0]/2-size_x/2
         root_y = res[1]/2-size_y/2
 
@@ -1850,15 +1857,15 @@ class GameStateManager(pygame.sprite.Sprite):
         )
         c_stats.add_element(
             TextPlain(
-                "- Explosive: {}", self.__font_small, self.__color_white,
-                self.rsm.destroyed_asteroids_explosive
+                "- Bouncy: {}", self.__font_small, self.__color_white,
+                self.rsm.destroyed_asteroids_bouncy
             ),
             nudge=(nudge_x_1, text_start_y+text_row_y*2)
         )
         c_stats.add_element(
             TextPlain(
-                "- Golden: {}", self.__font_small, self.__color_white,
-                self.rsm.destroyed_asteroids_golden
+                "- Explosive: {}", self.__font_small, self.__color_white,
+                self.rsm.destroyed_asteroids_explosive
             ),
             nudge=(nudge_x_1, text_start_y+text_row_y*3)
         )
@@ -1868,6 +1875,13 @@ class GameStateManager(pygame.sprite.Sprite):
                 self.rsm.destroyed_asteroids_homing
             ),
             nudge=(nudge_x_1, text_start_y+text_row_y*4)
+        )
+        c_stats.add_element(
+            TextPlain(
+                "- Golden: {}", self.__font_small, self.__color_white,
+                self.rsm.destroyed_asteroids_golden
+            ),
+            nudge=(nudge_x_1, text_start_y+text_row_y*5)
         )
         c_stats.add_element(
             TextPlain(

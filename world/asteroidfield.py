@@ -6,6 +6,7 @@ from asteroids.asteroidbasic import AsteroidBasic
 from asteroids.asteroidgolden import AsteroidGolden
 from asteroids.asteroidexplosive import AsteroidExplosive
 from asteroids.asteroidhoming import AsteroidHoming
+from asteroids.asteroidbouncy import AsteroidBouncy
 
 
 class AsteroidField(pygame.sprite.Sprite):
@@ -37,6 +38,7 @@ class AsteroidField(pygame.sprite.Sprite):
         self.__chance_golden = CHANCE_GOLDEN
         self.__chance_homing = self.__chance_golden + CHANCE_HOMING
         self.__chance_explosive = self.__chance_homing + CHANCE_EXPLOSIVE
+        self.__chance_bouncy = self.__chance_explosive + CHANCE_BOUNCY
 
         self.update_spawns(screen_resolution)
 
@@ -119,6 +121,9 @@ class AsteroidField(pygame.sprite.Sprite):
         elif roll <= self.__chance_explosive:
             velocity = velocity
             AsteroidExplosive(position, velocity, speed)
+        elif roll <= self.__chance_bouncy:
+            velocity = velocity
+            AsteroidBouncy(position, velocity, speed, radius, self.game)
         else:
             velocity = velocity
             AsteroidBasic(position, velocity, speed, radius)

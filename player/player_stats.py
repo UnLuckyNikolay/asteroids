@@ -31,9 +31,10 @@ class PlayerStats():
 
         self.destroyed_asteroids : int = 0
         self.destroyed_asteroids_basic : int = 0
+        self.destroyed_asteroids_bouncy : int = 0
         self.destroyed_asteroids_explosive : int = 0
-        self.destroyed_asteroids_golden : int = 0
         self.destroyed_asteroids_homing : int = 0
+        self.destroyed_asteroids_golden : int = 0
 
         self.collected_loot : int = 0
         self.collected_ores_copper : int = 0
@@ -76,9 +77,10 @@ class PlayerStats():
         
         self.destroyed_asteroids += rsm.destroyed_asteroids
         self.destroyed_asteroids_basic += rsm.destroyed_asteroids_basic
+        self.destroyed_asteroids_bouncy += rsm.destroyed_asteroids_bouncy
         self.destroyed_asteroids_explosive += rsm.destroyed_asteroids_explosive
-        self.destroyed_asteroids_golden += rsm.destroyed_asteroids_golden
         self.destroyed_asteroids_homing += rsm.destroyed_asteroids_homing
+        self.destroyed_asteroids_golden += rsm.destroyed_asteroids_golden
 
         self.collected_loot += rsm.collected_loot
         self.collected_ores_copper += rsm.collected_ores_copper
@@ -112,9 +114,10 @@ class PlayerStats():
             # Kills
             "destroyed_asteroids" : self.destroyed_asteroids,
             "destroyed_asteroids_basic" : self.destroyed_asteroids_basic,
+            "destroyed_asteroids_bouncy" : self.destroyed_asteroids_bouncy,
             "destroyed_asteroids_explosive" : self.destroyed_asteroids_explosive,
-            "destroyed_asteroids_golden" : self.destroyed_asteroids_golden,
             "destroyed_asteroids_homing" : self.destroyed_asteroids_homing,
+            "destroyed_asteroids_golden" : self.destroyed_asteroids_golden,
             
             # Loot
             "collected_loot" : self.collected_loot,
@@ -146,9 +149,10 @@ class PlayerStats():
             # Kills
             self.destroyed_asteroids = player_stats_save.get("destroyed_asteroids", self.destroyed_asteroids)
             self.destroyed_asteroids_basic = player_stats_save.get("destroyed_asteroids_basic", self.destroyed_asteroids_basic)
+            self.destroyed_asteroids_bouncy = player_stats_save.get("destroyed_asteroids_bouncy", self.destroyed_asteroids_bouncy)
             self.destroyed_asteroids_explosive = player_stats_save.get("destroyed_asteroids_explosive", self.destroyed_asteroids_explosive)
-            self.destroyed_asteroids_golden = player_stats_save.get("destroyed_asteroids_golden", self.destroyed_asteroids_golden)
             self.destroyed_asteroids_homing = player_stats_save.get("destroyed_asteroids_homing", self.destroyed_asteroids_homing)
+            self.destroyed_asteroids_golden = player_stats_save.get("destroyed_asteroids_golden", self.destroyed_asteroids_golden)
             
             # Loot
             self.collected_loot = player_stats_save.get("collected_loot", self.collected_loot)

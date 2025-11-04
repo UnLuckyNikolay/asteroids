@@ -1,4 +1,4 @@
-import pygame, random
+import random
 
 from constants import *
 from asteroids.asteroid import Asteroid

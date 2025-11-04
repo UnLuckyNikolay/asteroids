@@ -42,7 +42,7 @@ IDEAS:
     - [ ] BIG cheat
     - [ ] Hidden joke weapon
 - Additional asteroids:
-    - [ ] Bouncy
+    - [x] Bouncy
 - [x] Graphics/color adjustments for the leaderboards for top places
 - [x] Add auto-shoot switch
 - [x] Add ship recolors

@@ -7,6 +7,7 @@ from asteroids.asteroidbasic import AsteroidBasic
 from asteroids.asteroidexplosive import AsteroidExplosive
 from asteroids.asteroidgolden import AsteroidGolden
 from asteroids.asteroidhoming import AsteroidHoming
+from asteroids.asteroidbouncy import AsteroidBouncy
 from asteroids.ores import Ore, CopperOre, SilverOre, GoldenOre, Diamond
 
 
@@ -27,9 +28,10 @@ class RoundStateManager(pygame.sprite.Sprite):
         
         self.destroyed_asteroids : int = 0
         self.destroyed_asteroids_basic : int = 0
+        self.destroyed_asteroids_bouncy : int = 0
         self.destroyed_asteroids_explosive : int = 0
-        self.destroyed_asteroids_golden : int = 0
         self.destroyed_asteroids_homing : int = 0
+        self.destroyed_asteroids_golden : int = 0
 
         self.collected_loot : int = 0
         self.collected_ores_copper : int = 0
@@ -58,6 +60,8 @@ class RoundStateManager(pygame.sprite.Sprite):
                 self.destroyed_asteroids_golden += 1
             elif entity_type == AsteroidHoming:
                 self.destroyed_asteroids_homing += 1
+            elif entity_type == AsteroidBouncy:
+                self.destroyed_asteroids_bouncy += 1
             else:
                 print(f"ERROR: Asteroid `{entity_type}` is missing from PlayerStats.increase_count_stat.")
         elif issubclass(entity_type, Ore):
