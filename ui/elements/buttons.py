@@ -2,9 +2,9 @@ import pygame, pygame.gfxdraw
 from typing import Callable
 from enum import Enum
 
-from ui_elements.container import Container, Allignment
-from ui_elements.text import TextPlain
-from ui_elements.helpers import get_points, draw_polygon
+from ui.elements.container import Container, Allignment
+from ui.elements.text import TextPlain
+from ui.helpers import get_points, draw_polygon
 
 
 class ModKey(Enum):

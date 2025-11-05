@@ -1,7 +1,7 @@
 import pygame.gfxdraw
 from typing import Callable
 
-from ui_elements.helpers import draw_polygon
+from ui.helpers import draw_polygon
 
 class HealthBar():
     def __init__(

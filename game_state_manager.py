@@ -8,13 +8,13 @@ from constants import *
 from json_helper.leaderboard.validator import ValidateLeaderboard
 from json_helper.profile.validator import ValidateProfile
 
-from ui_elements.container import Container, Allignment
-from ui_elements.buttons import ButtonBase, Button, Switch, ModKey, ButtonRound, InfoButton
-from ui_elements.text import TextPlain, TextUpdated
-from ui_elements.sprites.healthbar import HealthBar
-from ui_elements.sprites.leaderboard import Leaderboard
-from ui_elements.simple_sprites.symbols import *
-from ui_elements.personal_sprites.getter import get_personal_sprite
+from ui.elements.container import Container, Allignment
+from ui.elements.buttons import ButtonBase, Button, Switch, ModKey, ButtonRound, InfoButton
+from ui.elements.text import TextPlain, TextUpdated
+from ui.elements.sprites.healthbar import HealthBar
+from ui.elements.sprites.leaderboard import Leaderboard
+from ui.elements.simple_sprites.symbols import *
+from ui.elements.personal_sprites.getter import get_personal_sprite
 
 from round_state_manager import RoundStateManager
 from player.player import Player, ShipUpgrade, ShipPart

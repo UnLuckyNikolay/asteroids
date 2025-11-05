@@ -2,9 +2,9 @@ import pygame, pygame.gfxdraw
 from enum import Enum
 from typing import Any
 
-from ui_elements.text import TextPlain, TextUpdated
-from ui_elements.simple_sprite import SimpleSprite
-from ui_elements.helpers import get_points
+from ui.elements.text import TextPlain, TextUpdated
+from ui.elements.simple_sprite import SimpleSprite
+from ui.helpers import get_points
 
 
 class Allignment(Enum):

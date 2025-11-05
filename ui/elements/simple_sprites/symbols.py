@@ -1,6 +1,6 @@
 import pygame, pygame.gfxdraw
 
-from ui_elements.simple_sprite import SimpleSprite
+from ui.elements.simple_sprite import SimpleSprite
 
 
 class SymbolCross(SimpleSprite):

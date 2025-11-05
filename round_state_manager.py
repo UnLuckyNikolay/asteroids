@@ -1,7 +1,7 @@
 import pygame
 
 from constants import *
-from ui_elements.helpers import get_time_as_text
+from ui.helpers import get_time_as_text
 from asteroids.asteroid import Asteroid
 from asteroids.asteroidbasic import AsteroidBasic
 from asteroids.asteroidexplosive import AsteroidExplosive

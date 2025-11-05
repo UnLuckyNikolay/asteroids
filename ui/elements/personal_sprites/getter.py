@@ -1,5 +1,5 @@
 from typing import Any
-from ui_elements.personal_sprites.amoguses import AmogusBlue, AmogusPink
+from ui.elements.personal_sprites.amoguses import AmogusBlue, AmogusPink
 
 
 def get_personal_sprite(player_name : str) -> Any | None:

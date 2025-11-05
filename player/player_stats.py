@@ -1,6 +1,6 @@
 from player.ship import ShipModel
 
-from ui_elements.helpers import get_time_as_text
+from ui.helpers import get_time_as_text
 from round_state_manager import RoundStateManager
 
 
