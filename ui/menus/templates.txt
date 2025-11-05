@@ -1,0 +1,73 @@
+### Template for menu
+
+from ui.colors import *
+from ui.elements.container import Container, Allignment
+from ui.elements.buttons import Button, ButtonRound, Switch, InfoButton, ModKey
+from ui.elements.text import TextPlain, TextUpdated
+from ui.font_builder import FontBuilder
+from ui.menus.enum import Menu
+from player.player_stats import PlayerStats
+from player.player import Player
+
+def initialize_(
+    game,
+    gsm,
+    player_stats : PlayerStats,
+    player : Player,
+    fonts : FontBuilder
+) -> tuple[list, list]:
+
+    containers : list[Container] = []
+    buttons : list[Button | Switch] = []
+    
+    # <> Containers <>
+
+    containers.extend(
+        []
+    )
+    
+    # <> Buttons <>
+
+    buttons.extend(
+        []
+    )
+
+    return containers, buttons
+
+### Template for menu during gameplay
+
+from ui.colors import *
+from ui.elements.container import Container, Allignment
+from ui.elements.buttons import Button, ButtonRound, Switch, InfoButton, ModKey
+from ui.elements.text import TextPlain, TextUpdated
+from ui.font_builder import FontBuilder
+from ui.menus.enum import Menu
+from round_state_manager import RoundStateManager
+from player.player_stats import PlayerStats
+from player.player import Player
+
+def initialize_(
+    game,
+    gsm,
+    rsm : RoundStateManager,
+    player_stats : PlayerStats,
+    player : Player,
+    fonts : FontBuilder
+) -> tuple[list, list]:
+
+    containers : list[Container] = []
+    buttons : list[Button | Switch] = []
+    
+    # <> Containers <>
+
+    containers.extend(
+        []
+    )
+    
+    # <> Buttons <>
+
+    buttons.extend(
+        []
+    )
+
+    return containers, buttons
