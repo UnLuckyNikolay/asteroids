@@ -6,34 +6,10 @@ from shapes.circleshape import CircleShape
 from player.weapons.plasmagun import PlasmaGun
 from player.weapons.bomblauncher import BombLauncher
 from player.ship_parts.magnet import Magnet
-from player.ship import Ship, ShipModel
+from player.ship import Ship
+from player.ship_enums import ShipModel, ShipPart, ShipUpgrade
 from player.player_stats import PlayerStats
 
-
-# New upgrades should be added to:
-# - .get_upgrade_level 
-# - .buy_upgrade
-class ShipUpgrade(Enum):
-    """List of player upgrades"""
-
-    ENGINE_SPEED = "Engine: Speed"
-    ENGINE_ACCELERATION = "Engine: Acceleration"
-    MAGNET_RADIUS = "Magnet: Radius"
-    MAGNET_STRENGTH = "Magnet: Strength"
-    PLASMAGUN_PROJECTILES = "Plasma Gun: Projectiles"
-    PLASMAGUN_COOLDOWN = "Plasma Gun: Cooldown"
-    BOMBLAUNCHER_RADIUS = "Bomb Launcher: Radius"
-    BOMBLAUNCHER_FUSE = "Bomb Launcher: Fuse"
-
-# New parts should be added to 
-# - .get_part_level
-class ShipPart(Enum):
-    """List of player parts"""
-
-    ENGINE = "Engine"
-    MAGNET = "Magnet"
-    PLASMAGUN = "Plasma Gun"
-    BOMBLAUNCHER = "Bomb Launcher"
 
 class Player(CircleShape):
     layer = 50 # pyright: ignore

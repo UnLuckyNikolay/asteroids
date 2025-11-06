@@ -5,7 +5,8 @@ from ui.elements.text import TextPlain, TextUpdated
 from ui.font_builder import FontBuilder
 from ui.menus.enum import Menu
 from player.player_stats import PlayerStats
-from player.player import Player, ShipModel
+from player.player import Player
+from player.ship_enums import ShipModel
 from player.ship import Ship
 from ui.elements.simple_sprites.symbols import *
 from ui.elements.personal_sprites.getter import get_personal_sprite

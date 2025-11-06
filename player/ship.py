@@ -1,20 +1,10 @@
 import pygame, pygame.gfxdraw
-from enum import Enum
+from player.ship_enums import ShipModel
 
 from constants import *
 
 
-# New models should be added to:
-# .get_name
-# .__get_parts
-# _get_parts_*model name*
-# get_color_profile
-class ShipModel(Enum):
-    POLY1 = 11
-    HAWK1 = 21
-    HAWK2 = 22
-    HAWK3 = 23
-    UFO2 = 32
+
 
 class Ship():
     def __init__(self, ship_model : ShipModel | int, hitbox_radius : int = 0, color_profile : int = 0):

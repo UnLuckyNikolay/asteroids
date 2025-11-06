@@ -1,7 +1,6 @@
 # pyright: reportAttributeAccessIssue=false
 
 import pygame, json, os
-from enum import Enum
 from typing import Any
 
 from constants import *
@@ -29,7 +28,7 @@ from ui.menus.menu_test import initialize_test_menu
 from round_state_manager import RoundStateManager
 from player.player import Player
 from player.player_stats import PlayerStats
-from player.ship import Ship, ShipModel
+from player.ship_enums import ShipModel
 
 
 class GameStateManager(pygame.sprite.Sprite):
@@ -80,7 +79,7 @@ class GameStateManager(pygame.sprite.Sprite):
         self._default_ship_model = ShipModel.HAWK3 # Value of the ShipType Enum
 
         # Secrets
-        self.__konami_sequence : list[int] = [82, 82, 81, 81, 80, 79, 80, 79, 5, 4, 40]
+        self.__konami_sequence : list[int] = [82, 82, 81, 81, 80, 79, 80, 79, 5, 4, 40] # Scancodes
         self._konami_progress : int = 0
 
     def draw(self, screen):

@@ -5,7 +5,8 @@ from ui.elements.text import TextPlain, TextUpdated
 from ui.font_builder import FontBuilder
 from ui.menus.enum import Menu
 from player.player_stats import PlayerStats
-from player.player import Player, ShipModel
+from player.player import Player
+from player.ship_enums import ShipModel
 from ui.elements.sprites.leaderboard import Leaderboard
 
 def initialize_leaderboard(
