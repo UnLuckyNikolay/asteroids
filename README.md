@@ -48,11 +48,14 @@ A classic game of Asteroids built using Pygame as a Boot.dev project and then en
 
 ## Controls
 
-* `W`/`S` - Accelerate/decelerate
-* `A`/`D` - Rotate
+* `W` / `↑` - Accelerate
+* `S` / `↓` - Decelerate
+* `A` / `←` - Rotate left
+* `D` / `→` - Rotate right
 * `Space` - Shoot the current weapon
 * `1` - Switch to the Plasma Gun
 * `2` - Switch to the Bomb Launcher
+* `3` - Switch to the M̴̮͕͎̐̈́e̷̪̠̖̒̉̔a̴̺̝͙̎̋͘ṭ̸̫̒͒͒͠ ̸̼̞̘̾̉́̓ͅC̴͔͙̐̐̚͝l̴͉̉̎́͝ḛ̶͌a̶̰̱̱͛v̷̘͙͖͋́̋ë̸͕́̊͌ṛ̷̥̬̳̈̽̏̇s̶̛͕̓͋ if you can
 * `Escape` - Open the Pause menu
 
 ## Screenshots (Outdated)
