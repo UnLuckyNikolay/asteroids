@@ -1,4 +1,5 @@
 import pygame
+from enum import Enum
 
 from constants import *
 from ui.helpers import get_time_as_text
@@ -10,6 +11,21 @@ from asteroids.asteroidhoming import AsteroidHoming
 from asteroids.asteroidbouncy import AsteroidBouncy
 from asteroids.ores import Ore, CopperOre, SilverOre, GoldenOre, Diamond
 
+
+class RoundTitle(Enum):
+    BASIC = "You tried"
+
+    EGG_NICE = "Nice!"
+    EGG_BLAZE = "Blaze it!"
+    EGG_LEET = "1337 5c0r3!"
+
+    CHEAT = "Having fun?"
+
+    GOOD = "Good run!"
+    RECORD_PB = "New PB!"
+    RECORD_1 = "Top 1!"
+    RECORD_2 = "Top 2!"
+    RECORD_3 = "Top 3!"
 
 class RoundStateManager(pygame.sprite.Sprite):
     def __init__(self, player):
@@ -79,29 +95,28 @@ class RoundStateManager(pygame.sprite.Sprite):
         else:
             print(f"ERROR: `{entity_type}` is missing from PlayerStats.increase_count_stat.")
 
-    def get_round_title(self) -> str:
+    def get_round_title(self) -> RoundTitle:
         """Returns the Title for the Round end screen."""
 
         if self.score == 69:
-            return "Nice!"
-        
+            return RoundTitle.EGG_NICE
         if self.score == 420:
-            return "Blaze it!"
-        
+            return RoundTitle.EGG_BLAZE
         if self.score == 1337:
-            return "Leet!"
+            return RoundTitle.EGG_LEET
 
         if self.player.is_sus:
-            return "Having fun?"
+            return RoundTitle.CHEAT
         
-        if self.record_place > 0 and self.record_place < 5:
-            return f"Top {self.record_place}!"
-        
+        if self.record_place == 1:
+            return RoundTitle.RECORD_1
+        if self.record_place == 2:
+            return RoundTitle.RECORD_2
+        if self.record_place == 3:
+            return RoundTitle.RECORD_3
         if self.score > self.old_pb:
-            return "New PB!"
-        
+            return RoundTitle.RECORD_PB
         if self.score > 500:
-            return "Good run!"
+            return RoundTitle.GOOD
         
-        return "You tried"
-    
+        return RoundTitle.BASIC

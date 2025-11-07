@@ -4,7 +4,7 @@ from ui.elements.buttons import Button, ButtonRound, Switch, InfoButton, ModKey
 from ui.elements.text import TextPlain, TextUpdated, TextAnimated
 from ui.font_builder import FontBuilder
 from ui.menus.enum import Menu
-from round_state_manager import RoundStateManager
+from round_state_manager import RoundStateManager, RoundTitle
 from player.player_stats import PlayerStats
 from player.player import Player
 
@@ -41,16 +41,30 @@ def initialize_round_end(
     c_title = Container(
         (int(root_x+size_x/2-250), root_y+10), (500, 75), (10, 10, 10, 10)
     )
-    c_title.set_outline_color(color_golden)
-    title = TextAnimated(
-            rsm.get_round_title(), fonts.big, color_golden
-        )
-    title.activate_animation_pulse_rotation(4)
-    title.activate_animation_pulse_scale(10)
+
+    title_text = rsm.get_round_title() # Round Title coloring and animation
+    if title_text in (RoundTitle.RECORD_1, RoundTitle.RECORD_2, RoundTitle.RECORD_3, RoundTitle.RECORD_PB):
+        title = TextAnimated(
+                title_text.value, fonts.big, color_golden
+            )
+        c_title.set_outline_color(color_golden)
+        title.activate_animation_pulse_rotation(4)
+        title.activate_animation_pulse_scale(10)
+    elif title_text in (RoundTitle.EGG_LEET, ):
+        title = TextAnimated(
+                title_text.value, fonts.big, color_green_hacker
+            )
+        c_title.set_outline_color(color_green_hacker)
+    else:
+        title = TextAnimated(
+                title_text.value, fonts.big, color_white
+            )
+        
     c_title.add_element(
         title,
         Allignment.CENTER
     )
+
     c_stats = Container(
         (root_x+10, root_y+95), (size_x-20, size_y-165), (10, 10, 10, 10)
     )
