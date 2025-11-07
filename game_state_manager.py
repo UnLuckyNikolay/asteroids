@@ -49,7 +49,8 @@ class GameStateManager(pygame.sprite.Sprite):
         self.__current_menu : Menu = Menu.PROFILE_SELECTION # Menu.PROFILE_SELECTION | Menu.TEST_MENU
 
         # Fonts
-        self.__fonts = FontBuilder()
+        font_path = "./fonts/anita-semi-square.normaali.ttf" #"../../fonts/anita-semi-square.normaali.ttf"
+        self.__fonts = FontBuilder(font_path)
         
         # Checking if ./saves/ folder exists
         self.__saves_folder_path = "./saves/"

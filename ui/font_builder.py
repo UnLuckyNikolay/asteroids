@@ -1,8 +1,7 @@
 import pygame
 
 class FontBuilder:
-    def __init__(self):
-        font_path = "./fonts/anita-semi-square.normaali.ttf" #"../../fonts/anita-semi-square.normaali.ttf"
+    def __init__(self, font_path):
         print(f"Trying to access file `{font_path}`")
         try:
             with open(font_path, "r"):
