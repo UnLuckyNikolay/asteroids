@@ -156,6 +156,8 @@ class GameStateManager(pygame.sprite.Sprite):
         if self.__hovered_button != None and self.__hovered_button._is_hovered:
             self.__hovered_button.switch_hovered_state()
         self.__hovered_button = None
+        for object in self.game.ui_updatable:
+            object.kill()
         self.initialize_current_menu()
 
     def check_hovered_button(self):

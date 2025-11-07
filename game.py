@@ -12,6 +12,7 @@ from player.weapons.projectiles.projectileplasma import ProjectilePlasma
 from player.weapons.projectiles.bomb import Bomb
 from player.weapons.projectiles.bombexplosion import BombExplosion
 from vfx.explosions import ExplosionBase, ExplosionSpiky, ExplosionRound
+from ui.elements.text import TextAnimated
 
 from world.starfield import StarField
 from world.asteroidfield import AsteroidField
@@ -39,7 +40,8 @@ class Game():
         self.getting_player_name : bool = False
         self.is_round_end : bool = False
 
-        self.updatable = pygame.sprite.Group()   # Must have method .update(delta)
+        self.updatable = pygame.sprite.Group()   # Must have method .update(delta), updated during gameplay
+        self.ui_updatable = pygame.sprite.Group()   # Same as above, but updated always, cleaned in GSM.switch_menu
         self.drawable = pygame.sprite.Group()
         self.asteroids = pygame.sprite.Group()            # Used for colision detection
         self.loot = pygame.sprite.Group()                 # ^ + magnet
@@ -50,6 +52,8 @@ class Game():
 
         GameStateManager.containers = (self.drawable)
         RoundStateManager.containers = (self.updatable, self.cleanup)
+
+        TextAnimated.containers = (self.ui_updatable)
 
         StarField.containers = (self.drawable)
         ExplosionBase.containers = (self.updatable, self.drawable, self.cleanup)
@@ -338,7 +342,10 @@ class Game():
             object.draw(self.screen)
 
         pygame.display.flip()
-        return self.clock.tick(self.max_fps) / 1000
+        dt =  self.clock.tick(self.max_fps) / 1000
+        for object in self.ui_updatable:
+            object.update(dt)
+        return dt
     
     def check_if_object_is_off_screen(self, object) -> bool:
         offset = 100

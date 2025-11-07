@@ -27,7 +27,7 @@ class ShipUpgrade(Enum):
     BOMBLAUNCHER_RADIUS = "Bomb Launcher: Radius"
     BOMBLAUNCHER_FUSE = "Bomb Launcher: Fuse"
 
-# New parts should be added to 
+# New parts should be added to:
 # player.get_part_level
 class ShipPart(Enum):
     """List of player parts"""

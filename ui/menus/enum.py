@@ -1,7 +1,7 @@
 from enum import Enum
 
 # New menus should be added to:
-# .initialize_current_menu (+ new function in ./ui/menus/)
+# GameStateManager.initialize_current_menu (+ new function in ./ui/menus/)
 class Menu(Enum): # Remember not to name 2 the same ever fucking again
     PROFILE_SELECTION = "Profile selection"
     NEW_PROFILE = "New profile"

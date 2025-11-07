@@ -1,7 +1,7 @@
 from ui.colors import *
 from ui.elements.container import Container, Allignment
 from ui.elements.buttons import Button, ButtonRound, Switch, InfoButton, ModKey
-from ui.elements.text import TextPlain, TextUpdated
+from ui.elements.text import TextPlain, TextUpdated, TextAnimated
 from ui.font_builder import FontBuilder
 from ui.menus.enum import Menu
 from round_state_manager import RoundStateManager
@@ -42,10 +42,13 @@ def initialize_round_end(
         (int(root_x+size_x/2-250), root_y+10), (500, 75), (10, 10, 10, 10)
     )
     c_title.set_outline_color(color_golden)
-    c_title.add_element(
-        TextPlain(
+    title = TextAnimated(
             rsm.get_round_title(), fonts.big, color_golden
-        ),
+        )
+    title.activate_animation_pulse_rotation(4)
+    title.activate_animation_pulse_scale(10)
+    c_title.add_element(
+        title,
         Allignment.CENTER
     )
     c_stats = Container(
