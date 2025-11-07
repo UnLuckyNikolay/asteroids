@@ -40,7 +40,7 @@ IDEAS:
     - [ ] Trajectory for Plasma Gun
 - Additional cheats:
     - [ ] BIG cheat
-    - [ ] Hidden joke weapon
+    - [x] Hidden joke weapon
 - Additional asteroids:
     - [x] Bouncy
 - [x] Graphics/color adjustments for the leaderboards for top places

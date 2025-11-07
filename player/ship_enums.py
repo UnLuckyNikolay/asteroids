@@ -36,3 +36,4 @@ class ShipPart(Enum):
     MAGNET = "Magnet"
     PLASMAGUN = "Plasma Gun"
     BOMBLAUNCHER = "Bomb Launcher"
+    LITERALLYAFUCKINGMEATCLEAVERLAUNCHER = "Literally A Fucking Meat Cleaver Launcher"

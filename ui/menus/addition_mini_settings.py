@@ -170,7 +170,7 @@ def add_mini_settings_and_cheats(
             player_stats.cheat_cleavers
         )
         s_cleavers.add_description(
-            TextPlain("Press 3 to Meat!", fonts.very_small, color_red)
+            TextPlain("Meat", fonts.very_small, color_red)
         )
         s_cleavers.set_active_outline_color(color_red)
         s_cleavers.add_element(

@@ -237,6 +237,23 @@ def initialize_pause_menu(
             c_colors]
     )
     
+    #MEAT
+    if player_stats.cheat_cleavers:
+        c_weapon_3 = Container((offset_x+column_2, offset_y+65+row_height*8), (455, 36), (6, 6, 6, 6))
+        c_weapon_3.add_element(
+            TextUpdated(
+                "Weapon 3: {}.v{}", fonts.small, color_red,
+                player.weapon_meat.get_name,
+                lambda: player.get_part_level(ShipPart.LITERALLYAFUCKINGMEATCLEAVERLAUNCHER)
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
+        )
+        c_weapon_3.set_outline_color(color_red)
+        c_weapon_3.set_fill_color((100, 0, 0, 75))
+
+        containers.append(c_weapon_3)
+    
     # <> Buttons <>
 
     # Color profiles # 30 for in between, 45 for button

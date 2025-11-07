@@ -59,7 +59,7 @@ class ButtonBase(Container):
         cursor_position = pygame.mouse.get_pos()
         width = self._description.get_width()
         if screen_res[0]-cursor_position[0]-30 < width:
-            draw_polygon(screen, (cursor_position[0]-14-width, cursor_position[1]-25), (width+6, 17), (0, 4, 0, 4), (50, 50, 50, 200))
+            draw_polygon(screen, (cursor_position[0]-14-width, cursor_position[1]-25), (width+6, 17), (0, 4, 0, 4), (50, 50, 100, 225))
             pygame.draw.aalines(
                 screen, (240, 240, 240, 255), False, 
                 [cursor_position, 
@@ -69,7 +69,7 @@ class ButtonBase(Container):
             )
             self._description.draw(screen, (cursor_position[0]-11-width, cursor_position[1]-25))
         else:
-            draw_polygon(screen, (cursor_position[0]+8, cursor_position[1]-25), (width+6, 17), (4, 0, 4, 0), (50, 50, 50, 200))
+            draw_polygon(screen, (cursor_position[0]+8, cursor_position[1]-25), (width+6, 17), (4, 0, 4, 0), (50, 50, 100, 225))
             pygame.draw.aalines(
                 screen, (240, 240, 240, 255), False, 
                 [cursor_position, 

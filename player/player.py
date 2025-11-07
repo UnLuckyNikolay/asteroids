@@ -280,6 +280,8 @@ class Player(CircleShape):
                 return self.weapon_plasmagun._level
             case ShipPart.BOMBLAUNCHER:
                 return self.weapon_bomblauncher._level
+            case ShipPart.LITERALLYAFUCKINGMEATCLEAVERLAUNCHER:
+                return self.weapon_meat._level
     
     def switch_color_profile(self, number : int):
         self.ship.switch_color_profile(number)
