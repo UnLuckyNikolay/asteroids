@@ -5,6 +5,7 @@ from constants import *
 from shapes.circleshape import CircleShape
 from player.weapons.plasmagun import PlasmaGun
 from player.weapons.bomblauncher import BombLauncher
+from player.weapons.literally_a_fucking_meat_cleaver_launcher import LiterallyAFuckingMeatCleaverLauncher
 from player.ship_parts.magnet import Magnet
 from player.ship import Ship
 from player.ship_enums import ShipModel, ShipPart, ShipUpgrade
@@ -51,6 +52,7 @@ class Player(CircleShape):
         self.magnet : Magnet = Magnet(self.position)
         self.weapon_plasmagun : PlasmaGun = PlasmaGun()
         self.weapon_bomblauncher : BombLauncher = BombLauncher()
+        self.weapon_meat : LiterallyAFuckingMeatCleaverLauncher = LiterallyAFuckingMeatCleaverLauncher()
         self.time_since_last_shot : float = 0
         self.weapon_current = self.weapon_plasmagun
 
@@ -111,7 +113,11 @@ class Player(CircleShape):
         self.magnet = Magnet(self.position)
         self.is_hidden = False
 
-        if self.stats.cheat_godmode or self.stats.cheat_stonks:
+        if (
+            self.stats.cheat_godmode 
+            or self.stats.cheat_stonks 
+            or self.stats.cheat_cleavers
+        ):
             self.is_sus = True
         else:
             self.is_sus = False

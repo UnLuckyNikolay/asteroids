@@ -54,7 +54,7 @@ def add_mini_settings_and_cheats(
 
     if player_stats.found_cheats:
         # Cheats
-        c_cheats = Container((res[0]-10-container_size[0], res[1]-offset_y*3), container_size, right_corners)
+        c_cheats = Container((res[0]-10-container_size[0], res[1]-offset_y*4), container_size, right_corners)
         c_cheats.add_element(
             TextPlain("Cheats", fonts.very_small, color_white),
             Allignment.RIGHT_WALL,
@@ -135,7 +135,7 @@ def add_mini_settings_and_cheats(
     if player_stats.found_cheats:
         # Cheat - Godmode
         s_godmode = Switch(
-            (res[0]-10-button_size[0], res[1]-offset_y*2), button_size, right_corners,
+            (res[0]-10-button_size[0], res[1]-offset_y*3), button_size, right_corners,
             player_stats.switch_godmode,
             player_stats.cheat_godmode
         )
@@ -150,7 +150,7 @@ def add_mini_settings_and_cheats(
         )
         # Cheat - Money cheat
         s_money = Switch(
-            (res[0]-10-button_size[0], res[1]-offset_y*1), button_size, right_corners,
+            (res[0]-10-button_size[0], res[1]-offset_y*2), button_size, right_corners,
             player_stats.switch_stonks,
             player_stats.cheat_stonks
         )
@@ -163,7 +163,22 @@ def add_mini_settings_and_cheats(
             Allignment.RIGHT_WALL,
             nudge=(-5, 0)
         )
+        # Cheat - Cleavers
+        s_cleavers = Switch(
+            (res[0]-10-button_size[0], res[1]-offset_y*1), button_size, right_corners,
+            player_stats.switch_cleavers,
+            player_stats.cheat_cleavers
+        )
+        s_cleavers.add_description(
+            TextPlain("Press 3 to Meat!", fonts.very_small, color_red)
+        )
+        s_cleavers.set_active_outline_color(color_red)
+        s_cleavers.add_element(
+            TextPlain("Cleavers", fonts.very_small, color_blue),
+            Allignment.RIGHT_WALL,
+            nudge=(-5, 0)
+        )
             
         button_list.extend(
-            [s_money, s_godmode]
+            [s_money, s_godmode, s_cleavers]
         )

@@ -11,6 +11,7 @@ from player.player_stats import PlayerStats
 from player.weapons.projectiles.projectileplasma import ProjectilePlasma
 from player.weapons.projectiles.bomb import Bomb
 from player.weapons.projectiles.bombexplosion import BombExplosion
+from player.weapons.projectiles.literally_a_fucking_meat_cleaver import LiterallyAFuckingMeatCleaver
 from vfx.explosions import ExplosionBase, ExplosionSpiky, ExplosionRound
 from ui.elements.text import TextAnimated
 
@@ -62,6 +63,7 @@ class Game():
         ProjectilePlasma.containers = (self.projectiles, self.updatable, self.drawable, self.moving_objects, self.cleanup)
         Bomb.containers = (self.drawable, self.updatable, self.cleanup)
         BombExplosion.containers = (self.explosion_hitboxes, self.cleanup)
+        LiterallyAFuckingMeatCleaver.containers = (self.projectiles, self.updatable, self.drawable, self.moving_objects, self.cleanup)
 
         AsteroidField.containers = (self.updatable, self.cleanup)
         Asteroid.containers = (self.asteroids, self.updatable, self.drawable, self.moving_objects, self.cleanup)
@@ -162,7 +164,8 @@ class Game():
                     # Asteroid shot
                     for projectile in self.projectiles:
                         if projectile.check_colision(asteroid) and not asteroid.is_dead:
-                            projectile.kill()
+                            if projectile.is_single_use:
+                                projectile.kill()
                             self.asteroid_field.split_asteroid(asteroid)
                             ExplosionSpiky(asteroid.position, asteroid.radius)
                             self.rsm.score += asteroid.reward
@@ -288,6 +291,9 @@ class Game():
             case 31 | 90: # 2 | Keypad2
                 if event.type == pygame.KEYDOWN and not self.is_paused:
                     self.player.weapon_current = self.player.weapon_bomblauncher
+            case 32 | 91: # 3 | Keypad3
+                if self.player_stats.cheat_cleavers and event.type == pygame.KEYDOWN and not self.is_paused:
+                    self.player.weapon_current = self.player.weapon_meat
 
     def handle_event(self, event : pygame.event.Event):
         """Used for handling events in all menus."""

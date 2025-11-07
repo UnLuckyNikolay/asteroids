@@ -4,8 +4,6 @@ from player.ship_enums import ShipModel
 from constants import *
 
 
-
-
 class Ship():
     def __init__(self, ship_model : ShipModel | int, hitbox_radius : int = 0, color_profile : int = 0):
         if ship_model is ShipModel:

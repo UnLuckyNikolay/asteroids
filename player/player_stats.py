@@ -28,6 +28,7 @@ class PlayerStats():
         self.found_cheats : bool = False
         self.cheat_godmode : bool = False
         self.cheat_stonks : bool = False
+        self.cheat_cleavers : bool = False
 
         self.destroyed_asteroids : int = 0
         self.destroyed_asteroids_basic : int = 0
@@ -110,6 +111,7 @@ class PlayerStats():
             "found_cheats" : self.found_cheats,
             "cheat_godmode" : self.cheat_godmode,
             "cheat_stonks" : self.cheat_stonks,
+            "cheat_cleavers" : self.cheat_cleavers,
 
             # Kills
             "destroyed_asteroids" : self.destroyed_asteroids,
@@ -145,6 +147,7 @@ class PlayerStats():
             self.found_cheats = player_stats_save.get("found_cheats", self.found_cheats)
             self.cheat_godmode = player_stats_save.get("cheat_godmode", self.cheat_godmode)
             self.cheat_stonks = player_stats_save.get("cheat_stonks", self.cheat_stonks)
+            self.cheat_cleavers = player_stats_save.get("cheat_cleavers", self.cheat_cleavers)
                 
             # Kills
             self.destroyed_asteroids = player_stats_save.get("destroyed_asteroids", self.destroyed_asteroids)
@@ -172,6 +175,9 @@ class PlayerStats():
 
     def switch_stonks(self):
         self.cheat_stonks = False if self.cheat_stonks else True
+
+    def switch_cleavers(self):
+        self.cheat_cleavers = False if self.cheat_cleavers else True
         
     def switch_ship_model_to_next(self):
         next = (self.ship_model_index+1) % self.unlocked_ships_amount

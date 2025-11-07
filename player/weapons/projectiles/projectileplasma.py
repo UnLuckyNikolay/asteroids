@@ -8,6 +8,7 @@ class ProjectilePlasma(CircleShape):
     layer = 60 # pyright: ignore
     def __init__(self, position, velocity):
         super().__init__(position, velocity, 5)
+        self.is_single_use = True
 
     
     def draw(self, screen):
