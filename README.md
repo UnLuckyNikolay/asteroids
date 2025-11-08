@@ -58,13 +58,13 @@ A classic game of Asteroids built using Pygame as a Boot.dev project and then en
 * `3` - Switch to the M̴̮͕͎̐̈́e̷̪̠̖̒̉̔a̴̺̝͙̎̋͘ṭ̸̫̒͒͒͠ ̸̼̞̘̾̉́̓ͅC̴͔͙̐̐̚͝l̴͉̉̎́͝ḛ̶͌a̶̰̱̱͛v̷̘͙͖͋́̋ë̸͕́̊͌ṛ̷̥̬̳̈̽̏̇s̶̛͕̓͋ if you can
 * `Escape` - Open the Pause menu
 
-## Screenshots (Outdated)
+## Screenshots
 
-![Gameplay Showcase 1](https://imgur.com/LEnoEWm.png)
+![Screenshot - Main Menu Showcase](https://imgur.com/g1jKmmF.png)
 
-![Gameplay Showcase 2](https://imgur.com/ATW6zDc.png)
+![Screenshot - Pause Menu Showcase](https://imgur.com/GorYp6F.png)
 
-![Gameplay Showcase 3](https://imgur.com/NBmQYrB.png)
+![Screenshot - Gameplay Showcase](https://imgur.com/Ka98xZm.png)
 
 ## Hints for secrets
 
