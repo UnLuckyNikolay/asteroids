@@ -1,4 +1,5 @@
 import pygame, pygame.gfxdraw
+from abc import ABC, abstractmethod
 from typing import Callable
 from enum import Enum
 
@@ -29,6 +30,18 @@ class ButtonBase(Container):
         self._is_hovered = False
         self._description : TextPlain | None = None
         self._mod_key : int | None = None
+
+    @abstractmethod
+    def draw(self, screen):
+        pass
+
+    @abstractmethod
+    def run_if_possible(self) -> bool:
+        pass
+
+    @abstractmethod
+    def check_if_possible(self) -> bool:
+        pass
 
     def make_weighted(self, mod_key : ModKey):
         """Makes the button pressable only if the modifier keyboard button is held."""
@@ -131,12 +144,17 @@ class Button(ButtonBase):
         super().add_element(element, allignment, nudge, color_override_and_lock)
 
     def run_if_possible(self) -> bool:
+        if self.check_if_possible():
+            self._key_func()
+            return True
+        return False
+
+    def check_if_possible(self) -> bool:
         mods = pygame.key.get_mods()
         if (
             (self._mod_key == None or (self._mod_key != None and mods & self._mod_key)) # Check for modifier keys if weighted
             and self._condition_func()
         ):
-            self._key_func()
             return True
         return False
     
@@ -226,12 +244,17 @@ class Switch(ButtonBase):
         super().add_element(element, allignment, nudge, color_override_and_lock)
     
     def run_if_possible(self) -> bool:
+        if self.check_if_possible():
+            self._key_func()
+            self._is_active = False if self._is_active else True
+            return True
+        return False
+    
+    def check_if_possible(self) -> bool:
         mods = pygame.key.get_mods()
         if (
             self._mod_key == None or (self._mod_key != None and mods & self._mod_key) # Check for modifier keys if weighted
         ):
-            self._key_func()
-            self._is_active = False if self._is_active else True
             return True
         return False
     
@@ -330,6 +353,11 @@ class InfoButton(ButtonBase):
             self._is_active = active_condition
 
     def run_if_possible(self) -> bool:
+        """Not possible."""
+
+        return False
+
+    def check_if_possible(self) -> bool:
         """Not possible."""
 
         return False
