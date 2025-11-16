@@ -5,7 +5,7 @@ import pygame
 from constants import *
 from game_state_manager import GameStateManager, Menu
 from round_state_manager import RoundStateManager
-from sfx.sfx_manager import SFXManager, SFX
+from sfx_manager import SFXManager, SFX
 
 from player.player import Player
 from player.player_stats import PlayerStats
@@ -60,6 +60,7 @@ class Game():
 
         GameStateManager.containers = (self.drawable)
         RoundStateManager.containers = (self.updatable, self.cleanup)
+        SFXManager.containers = (self.updatable)
 
         TextAnimated.containers = (self.ui_updatable)
 
@@ -192,6 +193,7 @@ class Game():
                 for loot in self.loot:
                     if loot.check_colision(self.player):
                         self.player.collect_loot(loot.price)
+                        self.sfxm.play_sound(SFX.ORE_COLLECTED)
                         self.rsm.increase_count_stat(type(loot))
                         loot.kill()
                     elif loot.check_colision(self.player.magnet):

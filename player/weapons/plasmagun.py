@@ -1,6 +1,6 @@
 import pygame
 
-from sfx.sfx_manager import SFXManager, SFX
+from sfx_manager import SFXManager, SFX
 from player.weapons.weapon import Weapon
 from player.weapons.projectiles.projectileplasma import ProjectilePlasma
 

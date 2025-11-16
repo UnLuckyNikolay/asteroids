@@ -2,7 +2,7 @@ import pygame
 from enum import Enum
 
 from constants import *
-from sfx.sfx_manager import SFXManager
+from sfx_manager import SFXManager
 from shapes.circleshape import CircleShape
 from player.weapons.plasmagun import PlasmaGun
 from player.weapons.bomblauncher import BombLauncher
