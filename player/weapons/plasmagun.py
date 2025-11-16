@@ -1,12 +1,15 @@
 import pygame
 
+from sfx.sfx_manager import SFXManager, SFX
 from player.weapons.weapon import Weapon
 from player.weapons.projectiles.projectileplasma import ProjectilePlasma
 
 
 class PlasmaGun(Weapon):
-    def __init__(self):
+    def __init__(self, sfxm : SFXManager):
         super().__init__("PlasmaGun")
+        self.sfxm = sfxm
+
         self._projectile_speed = 500
         self._cooldown = 0.4
 
@@ -32,6 +35,7 @@ class PlasmaGun(Weapon):
 
     def attempt_shot(self, position, rotation, time_since_last_shot):
         if time_since_last_shot >= self._cooldown:
+            self.sfxm.play_sound(SFX.PLAYER_PLASMA_SHOT)
             if self._level_projectiles == 1 or self._level_projectiles == 3:
                 self._spawn_bullet((0, 23), position, rotation)
 

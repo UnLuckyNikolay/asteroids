@@ -1,0 +1,6 @@
+3 - https://tsfxr.jdmnk.dev/#4DXe5vSYu1g749BQVVBwy7G1BFHKDm9UM4ZY7aYJL95mvPWaVFppNeCBwX7CdbM2kTayx7gNJStBQSaCYPyz8NmVSeHJoBV5BN81THLpZSnwCtZWuLRsXibKV
+
+1 - pitch -10
+2 - pitch -5
+4 - pitch +5
+5 - pitch +10

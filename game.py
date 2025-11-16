@@ -5,6 +5,7 @@ import pygame
 from constants import *
 from game_state_manager import GameStateManager, Menu
 from round_state_manager import RoundStateManager
+from sfx.sfx_manager import SFXManager, SFX
 
 from player.player import Player
 from player.player_stats import PlayerStats
@@ -23,6 +24,12 @@ from asteroids.ores import Ore
 
 class Game():
     def __init__(self):
+        pygame.mixer.pre_init(
+            frequency=44100,
+            size=-16,
+            channels=2,
+            buffer=1024,
+        )
         pygame.init()
         self.screen_resolution_windowed = (SCREEN_WIDTH, SCREEN_HEIGHT)
         self.screen_resolution_fullscreen = pygame.display.get_desktop_sizes()[0]
@@ -82,6 +89,7 @@ class Game():
 
         self.star_field = StarField(self.screen_resolution_fullscreen)
         self.gsm = GameStateManager(self)
+        self.sfxm = SFXManager() # All sfx file paths are stored inside SFXManager
         self.asteroid_field = None
         self.player = None
 
@@ -100,7 +108,7 @@ class Game():
         if self.player != None:
             self.player.kill()
         self.player_stats : PlayerStats = PlayerStats()
-        self.player : Player = Player(self, self.player_stats)
+        self.player : Player = Player(self, self.player_stats, self.sfxm)
         self.player_stats.set_player(self.player)
         self.gsm.player = self.player
         self.gsm.player_stats = self.player_stats
@@ -198,6 +206,7 @@ class Game():
         # Death enimation
         self.player.end_round()
         ExplosionRound(self.player.position)
+        self.sfxm.play_sound(SFX.PLAYER_DEATH)
         death_timer = 0.0
         is_player_teleported = False
         while self.is_running and death_timer < 2:
