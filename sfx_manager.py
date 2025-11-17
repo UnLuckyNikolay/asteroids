@@ -35,7 +35,7 @@ class SFXManager(pygame.sprite.Sprite):
         mxr.init()
 
         self.volume = 0.6
-        sfx_dir = "./sfx/sounds/"
+        sfx_dir = "./_internal/sounds/"
         self.sfx_dict : dict[SFX, _SoundBase] = {}
         self.time : float = 0.0
 
