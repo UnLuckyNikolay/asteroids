@@ -9,6 +9,7 @@ class SFX(Enum):
     """The list of all SFX. Values are dir paths."""
 
     PLAYER_PLASMA_SHOT = "player/plasma_shot/"
+    PLAYER_HIT = "player/hit/"
     PLAYER_DEATH = "player/death/"
 
     ASTEROID_EXPLOSION = "asteroid/explosion/"
@@ -20,7 +21,8 @@ class SFX(Enum):
 # Additional OPTIONAL volume adjust for sounds.
 _volume_adjust : dict [SFX, float] = {
     SFX.PLAYER_PLASMA_SHOT : 0.6,
-    SFX.PLAYER_DEATH : 0.6,
+    SFX.PLAYER_HIT : 0.8,
+    SFX.PLAYER_DEATH : 0.8,
 }
 
 class SFXManager(pygame.sprite.Sprite):
@@ -43,6 +45,7 @@ class SFXManager(pygame.sprite.Sprite):
             match sfx_enum: # Add new enums here
                 case (
                     SFX.PLAYER_PLASMA_SHOT |
+                    SFX.PLAYER_HIT | 
                     SFX.PLAYER_DEATH |
                     SFX.BUTTON_CLICK_SUCCESS |
                     SFX.BUTTON_CLICK_FAIL |

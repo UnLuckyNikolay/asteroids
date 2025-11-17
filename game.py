@@ -166,9 +166,10 @@ class Game():
                 # Player hit
                 for asteroid in self.asteroids:
                     if asteroid.check_colision(self.player) and not self.player.is_invul: # No check for dead asteroids because first loop, only off-screen ones are dead
-                        self.player.take_damage_and_check_if_alive()
+                        alive = self.player.take_damage_and_check_if_alive()
+                        if alive:
+                            self.sfxm.play_sound(SFX.PLAYER_HIT)
                         self.asteroid_field.kill_asteroid(asteroid)
-                        self.sfxm.play_sound(SFX.ASTEROID_EXPLOSION)
                         ExplosionSpiky(asteroid.position, asteroid.radius)
                     
                     # Asteroid shot
@@ -208,7 +209,7 @@ class Game():
             else:
                 self.redraw_objects_and_ui()
 
-        # Death enimation
+        # Death animation
         self.player.end_round()
         ExplosionRound(self.player.position)
         self.sfxm.play_sound(SFX.PLAYER_DEATH)

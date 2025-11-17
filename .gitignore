@@ -9,3 +9,6 @@ crashlogs/
 build/
 dist/
 main.spec
+
+# In case I miss any
+*:Zone.Identifier

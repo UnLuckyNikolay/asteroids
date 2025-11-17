@@ -64,7 +64,7 @@ IDEAS:
 - [ ] Sounds:
     - [x] Plasma shot
     - [x] Bomb explosion
-    - [ ] Player hit
+    - [x] Player hit
     - [x] Player death
     - [x] Asteroid hit
     - [x] Button click success
