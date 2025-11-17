@@ -187,6 +187,8 @@ class GameStateManager(pygame.sprite.Sprite):
             return
         
         self.__hovered_button.run_if_possible(self.sfxm)
+        if self.__hovered_button != None and self.__hovered_button.is_active == False:
+            self.__hovered_button = None
 
     ### Saving
 

@@ -34,6 +34,9 @@ class ButtonBase(Container):
 
         self.sfx_click_success : SFX = SFX.BUTTON_CLICK_SUCCESS
         self.sfx_click_fail : SFX = SFX.BUTTON_CLICK_FAIL
+        
+        self.is_active : bool = True # Only used for GSM right now (to properly handle disappearing buttons), can upgrade later
+        self._is_one_time_usage : bool = False
 
     @abstractmethod
     def draw(self, screen):
@@ -105,6 +108,15 @@ class ButtonBase(Container):
     def set_click_fail_sfx(self, sfx : SFX):
         self.sfx_click_fail = sfx
 
+    def set_one_time_usage(self):
+        """
+        If activated: after button is pressed successfuly - bool .is_active becomes False.
+        
+        Used for disappearing buttons to check if they have been activated.
+        """
+
+        self._is_one_time_usage = True
+
 class Button(ButtonBase):
     def __init__(
             self,
@@ -155,6 +167,8 @@ class Button(ButtonBase):
     def run_if_possible(self, sfxm : SFXManager) -> bool:
         if self.check_if_possible():
             sfxm.play_sound(self.sfx_click_success)
+            if self._is_one_time_usage:
+                self.is_active = False
             self._key_func()
             return True
         sfxm.play_sound(self.sfx_click_fail)

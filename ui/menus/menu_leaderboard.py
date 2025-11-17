@@ -8,6 +8,7 @@ from player.player_stats import PlayerStats
 from player.player import Player
 from player.ship_enums import ShipModel
 from ui.elements.sprites.leaderboard import Leaderboard
+from sfx_manager import SFX
 
 def initialize_leaderboard(
     game,
@@ -86,6 +87,8 @@ def initialize_leaderboard(
         b_ufo.add_description(
             TextPlain("Do you want to believe?", fonts.very_small, color_green)
         )
+        b_ufo.set_click_success_sfx(SFX.SECRET_UFO)
+        b_ufo.set_one_time_usage()
         
         buttons.append(b_ufo)
 
