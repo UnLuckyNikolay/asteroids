@@ -186,11 +186,7 @@ class GameStateManager(pygame.sprite.Sprite):
         if self.__hovered_button == None:
             return
         
-        if self.__hovered_button.check_if_possible():
-            self.sfxm.play_sound(SFX.BUTTON_CLICK_SUCCESS)
-        elif not isinstance(self.__hovered_button, (InfoButton)):
-            self.sfxm.play_sound(SFX.BUTTON_CLICK_FAIL)
-        self.__hovered_button.run_if_possible()
+        self.__hovered_button.run_if_possible(self.sfxm)
 
     ### Saving
 

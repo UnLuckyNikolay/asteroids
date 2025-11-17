@@ -6,6 +6,7 @@ from enum import Enum
 from ui.elements.container import Container, Allignment
 from ui.elements.text import TextPlain
 from ui.helpers import get_points, draw_polygon
+from sfx_manager import SFXManager, SFX
 
 
 class ModKey(Enum):
@@ -31,12 +32,15 @@ class ButtonBase(Container):
         self._description : TextPlain | None = None
         self._mod_key : int | None = None
 
+        self.sfx_click_success : SFX = SFX.BUTTON_CLICK_SUCCESS
+        self.sfx_click_fail : SFX = SFX.BUTTON_CLICK_FAIL
+
     @abstractmethod
     def draw(self, screen):
         pass
 
     @abstractmethod
-    def run_if_possible(self) -> bool:
+    def run_if_possible(self, sfxm : SFXManager) -> bool:
         pass
 
     @abstractmethod
@@ -95,6 +99,11 @@ class ButtonBase(Container):
     def add_description(self, text : TextPlain):
         self._description = text
 
+    def set_click_success_sfx(self, sfx : SFX):
+        self.sfx_click_success = sfx
+
+    def set_click_fail_sfx(self, sfx : SFX):
+        self.sfx_click_fail = sfx
 
 class Button(ButtonBase):
     def __init__(
@@ -143,10 +152,12 @@ class Button(ButtonBase):
             element.set_color(self._color_outline_inactive)
         super().add_element(element, allignment, nudge, color_override_and_lock)
 
-    def run_if_possible(self) -> bool:
+    def run_if_possible(self, sfxm : SFXManager) -> bool:
         if self.check_if_possible():
+            sfxm.play_sound(self.sfx_click_success)
             self._key_func()
             return True
+        sfxm.play_sound(self.sfx_click_fail)
         return False
 
     def check_if_possible(self) -> bool:
@@ -243,11 +254,13 @@ class Switch(ButtonBase):
             element.set_color(self._color_outline_active)
         super().add_element(element, allignment, nudge, color_override_and_lock)
     
-    def run_if_possible(self) -> bool:
+    def run_if_possible(self, sfxm : SFXManager) -> bool:
         if self.check_if_possible():
+            sfxm.play_sound(self.sfx_click_success)
             self._key_func()
             self._is_active = False if self._is_active else True
             return True
+        sfxm.play_sound(self.sfx_click_fail)
         return False
     
     def check_if_possible(self) -> bool:
@@ -352,7 +365,7 @@ class InfoButton(ButtonBase):
             self._active_func = None
             self._is_active = active_condition
 
-    def run_if_possible(self) -> bool:
+    def run_if_possible(self, sfxm : SFXManager) -> bool:
         """Not possible."""
 
         return False
