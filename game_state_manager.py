@@ -8,7 +8,7 @@ from json_helper.leaderboard.validator import ValidateLeaderboard
 from json_helper.profile.validator import ValidateProfile
 
 from ui.elements.container import Container
-from ui.elements.buttons import ButtonBase, Button, Switch
+from ui.elements.buttons import ButtonBase, Button, Switch, InfoButton
 from ui.elements.sprites.leaderboard import Leaderboard
 from ui.font_builder import FontBuilder
 
@@ -25,6 +25,7 @@ from ui.menus.menu_pause import initialize_pause_menu
 from ui.menus.menu_round_end import initialize_round_end
 from ui.menus.menu_test import initialize_test_menu
 
+from sfx_manager import SFXManager, SFX
 from round_state_manager import RoundStateManager
 from player.player import Player
 from player.player_stats import PlayerStats
@@ -33,13 +34,14 @@ from player.ship_enums import ShipModel
 
 class GameStateManager(pygame.sprite.Sprite):
     layer = 100 # pyright: ignore
-    def __init__(self, game):
+    def __init__(self, game, sfxm : SFXManager):
         if hasattr(self, "containers"):
             super().__init__(self.containers)
         else:
             super().__init__()
 
         self.game = game
+        self.sfxm = sfxm
         self.rsm : RoundStateManager = None
         self.player : Player
         self.player_stats : PlayerStats
@@ -184,6 +186,10 @@ class GameStateManager(pygame.sprite.Sprite):
         if self.__hovered_button == None:
             return
         
+        if self.__hovered_button.check_if_possible():
+            self.sfxm.play_sound(SFX.BUTTON_CLICK_SUCCESS)
+        elif not isinstance(self.__hovered_button, (InfoButton)):
+            self.sfxm.play_sound(SFX.BUTTON_CLICK_FAIL)
         self.__hovered_button.run_if_possible()
 
     ### Saving

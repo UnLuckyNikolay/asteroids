@@ -13,8 +13,12 @@ class SFX(Enum):
 
     ORE_COLLECTED = "ore/"
 
+    BUTTON_CLICK_SUCCESS = "button/click_successful/"
+    BUTTON_CLICK_FAIL = "button/click_failed/"
+
 # Additional OPTIONAL volume adjust for sounds.
 _volume_adjust : dict [SFX, float] = {
+    SFX.PLAYER_PLASMA_SHOT : 0.6,
     SFX.PLAYER_DEATH : 0.6,
 }
 
@@ -34,12 +38,16 @@ class SFXManager(pygame.sprite.Sprite):
 
         for sfx_enum in SFX:
             path = f"{sfx_dir}{sfx_enum.value}"
+
             match sfx_enum: # Add new enums here
                 case (
                     SFX.PLAYER_PLASMA_SHOT |
-                    SFX.PLAYER_DEATH
+                    SFX.PLAYER_DEATH |
+                    SFX.BUTTON_CLICK_SUCCESS |
+                    SFX.BUTTON_CLICK_FAIL
                 ):
                     self.sfx_dict[sfx_enum] = _SoundRandom(sfx_enum, path)
+
                 case (
                     SFX.ORE_COLLECTED
                 ):
@@ -86,6 +94,7 @@ class _SoundBase:
         sound.set_volume(volume * _volume_adjust.get(self.type, 1))
         sound.play()
 
+
 class _SoundRandom(_SoundBase):
     """Plays a random sound file from the chosen directory."""
 
@@ -111,6 +120,7 @@ class _SoundRandom(_SoundBase):
         sound = self.sounds[i]
         self._play_sound_inner(sound, volume)
 
+
 class _SoundGrowingPitch(_SoundBase):
     """Plays a chain of sounds with increasing pitch."""
 
@@ -119,7 +129,7 @@ class _SoundGrowingPitch(_SoundBase):
 
         self.last_i : int = -1
         self.last_time : float = -1.0
-        self.reset_timer = 3.0
+        self.reset_timer = 2.0
 
     def play_sound(self, volume, time):
         if len(self.sounds) == 0:

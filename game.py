@@ -89,8 +89,8 @@ class Game():
         # 100 - UserInterface
 
         self.star_field = StarField(self.screen_resolution_fullscreen)
-        self.gsm = GameStateManager(self)
         self.sfxm = SFXManager() # All sfx file paths are stored inside SFXManager
+        self.gsm = GameStateManager(self, self.sfxm)
         self.asteroid_field = None
         self.player = None
 
