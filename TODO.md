@@ -75,7 +75,7 @@ IDEAS:
     - [ ] Switch disabled
     - [ ] Sounds for secrets?
         - [ ] Konami
-        - [ ] UFO
+        - [x] UFO
 
 DISTANT/POSSIBLE IDEAS:
 - [ ] Save backups

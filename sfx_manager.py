@@ -18,6 +18,8 @@ class SFX(Enum):
     BUTTON_CLICK_SUCCESS = "button/click_successful/"
     BUTTON_CLICK_FAIL = "button/click_failed/"
 
+    SECRET_UFO = "secret/ufo/"
+
 # Additional OPTIONAL volume adjust for sounds.
 _volume_adjust : dict [SFX, float] = {
     SFX.PLAYER_PLASMA_SHOT : 0.6,
@@ -49,7 +51,8 @@ class SFXManager(pygame.sprite.Sprite):
                     SFX.PLAYER_DEATH |
                     SFX.BUTTON_CLICK_SUCCESS |
                     SFX.BUTTON_CLICK_FAIL |
-                    SFX.ASTEROID_EXPLOSION
+                    SFX.ASTEROID_EXPLOSION | 
+                    SFX.SECRET_UFO
                 ):
                     self.sfx_dict[sfx_enum] = _SoundRandom(sfx_enum, path)
 
@@ -156,3 +159,18 @@ class _SoundGrowingPitch(_SoundBase):
             self.last_i = i
         self.last_time = time
         self._play_sound_inner(sound, volume)
+
+
+# class _SoundCombined(_SoundBase):
+#     """Plays all the sounds at once."""
+
+#     def __init__(self, type_enum : SFX, dir_path : str):
+#         super().__init__(type_enum, dir_path)
+
+#     def play_sound(self, volume):
+#         if len(self.sounds) == 0:
+#             print(f"ERROR: no sounds for {self.type}")
+#             return
+        
+#         for sound in self.sounds:
+#             self._play_sound_inner(sound, volume)
