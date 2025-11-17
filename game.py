@@ -168,6 +168,7 @@ class Game():
                     if asteroid.check_colision(self.player) and not self.player.is_invul: # No check for dead asteroids because first loop, only off-screen ones are dead
                         self.player.take_damage_and_check_if_alive()
                         self.asteroid_field.kill_asteroid(asteroid)
+                        self.sfxm.play_sound(SFX.ASTEROID_EXPLOSION)
                         ExplosionSpiky(asteroid.position, asteroid.radius)
                     
                     # Asteroid shot
@@ -177,6 +178,7 @@ class Game():
                                 projectile.kill()
                             self.asteroid_field.split_asteroid(asteroid)
                             ExplosionSpiky(asteroid.position, asteroid.radius)
+                            self.sfxm.play_sound(SFX.ASTEROID_EXPLOSION)
                             self.rsm.score += asteroid.reward
                             self.rsm.increase_count_stat(type(asteroid))
                     
@@ -185,6 +187,7 @@ class Game():
                     for asteroid in self.asteroids:
                         if hitbox.check_colision(asteroid) and not asteroid.is_dead:
                             self.asteroid_field.split_asteroid(asteroid)
+                            self.sfxm.play_sound(SFX.ASTEROID_EXPLOSION)
                             self.rsm.score += asteroid.reward
                             self.rsm.increase_count_stat(type(asteroid))
                     hitbox.kill()

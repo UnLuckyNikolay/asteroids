@@ -11,6 +11,7 @@ class SFX(Enum):
     PLAYER_PLASMA_SHOT = "player/plasma_shot/"
     PLAYER_DEATH = "player/death/"
 
+    ASTEROID_EXPLOSION = "asteroid/explosion/"
     ORE_COLLECTED = "ore/"
 
     BUTTON_CLICK_SUCCESS = "button/click_successful/"
@@ -44,7 +45,8 @@ class SFXManager(pygame.sprite.Sprite):
                     SFX.PLAYER_PLASMA_SHOT |
                     SFX.PLAYER_DEATH |
                     SFX.BUTTON_CLICK_SUCCESS |
-                    SFX.BUTTON_CLICK_FAIL
+                    SFX.BUTTON_CLICK_FAIL |
+                    SFX.ASTEROID_EXPLOSION
                 ):
                     self.sfx_dict[sfx_enum] = _SoundRandom(sfx_enum, path)
 

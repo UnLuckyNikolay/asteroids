@@ -61,10 +61,24 @@ IDEAS:
 - [x] Condition to activate cheat switches
 - [x] Check how to save crash logs
 - [ ] Find a way to open fullscreen
+- [ ] Sounds:
+    - [x] Plasma shot
+    - [x] Bomb explosion
+    - [ ] Player hit
+    - [x] Player death
+    - [x] Asteroid hit
+    - [x] Button click success
+    - [x] Button clock fail
+    - [ ] Round end normal
+    - [ ] Round end good
+    - [ ] Switch enabled
+    - [ ] Switch disabled
+    - [ ] Sounds for secrets?
+        - [ ] Konami
+        - [ ] UFO
 
 DISTANT/POSSIBLE IDEAS:
 - [ ] Save backups
-- [ ] Sounds
 - [ ] Music
 - [ ] Temporary boosts as loot
 - [ ] Difficulty selection (speed of difficulty ramp-up, max amount of special asteroids)
