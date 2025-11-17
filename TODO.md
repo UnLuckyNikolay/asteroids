@@ -64,7 +64,7 @@ IDEAS:
 - [ ] Sounds:
     - [x] Plasma shot
     - [x] Bomb explosion
-    - [ ] NEXT VER >>> Cleavers
+    - [x] Cleavers
     - [x] Player hit
     - [x] Player death
     - [x] Asteroid hit

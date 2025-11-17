@@ -10,6 +10,7 @@ class SFX(Enum):
 
     PLAYER_PLASMA_SHOT = "player/plasma_shot/"
     PLAYER_BOMB_EXPLOSION = "player/bomb_explosion/"
+    PLAYER_CLEAVERS = "player/cleavers/"
     PLAYER_HIT = "player/hit/"
     PLAYER_DEATH = "player/death/"
 
@@ -50,6 +51,7 @@ class SFXManager(pygame.sprite.Sprite):
                 case (
                     SFX.PLAYER_PLASMA_SHOT |
                     SFX.PLAYER_BOMB_EXPLOSION |
+                    SFX.PLAYER_CLEAVERS |
                     SFX.PLAYER_HIT | 
                     SFX.PLAYER_DEATH |
                     SFX.BUTTON_CLICK_SUCCESS |

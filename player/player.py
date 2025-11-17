@@ -54,7 +54,7 @@ class Player(CircleShape):
         self.magnet : Magnet = Magnet(self.position)
         self.weapon_plasmagun : PlasmaGun = PlasmaGun(self.sfxm)
         self.weapon_bomblauncher : BombLauncher = BombLauncher(self.sfxm)
-        self.weapon_meat : LiterallyAFuckingMeatCleaverLauncher = LiterallyAFuckingMeatCleaverLauncher()
+        self.weapon_meat : LiterallyAFuckingMeatCleaverLauncher = LiterallyAFuckingMeatCleaverLauncher(self.sfxm)
         self.time_since_last_shot : float = 0
         self.weapon_current = self.weapon_plasmagun
 
@@ -108,6 +108,7 @@ class Player(CircleShape):
         self.time_since_last_shot = 0
         self.weapon_plasmagun = PlasmaGun(self.sfxm)
         self.weapon_bomblauncher = BombLauncher(self.sfxm)
+        # Meat Cleavers are left as is because they are not upgradable. They were created perfect.
         self.weapon_current = self.weapon_plasmagun
 
     def teleport_and_prepare_for_round(self, position : tuple[int, int]):
