@@ -9,6 +9,7 @@ class SFX(Enum):
     """The list of all SFX. Values are dir paths."""
 
     PLAYER_PLASMA_SHOT = "player/plasma_shot/"
+    PLAYER_BOMB_EXPLOSION = "player/bomb_explosion/"
     PLAYER_HIT = "player/hit/"
     PLAYER_DEATH = "player/death/"
 
@@ -48,6 +49,7 @@ class SFXManager(pygame.sprite.Sprite):
             match sfx_enum: # Add new enums here
                 case (
                     SFX.PLAYER_PLASMA_SHOT |
+                    SFX.PLAYER_BOMB_EXPLOSION |
                     SFX.PLAYER_HIT | 
                     SFX.PLAYER_DEATH |
                     SFX.BUTTON_CLICK_SUCCESS |

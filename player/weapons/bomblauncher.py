@@ -1,12 +1,15 @@
 import pygame
 
+from sfx_manager import SFXManager, SFX
 from player.weapons.weapon import Weapon
 from player.weapons.projectiles.bomb import Bomb
 
 
 class BombLauncher(Weapon):
-    def __init__(self):
+    def __init__(self, sfxm : SFXManager):
         super().__init__("BombLauncher")
+        self.sfxm = sfxm
+
         self._cooldown = 1.5
         self._explosion_radius = 100
         self._fuse_timer = 2.5
@@ -47,5 +50,5 @@ class BombLauncher(Weapon):
     
     def _spawn_bomb(self, dot, position, rotation):
         spawn = pygame.Vector2(dot).rotate(rotation)
-        Bomb(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), pygame.Vector2(0, 0), self._explosion_radius, self._fuse_timer)
+        Bomb(pygame.Vector2(position.x + spawn.x, position.y + spawn.y), pygame.Vector2(0, 0), self._explosion_radius, self._fuse_timer, self.sfxm)
                 

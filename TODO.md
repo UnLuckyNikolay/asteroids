@@ -64,13 +64,14 @@ IDEAS:
 - [ ] Sounds:
     - [x] Plasma shot
     - [x] Bomb explosion
+    - [ ] NEXT VER >>> Cleavers
     - [x] Player hit
     - [x] Player death
     - [x] Asteroid hit
     - [x] Button click success
     - [x] Button clock fail
     - [ ] Round end normal
-    - [ ] Round end good
+    - [ ] NEXT VER >>> Round end good
     - [ ] Switch enabled
     - [ ] Switch disabled
     - [x] Sounds for secrets?

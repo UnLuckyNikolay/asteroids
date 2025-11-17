@@ -53,7 +53,7 @@ class Player(CircleShape):
         self.__engine_acceleration_mp : float = 0.8
         self.magnet : Magnet = Magnet(self.position)
         self.weapon_plasmagun : PlasmaGun = PlasmaGun(self.sfxm)
-        self.weapon_bomblauncher : BombLauncher = BombLauncher()
+        self.weapon_bomblauncher : BombLauncher = BombLauncher(self.sfxm)
         self.weapon_meat : LiterallyAFuckingMeatCleaverLauncher = LiterallyAFuckingMeatCleaverLauncher()
         self.time_since_last_shot : float = 0
         self.weapon_current = self.weapon_plasmagun
@@ -107,7 +107,7 @@ class Player(CircleShape):
 
         self.time_since_last_shot = 0
         self.weapon_plasmagun = PlasmaGun(self.sfxm)
-        self.weapon_bomblauncher = BombLauncher()
+        self.weapon_bomblauncher = BombLauncher(self.sfxm)
         self.weapon_current = self.weapon_plasmagun
 
     def teleport_and_prepare_for_round(self, position : tuple[int, int]):
