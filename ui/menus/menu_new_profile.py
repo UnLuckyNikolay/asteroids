@@ -50,7 +50,8 @@ def initialize_new_profile(
 
     b_confirm = Button(
         (root_x+125, root_y+150), (200, 50), (3, 10, 3, 10),
-        game.finish_getting_player_name
+        game.finish_getting_player_name,
+        lambda: len(player_stats.name) > 0
     )
     b_confirm.add_element(
         TextPlain("Confirm", fonts.medium, color_blue),
