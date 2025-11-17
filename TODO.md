@@ -73,8 +73,8 @@ IDEAS:
     - [ ] Round end good
     - [ ] Switch enabled
     - [ ] Switch disabled
-    - [ ] Sounds for secrets?
-        - [ ] Konami
+    - [x] Sounds for secrets?
+        - [x] Konami
         - [x] UFO
 
 DISTANT/POSSIBLE IDEAS:

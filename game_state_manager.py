@@ -308,9 +308,10 @@ class GameStateManager(pygame.sprite.Sprite):
                     # Cheat visibility
                     if event.scancode == self.__konami_sequence[self._konami_progress]:
                         self._konami_progress += 1
-                        if self._konami_progress == 11:
+                        if self._konami_progress == 11 and not self.player_stats.found_cheats:
                             self._konami_progress = 0
                             self.player_stats.found_cheats = True
+                            self.sfxm.play_sound(SFX.SECRET_CHEATS)
                             self.initialize_current_menu()
                     else:
                         self._konami_progress = 0

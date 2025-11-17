@@ -18,6 +18,7 @@ class SFX(Enum):
     BUTTON_CLICK_SUCCESS = "button/click_successful/"
     BUTTON_CLICK_FAIL = "button/click_failed/"
 
+    SECRET_CHEATS = "secret/cheats/"
     SECRET_UFO = "secret/ufo/"
 
 # Additional OPTIONAL volume adjust for sounds.
@@ -52,6 +53,7 @@ class SFXManager(pygame.sprite.Sprite):
                     SFX.BUTTON_CLICK_SUCCESS |
                     SFX.BUTTON_CLICK_FAIL |
                     SFX.ASTEROID_EXPLOSION | 
+                    SFX.SECRET_CHEATS |
                     SFX.SECRET_UFO
                 ):
                     self.sfx_dict[sfx_enum] = _SoundRandom(sfx_enum, path)
