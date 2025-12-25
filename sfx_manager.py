@@ -4,7 +4,7 @@ from enum import Enum
 
 
 # New SFX should be added to:
-# - SFXManager.sfx_dict match statement in _init_
+# - SFXManager.sfx_dict match statement in _init_ if needed (uses _SoundRandom by default)
 class SFX(Enum):
     """The list of all SFX. Values are dir paths."""
 
@@ -49,23 +49,12 @@ class SFXManager(pygame.sprite.Sprite):
 
             match sfx_enum: # Add new enums here
                 case (
-                    SFX.PLAYER_PLASMA_SHOT |
-                    SFX.PLAYER_BOMB_EXPLOSION |
-                    SFX.PLAYER_CLEAVERS |
-                    SFX.PLAYER_HIT | 
-                    SFX.PLAYER_DEATH |
-                    SFX.BUTTON_CLICK_SUCCESS |
-                    SFX.BUTTON_CLICK_FAIL |
-                    SFX.ASTEROID_EXPLOSION | 
-                    SFX.SECRET_CHEATS |
-                    SFX.SECRET_UFO
-                ):
-                    self.sfx_dict[sfx_enum] = _SoundRandom(sfx_enum, path)
-
-                case (
                     SFX.ORE_COLLECTED
                 ):
                     self.sfx_dict[sfx_enum] = _SoundGrowingPitch(sfx_enum, path)
+
+                case _:
+                    self.sfx_dict[sfx_enum] = _SoundRandom(sfx_enum, path)
 
     def play_sound(self, sound_enum : SFX):
         try:

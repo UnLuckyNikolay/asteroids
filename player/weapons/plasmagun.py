@@ -13,8 +13,12 @@ class PlasmaGun(Weapon):
         self._projectile_speed = 500
         self._cooldown = 0.4
 
+        self._level_max = 5
+
         self._level_projectiles = 1
+        self._level_max_projectiles = 3
         self._level_cooldown = 1
+        self._level_max_cooldown = 3
 
 
     def upgrade_cooldown(self):

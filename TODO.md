@@ -19,11 +19,13 @@ FIXES/TWEAKS:
 - [x] Revisit visible naming scheme for ship parts
 - [x] Rename and move UserInterface class to GameStateManager, rename GameStateManager to RoundStateManager
 - [x] Refactor movement
-- [ ] Update screenshots in README
+- [x] Update screenshots in README
 - [x] Increase alpha of background of the pause menu
 - [x] Revamp difficulty increase
 - [x] Homing isn't affected by delta
 - [x] Refactor text for easier placement
+- [ ] Disable player hit sounds while in godmode
+- [ ] Sounds are dropped sometimes, possibly when too many played at once
 
 IDEAS:
 - Additional ship skins:
@@ -43,6 +45,9 @@ IDEAS:
     - [x] Hidden joke weapon
 - Additional asteroids:
     - [x] Bouncy
+- UI sugar:
+    - [x] Colors for top places at the leaderboards
+    - [x] Golden outline for max upgrades
 - [x] Graphics/color adjustments for the leaderboards for top places
 - [x] Add auto-shoot switch
 - [x] Add ship recolors

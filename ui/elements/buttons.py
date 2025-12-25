@@ -141,17 +141,16 @@ class Button(ButtonBase):
     def draw(self, screen):
         is_possible = self._condition_func()
         self._check_element_color(is_possible)
-        points = get_points(self._position, self._size, self._corners)
         if self._is_hovered and is_possible:
-            pygame.gfxdraw.filled_polygon(screen, points, self._color_fill_hover)
+            fill = self._color_fill_hover
         else:
-            pygame.gfxdraw.filled_polygon(screen, points, self._color_fill)
+            fill = self._color_fill
         if is_possible:
-            pygame.draw.polygon(screen, self._color_outline, points, 3)
+            outline = self._color_outline
         else:
-            pygame.draw.polygon(screen, self._color_outline_inactive, points, 3)
+            outline = self._color_outline_inactive
 
-        self._draw_elements(screen)
+        self._draw_box(screen, fill, outline)
 
     def add_element(
             self, 
@@ -240,22 +239,21 @@ class Switch(ButtonBase):
     def draw(self, screen):
         if self._active_func != None:
             self._is_active = self._active_func()
-        points = get_points(self._position, self._size, self._corners)
         self._check_element_color()
         if self._is_hovered and self._is_active:
-            pygame.gfxdraw.filled_polygon(screen, points, self._color_fill_hover_active)
-            pygame.draw.polygon(screen, self._color_outline_active, points, 3)
+            fill = self._color_fill_hover_active
+            outline = self._color_outline_active
         elif self._is_hovered and not self._is_active:
-            pygame.gfxdraw.filled_polygon(screen, points, self._color_fill_hover_inactive)
-            pygame.draw.polygon(screen, self._color_outline, points, 3)
+            fill = self._color_fill_hover_inactive
+            outline = self._color_outline
         elif not self._is_hovered and self._is_active:
-            pygame.gfxdraw.filled_polygon(screen, points, self._color_fill_active)
-            pygame.draw.polygon(screen, self._color_outline_active, points, 3)
+            fill = self._color_fill_active
+            outline = self._color_outline_active
         elif not self._is_hovered and not self._is_active:
-            pygame.gfxdraw.filled_polygon(screen, points, self._color_fill)
-            pygame.draw.polygon(screen, self._color_outline, points, 3)
+            fill = self._color_fill
+            outline = self._color_outline
 
-        self._draw_elements(screen)
+        self._draw_box(screen, fill, outline)
 
     def add_element(
             self, 
@@ -392,20 +390,19 @@ class InfoButton(ButtonBase):
     def draw(self, screen):
         # if self._active_func != None:
         #     self._is_active = self._active_func()
-        points = get_points(self._position, self._size, self._corners)
         self._check_element_color()
         if self._is_hovered and self._is_active:
-            pygame.gfxdraw.filled_polygon(screen, points, self._color_fill_hover_active)
+            fill = self._color_fill_hover_active
         elif self._is_hovered and not self._is_active:
-            pygame.gfxdraw.filled_polygon(screen, points, self._color_fill_hover)
+            fill = self._color_fill_hover
         else:
-            pygame.gfxdraw.filled_polygon(screen, points, self._color_fill)
+            fill = self._color_fill
         if self._is_active:
-            pygame.draw.polygon(screen, self._color_outline_active, points, 3)
+            outline = self._color_outline_active
         else:
-            pygame.draw.polygon(screen, self._color_outline, points, 3)
+            outline = self._color_outline
 
-        self._draw_elements(screen)
+        self._draw_box(screen, fill, outline)
 
     def _check_element_color(self):
         if self._is_active:

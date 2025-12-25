@@ -15,6 +15,7 @@ from player.weapons.projectiles.bombexplosion import BombExplosion
 from player.weapons.projectiles.literally_a_fucking_meat_cleaver import LiterallyAFuckingMeatCleaverBase
 from vfx.explosions import ExplosionBase, ExplosionSpiky, ExplosionRound
 from ui.elements.text import TextAnimated
+from ui.elements.container import Container
 
 from world.starfield import StarField
 from world.asteroidfield import AsteroidField
@@ -63,6 +64,7 @@ class Game():
         SFXManager.containers = (self.updatable)
 
         TextAnimated.containers = (self.ui_updatable)
+        Container.containers = (self.ui_updatable)
 
         StarField.containers = (self.drawable)
         ExplosionBase.containers = (self.updatable, self.drawable, self.cleanup)

@@ -47,9 +47,12 @@ class Player(CircleShape):
         self.ship : Ship = Ship(self.stats.unlocked_ships[self.stats.ship_model_index][0], self.radius)
         self.is_hitbox_shown : bool = False
         self.__level_engine : int = 1
+        self.__level_max_engine : int = 5
         self.__level_engine_speed : int = 1
+        self.__level_max_engine_speed : int = 3
         self.__engine_speed : int = 200
         self.__level_engine_acceleration : int = 1
+        self.__level_max_engine_acceleration : int = 3
         self.__engine_acceleration_mp : float = 0.8
         self.magnet : Magnet = Magnet(self.position)
         self.weapon_plasmagun : PlasmaGun = PlasmaGun(self.sfxm)
@@ -108,7 +111,7 @@ class Player(CircleShape):
         self.time_since_last_shot = 0
         self.weapon_plasmagun = PlasmaGun(self.sfxm)
         self.weapon_bomblauncher = BombLauncher(self.sfxm)
-        # Meat Cleavers are left as is because they are not upgradable. They were created perfect.
+        self.weapon_meat = LiterallyAFuckingMeatCleaverLauncher(self.sfxm)
         self.weapon_current = self.weapon_plasmagun
 
     def teleport_and_prepare_for_round(self, position : tuple[int, int]):
@@ -285,6 +288,19 @@ class Player(CircleShape):
                 return self.weapon_bomblauncher._level
             case ShipPart.LITERALLYAFUCKINGMEATCLEAVERLAUNCHER:
                 return self.weapon_meat._level
+
+    def get_part_level_max(self, part : ShipPart) -> int:
+        match part:
+            case ShipPart.ENGINE:
+                return self.__level_max_engine
+            case ShipPart.MAGNET:
+                return self.magnet._level_max
+            case ShipPart.PLASMAGUN:
+                return self.weapon_plasmagun._level_max
+            case ShipPart.BOMBLAUNCHER:
+                return self.weapon_bomblauncher._level_max
+            case ShipPart.LITERALLYAFUCKINGMEATCLEAVERLAUNCHER:
+                return self.weapon_meat._level_max
     
     def switch_color_profile(self, number : int):
         self.ship.switch_color_profile(number)
@@ -329,6 +345,29 @@ class Player(CircleShape):
                 return self.weapon_bomblauncher._level_radius
             case ShipUpgrade.BOMBLAUNCHER_FUSE:
                 return self.weapon_bomblauncher._level_fuse
+            case ShipUpgrade.LITERALLYAFUCKINGMEATCLEAVERLAUNCHER_MEAT:
+                return self.weapon_meat._level_meat
+
+    def get_upgrade_level_max(self, ship_part : ShipUpgrade) -> int:
+        match ship_part:
+            case ShipUpgrade.ENGINE_SPEED:
+                return self.__level_max_engine_speed
+            case ShipUpgrade.ENGINE_ACCELERATION:
+                return self.__level_max_engine_acceleration
+            case ShipUpgrade.MAGNET_RADIUS:
+                return self.magnet._level_max_radius
+            case ShipUpgrade.MAGNET_STRENGTH:
+                return self.magnet._level_max_strength
+            case ShipUpgrade.PLASMAGUN_PROJECTILES:
+                return self.weapon_plasmagun._level_max_projectiles
+            case ShipUpgrade.PLASMAGUN_COOLDOWN:
+                return self.weapon_plasmagun._level_max_cooldown
+            case ShipUpgrade.BOMBLAUNCHER_RADIUS:
+                return self.weapon_bomblauncher._level_max_radius
+            case ShipUpgrade.BOMBLAUNCHER_FUSE:
+                return self.weapon_bomblauncher._level_max_fuse
+            case ShipUpgrade.LITERALLYAFUCKINGMEATCLEAVERLAUNCHER_MEAT:
+                return self.weapon_meat._level_max_meat
             
     def get_upgrade_price(self, ship_part : ShipUpgrade) -> int | None:
         level = self.get_upgrade_level(ship_part)
@@ -380,6 +419,8 @@ class Player(CircleShape):
                 self.magnet.upgrade_radius()
             case ShipUpgrade.MAGNET_STRENGTH:
                 self.magnet.upgrade_strength()
+            case ShipUpgrade.LITERALLYAFUCKINGMEATCLEAVERLAUNCHER_MEAT:
+                self.weapon_meat.upgrade_meat()
 
     def __upgrade_engine_speed(self):
         match self.__level_engine_speed:

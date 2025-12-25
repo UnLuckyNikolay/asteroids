@@ -73,6 +73,10 @@ def initialize_pause_menu(
         Allignment.LEFT_WALL,
         nudge=(12, 0)
     )
+    c_engine.add_conditional_override(
+        lambda: player.get_part_level(ShipPart.ENGINE) >= player.get_part_level_max(ShipPart.ENGINE),
+        lambda: c_engine.set_color(color_golden)
+    )
     
     c_engine_speed = Container((offset_x+column_1, offset_y+65+row_height*3), (409, 36), (6, 3, 3, 6))
     c_engine_speed.add_element(
@@ -82,6 +86,10 @@ def initialize_pause_menu(
         ),
         Allignment.LEFT_WALL,
         nudge=(12, 0)
+    )
+    c_engine_speed.add_conditional_override(
+        lambda: player.get_upgrade_level(ShipUpgrade.ENGINE_SPEED) >= player.get_upgrade_level_max(ShipUpgrade.ENGINE_SPEED),
+        lambda: c_engine_speed.set_color(color_golden)
     )
     
     c_engine_acc = Container((offset_x+column_1, offset_y+65+row_height*4), (409, 36), (6, 3, 3, 6))
@@ -93,7 +101,12 @@ def initialize_pause_menu(
         Allignment.LEFT_WALL,
         nudge=(12, 0)
     )
+    c_engine_acc.add_conditional_override(
+        lambda: player.get_upgrade_level(ShipUpgrade.ENGINE_ACCELERATION) >= player.get_upgrade_level_max(ShipUpgrade.ENGINE_ACCELERATION),
+        lambda: c_engine_acc.set_color(color_golden)
+    )
     
+    # Magnet
     c_magnet = Container((offset_x+column_1, offset_y+65+row_height*5), (455, 36), (6, 6, 6, 6))
     c_magnet.add_element(
         TextUpdated(
@@ -102,6 +115,10 @@ def initialize_pause_menu(
         ),
         Allignment.LEFT_WALL,
         nudge=(12, 0)
+    )
+    c_magnet.add_conditional_override(
+        lambda: player.get_part_level(ShipPart.MAGNET) >= player.get_part_level_max(ShipPart.MAGNET),
+        lambda: c_magnet.set_color(color_golden)
     )
     
     c_magnet_rad = Container((offset_x+column_1, offset_y+65+row_height*6), (409, 36), (6, 3, 3, 6))
@@ -113,6 +130,10 @@ def initialize_pause_menu(
         Allignment.LEFT_WALL,
         nudge=(12, 0)
     )
+    c_magnet_rad.add_conditional_override(
+        lambda: player.get_upgrade_level(ShipUpgrade.MAGNET_RADIUS) >= player.get_upgrade_level_max(ShipUpgrade.MAGNET_RADIUS),
+        lambda: c_magnet_rad.set_color(color_golden)
+    )
     
     c_magnet_str = Container((offset_x+column_1, offset_y+65+row_height*7), (409, 36), (6, 3, 3, 6))
     c_magnet_str.add_element(
@@ -122,6 +143,10 @@ def initialize_pause_menu(
         ),
         Allignment.LEFT_WALL,
         nudge=(12, 0)
+    )
+    c_magnet_str.add_conditional_override(
+        lambda: player.get_upgrade_level(ShipUpgrade.MAGNET_STRENGTH) >= player.get_upgrade_level_max(ShipUpgrade.MAGNET_STRENGTH),
+        lambda: c_magnet_str.set_color(color_golden)
     )
 
     # Current stats
@@ -181,6 +206,11 @@ def initialize_pause_menu(
         Allignment.LEFT_WALL,
         nudge=(12, 0)
     )
+    c_weapon_1.add_conditional_override(
+        lambda: player.get_part_level(ShipPart.PLASMAGUN) >= player.get_part_level_max(ShipPart.PLASMAGUN),
+        lambda: c_weapon_1.set_color(color_golden)
+    )
+
     c_weapon_1_proj = Container((offset_x+column_2, offset_y+65+row_height*3), (409, 36), (6, 3, 3, 6))
     c_weapon_1_proj.add_element(
         TextUpdated(
@@ -190,6 +220,11 @@ def initialize_pause_menu(
         Allignment.LEFT_WALL,
         nudge=(12, 0)
     )
+    c_weapon_1_proj.add_conditional_override(
+        lambda: player.get_upgrade_level(ShipUpgrade.PLASMAGUN_PROJECTILES) >= player.get_upgrade_level_max(ShipUpgrade.PLASMAGUN_PROJECTILES),
+        lambda: c_weapon_1_proj.set_color(color_golden)
+    )
+
     c_weapon_1_cd = Container((offset_x+column_2, offset_y+65+row_height*4), (409, 36), (6, 3, 3, 6))
     c_weapon_1_cd.add_element(
         TextUpdated(
@@ -199,6 +234,11 @@ def initialize_pause_menu(
         Allignment.LEFT_WALL,
         nudge=(12, 0)
     )
+    c_weapon_1_cd.add_conditional_override(
+        lambda: player.get_upgrade_level(ShipUpgrade.PLASMAGUN_COOLDOWN) >= player.get_upgrade_level_max(ShipUpgrade.PLASMAGUN_COOLDOWN),
+        lambda: c_weapon_1_cd.set_color(color_golden)
+    )
+
     #Bomb Launcher
     c_weapon_2 = Container((offset_x+column_2, offset_y+65+row_height*5), (455, 36), (6, 6, 6, 6))
     c_weapon_2.add_element(
@@ -210,6 +250,10 @@ def initialize_pause_menu(
         Allignment.LEFT_WALL,
         nudge=(12, 0)
     )
+    c_weapon_2.add_conditional_override(
+        lambda: player.get_part_level(ShipPart.BOMBLAUNCHER) >= player.get_part_level_max(ShipPart.BOMBLAUNCHER),
+        lambda: c_weapon_2.set_color(color_golden)
+    )
     c_weapon_2_rad = Container((offset_x+column_2, offset_y+65+row_height*6), (409, 36), (6, 3, 3, 6))
     c_weapon_2_rad.add_element(
         TextUpdated(
@@ -219,6 +263,10 @@ def initialize_pause_menu(
         Allignment.LEFT_WALL,
         nudge=(12, 0)
     )
+    c_weapon_2_rad.add_conditional_override(
+        lambda: player.get_upgrade_level(ShipUpgrade.BOMBLAUNCHER_RADIUS) >= player.get_upgrade_level_max(ShipUpgrade.BOMBLAUNCHER_RADIUS),
+        lambda: c_weapon_2_rad.set_color(color_golden)
+    )
     c_weapon_2_fuse = Container((offset_x+column_2, offset_y+65+row_height*7), (409, 36), (6, 3, 3, 6))
     c_weapon_2_fuse.add_element(
         TextUpdated(
@@ -227,6 +275,10 @@ def initialize_pause_menu(
         ),
         Allignment.LEFT_WALL,
         nudge=(12, 0)
+    )
+    c_weapon_2_fuse.add_conditional_override(
+        lambda: player.get_upgrade_level(ShipUpgrade.BOMBLAUNCHER_FUSE) >= player.get_upgrade_level_max(ShipUpgrade.BOMBLAUNCHER_FUSE),
+        lambda: c_weapon_2_fuse.set_color(color_golden)
     )
 
     containers.extend(
@@ -242,17 +294,35 @@ def initialize_pause_menu(
         c_weapon_3 = Container((offset_x+column_2, offset_y+65+row_height*8), (455, 36), (6, 6, 6, 6))
         c_weapon_3.add_element(
             TextUpdated(
-                "Weapon 3: {}.v{}", fonts.small, color_red,
+                "Weapon 3: {}.v{}", fonts.small, color_white,
                 player.weapon_meat.get_name,
                 lambda: player.get_part_level(ShipPart.LITERALLYAFUCKINGMEATCLEAVERLAUNCHER)
             ),
             Allignment.LEFT_WALL,
             nudge=(12, 0)
         )
-        c_weapon_3.set_outline_color(color_red)
-        c_weapon_3.set_fill_color((100, 0, 0, 75))
+        #c_weapon_3.set_outline_color(color_red)
+        #c_weapon_3.set_fill_color((100, 0, 0, 75))
+        c_weapon_3.add_conditional_override(
+            lambda: player.get_part_level(ShipPart.LITERALLYAFUCKINGMEATCLEAVERLAUNCHER) >= player.get_part_level_max(ShipPart.LITERALLYAFUCKINGMEATCLEAVERLAUNCHER),
+            lambda: c_weapon_3.set_color(color_red)
+        )
 
-        containers.append(c_weapon_3)
+        c_weapon_3_meat = Container((offset_x+column_2, offset_y+65+row_height*9), (409, 36), (6, 3, 3, 6))
+        c_weapon_3_meat.add_element(
+            TextUpdated(
+                "More meat: {}", fonts.small, color_white,
+                lambda: player.get_upgrade_price_as_text(ShipUpgrade.LITERALLYAFUCKINGMEATCLEAVERLAUNCHER_MEAT)
+            ),
+            Allignment.LEFT_WALL,
+            nudge=(12, 0)
+        )
+        c_weapon_3_meat.add_conditional_override(
+            lambda: player.get_upgrade_level(ShipUpgrade.LITERALLYAFUCKINGMEATCLEAVERLAUNCHER_MEAT) >= player.get_upgrade_level_max(ShipUpgrade.LITERALLYAFUCKINGMEATCLEAVERLAUNCHER_MEAT),
+            lambda: c_weapon_3_meat.set_color(color_red)
+        )
+
+        containers.extend([c_weapon_3, c_weapon_3_meat])
     
     # <> Buttons <>
 
@@ -437,6 +507,20 @@ def initialize_pause_menu(
         TextPlain("/\\", fonts.small, color_green),
         Allignment.CENTER
     )
+    #MEAT
+    if player_stats.cheat_cleavers:
+        b_weapon_3_meat_up = Button(
+            (offset_x+column_2+419, offset_y+65+row_height*9), (36, 36), (3, 6, 6, 3),
+            lambda: player.buy_upgrade(ShipUpgrade.LITERALLYAFUCKINGMEATCLEAVERLAUNCHER_MEAT),
+            lambda: player.can_buy_upgrade(ShipUpgrade.LITERALLYAFUCKINGMEATCLEAVERLAUNCHER_MEAT)
+        )
+        b_weapon_3_meat_up.set_outline_color(color_green)
+        b_weapon_3_meat_up.add_element(
+            TextPlain("/\\", fonts.small, color_green),
+            Allignment.CENTER
+        )
+
+        buttons.extend([b_weapon_3_meat_up])
 
     # Ends the run and returns to the main menu
     b_end_run = Button(

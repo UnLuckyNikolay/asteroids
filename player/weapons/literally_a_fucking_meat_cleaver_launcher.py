@@ -18,15 +18,34 @@ class LiterallyAFuckingMeatCleaverLauncher(Weapon):
         self._projectile_speed = 300
         self._cooldown = 1.0
 
-        self._level = 666
+        self._level = 222
+        self._level_max = 666
 
+        self._level_meat = 1
+        self._level_max_meat = 3
+
+
+    def upgrade_meat(self):
+        match self._level_meat:
+            case 1:
+                self._level += 222
+                self._level_meat += 1
+            case 2:
+                self._level += 222
+                self._level_meat += 1
 
     def attempt_shot(self, position, rotation, time_since_last_shot):
         if time_since_last_shot >= self._cooldown:
             self.sfxm.play_sound(SFX.PLAYER_CLEAVERS)
-            self._spawn_cleaver(LiterallyAFuckingMeatCleaverSprite1, (20, 20), position, rotation-45)
-            self._spawn_cleaver(LiterallyAFuckingMeatCleaverSprite2, (0, 33), position, rotation)
-            self._spawn_cleaver(LiterallyAFuckingMeatCleaverSprite3, (-20, 20), position, rotation+45)
+            if self._level == 222:
+                self._spawn_cleaver(LiterallyAFuckingMeatCleaverSprite2, (0, 33), position, rotation)
+            elif self._level == 444:
+                self._spawn_cleaver(LiterallyAFuckingMeatCleaverSprite1, (15, 25), position, rotation-25)
+                self._spawn_cleaver(LiterallyAFuckingMeatCleaverSprite3, (-25, 15), position, rotation+25)
+            elif self._level == 666:
+                self._spawn_cleaver(LiterallyAFuckingMeatCleaverSprite2, (0, 33), position, rotation)
+                self._spawn_cleaver(LiterallyAFuckingMeatCleaverSprite1, (20, 20), position, rotation-45)
+                self._spawn_cleaver(LiterallyAFuckingMeatCleaverSprite3, (-20, 20), position, rotation+45)
             return True
         else:
             return False

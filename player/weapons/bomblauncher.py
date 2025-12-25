@@ -14,8 +14,12 @@ class BombLauncher(Weapon):
         self._explosion_radius = 100
         self._fuse_timer = 2.5
 
+        self._level_max = 5
+
         self._level_radius = 1
+        self._level_max_radius = 3
         self._level_fuse = 1
+        self._level_max_fuse = 3
 
 
     def upgrade_fuse(self):

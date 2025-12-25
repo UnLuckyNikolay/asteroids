@@ -26,6 +26,7 @@ class ShipUpgrade(Enum):
     PLASMAGUN_COOLDOWN = "Plasma Gun: Cooldown"
     BOMBLAUNCHER_RADIUS = "Bomb Launcher: Radius"
     BOMBLAUNCHER_FUSE = "Bomb Launcher: Fuse"
+    LITERALLYAFUCKINGMEATCLEAVERLAUNCHER_MEAT = "Literally A Fucking Meat Cleaver Launcher: Meat"
 
 # New parts should be added to:
 # player.get_part_level
