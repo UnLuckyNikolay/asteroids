@@ -292,7 +292,7 @@ class GameStateManager(pygame.sprite.Sprite):
     def _reset_leaderboard(self):
         self._scores = []
         self.__save_leaderboard()
-        self.__initialize_leaderboard()
+        self.initialize_current_menu()
 
     def __save_leaderboard(self):
         print(f"Saving leaderboard to `{self.__leaderboard_path}`")
