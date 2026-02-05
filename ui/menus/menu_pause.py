@@ -22,8 +22,12 @@ def initialize_pause_menu(
     buttons : list[Button | Switch] = []
 
     # Space between elements - 15
+    if player_stats.cheat_cleavers:
+        bg_height = 525
+    else: 
+        bg_height = 423
     offset_x = int((game.screen_resolution[0] - 1280)/2)
-    offset_y = int((game.screen_resolution[1] - 720)/2)
+    offset_y = int((game.screen_resolution[1] - bg_height - 180)/2)
     row_height = 51
     column_1 = 290
     column_2 = 760
@@ -31,7 +35,7 @@ def initialize_pause_menu(
     # <> Containers <>
 
     # Background
-    c_background = Container((offset_x+50, offset_y+50), (1180, 540), (20, 20, 8, 15))
+    c_background = Container((offset_x+50, offset_y+50), (1180, bg_height), (20, 20, 8, 15))
     c_background.set_fill_color((75, 75, 100, 150))
             
     # Current ship
@@ -524,7 +528,7 @@ def initialize_pause_menu(
 
     # Ends the run and returns to the main menu
     b_end_run = Button(
-        (offset_x+730, offset_y+600), (500, 72), (8, 8, 20, 20),
+        (offset_x+730, offset_y+bg_height+60), (500, 72), (8, 8, 20, 20),
         game.handler_finish_round
     )
     b_end_run.make_weighted(ModKey.SHIFT)

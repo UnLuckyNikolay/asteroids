@@ -26,6 +26,7 @@ FIXES/TWEAKS:
 - [x] Refactor text for easier placement
 - [ ] Disable player hit sounds while in godmode
 - [ ] Sounds are dropped sometimes, possibly when too many played at once
+- [x] Tweak the size of the pause menu based on the contents
 
 IDEAS:
 - Additional ship skins:
