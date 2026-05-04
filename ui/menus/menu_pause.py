@@ -3,7 +3,7 @@ from ui.elements.container import Container, Allignment
 from ui.elements.buttons import Button, ButtonRound, Switch, InfoButton, ModKey
 from ui.elements.text import TextPlain, TextUpdated
 from ui.font_builder import FontBuilder
-from ui.menus.enum import Menu
+from ui.menus.enum_menu import Menu
 from round_state_manager import RoundStateManager
 from player.player_stats import PlayerStats
 from player.player import Player, ShipUpgrade, ShipPart

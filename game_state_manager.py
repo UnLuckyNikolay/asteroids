@@ -12,7 +12,7 @@ from ui.elements.buttons import ButtonBase, Button, Switch, InfoButton
 from ui.elements.sprites.leaderboard import Leaderboard
 from ui.font_builder import FontBuilder
 
-from ui.menus.enum import Menu
+from ui.menus.enum_menu import Menu
 from ui.menus.addition_mini_settings import add_mini_settings_and_cheats
 from ui.menus.menu_profile_selection import initialize_profile_selection
 from ui.menus.menu_new_profile import initialize_new_profile
