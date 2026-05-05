@@ -398,7 +398,7 @@ def initialize_pause_menu(
     # Model switching
     b_model_left = Button(
         (offset_x+column_1, offset_y+65+row_height*1), (36, 36), (6, 3, 3, 6), 
-        player_stats.switch_ship_model_to_previous
+        player.switch_ship_model_to_previous
     )
     b_model_left.add_element(
         TextPlain("<", fonts.small, color_blue),
@@ -407,7 +407,7 @@ def initialize_pause_menu(
 
     b_model_right = Button(
         (offset_x+column_1+419, offset_y+65+row_height*1), (36, 36), (3, 6, 6, 3), 
-        player_stats.switch_ship_model_to_next
+        player.switch_ship_model_to_next
     )
     b_model_right.add_element(
         TextPlain(">", fonts.small, color_blue),

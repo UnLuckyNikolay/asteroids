@@ -44,7 +44,7 @@ class Player(CircleShape):
         self.lives_max : int = 3
         self.times_healed : int = 0
 
-        self.ship : Ship = Ship(self.stats.unlocked_ships[self.stats.ship_model_index][0], self.radius)
+        self.ship : Ship = Ship(self.stats.get_current_ship_model(), self.radius)
         self.is_hitbox_shown : bool = False
         self.__level_engine : int = 1
         self.__level_max_engine : int = 5
@@ -77,6 +77,21 @@ class Player(CircleShape):
         else:
             self.__turning_speed = value
 
+
+    def load_save(self, player_stats):
+        self.stats.load_save(player_stats)
+        self.apply_saved_skin()
+
+    def apply_saved_skin(self):
+        self.ship.switch_model(self.stats.get_current_ship_model(), self.stats.ship_color_profile)
+        
+    def switch_ship_model_to_next(self):
+        self.stats.switch_ship_model_to_next()
+        self.apply_saved_skin()
+    
+    def switch_ship_model_to_previous(self):
+        self.stats.switch_ship_model_to_previous()
+        self.apply_saved_skin()
 
     def reset(self):
         self.velocity_target.update(0, 0)
@@ -115,6 +130,7 @@ class Player(CircleShape):
         self.weapon_current = self.weapon_plasmagun
 
     def teleport_and_prepare_for_round(self, position : tuple[int, int]):
+        self.apply_saved_skin()
         self.position.update(position)
         self.magnet = Magnet(self.position)
         self.is_hidden = False

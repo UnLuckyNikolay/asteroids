@@ -46,7 +46,7 @@ def initialize_player_info(
         (root_x, root_y), (size_x, size_y), (7, 7, 30, 30)
     )
     c_profile.add_element(
-        Ship(player_stats.ship_model_value, color_profile=player_stats.ship_color_profile),
+        Ship(player_stats.get_current_ship_model(), color_profile=player_stats.ship_color_profile),
         Allignment.UPPER_RIGHT_CORNER, 
         nudge=(-70, 70)
     )

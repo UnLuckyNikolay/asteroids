@@ -112,7 +112,6 @@ class Game():
             self.player.kill()
         self.player_stats : PlayerStats = PlayerStats()
         self.player : Player = Player(self, self.player_stats, self.sfxm)
-        self.player_stats.set_player(self.player)
         self.gsm.player = self.player
         self.gsm.player_stats = self.player_stats
 

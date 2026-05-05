@@ -17,5 +17,15 @@ def ValidateProfile(player_save_path) -> dict | None:
     except jsonschema.exceptions.ValidationError as e:
         print(f"Error validating `{player_save_path}`.")
         return None
+    
+    if data["player_stats_save"]["version"] == 1:
+        # New unlocked ship list
+        old_list = data["player_stats_save"]["unlocked_ships"]
+        new_list = []
+        for ship_tuple in old_list:
+            if ship_tuple[1]:
+                new_list.append(ship_tuple[0])
+        data["player_stats_save"]["unlocked_ships"] = new_list
+        data["player_stats_save"]["version"] = 2
 
     return data

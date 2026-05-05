@@ -53,7 +53,7 @@ def initialize_main_menu(
         nudge=(text_nudge_x, 77)
     )
     c_profile.add_element(
-        Ship(player_stats.ship_model_value, color_profile=player_stats.ship_color_profile),
+        Ship(player_stats.get_current_ship_model(), color_profile=player_stats.ship_color_profile),
         Allignment.UPPER_RIGHT_CORNER,
         nudge=(-70, 70)
     )
