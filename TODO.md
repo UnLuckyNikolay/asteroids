@@ -98,3 +98,14 @@ DISTANT/POSSIBLE IDEAS:
     - [ ] Add holes
     - [ ] Rename Homing to Void
         - [ ] Move them up in player info
+
+TO CHECK/FIX FOR 2.0:
+- Homing Asteroid limit
+- Bounct Asteroid updating
+- Check which classes should be Sprite children (bcs of containers)
+- Player - use reset in init
+- Player - check name when exiting in profile creation
+- Check exiting
+- Player reset into init
+- Ship isn't updated in profile selection
+- Get some sleep

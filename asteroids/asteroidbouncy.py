@@ -6,15 +6,14 @@ from asteroids.ores import CopperOre, SilverOre, GoldenOre, Diamond
 
 
 class AsteroidBouncy(Asteroid):
-    def __init__(self, position, velocity, max_speed, radius, game):
+    def __init__(self, position, velocity, max_speed, radius, getter_screen_resolution):
         # Color of the Repulsion Gel from Portal 2
         super().__init__(position, velocity, max_speed, radius, (0, 95, 130), (0, 75, 100), 2)
-        self.game = game
-        self.is_new = True
+        self.getter_screen_res = getter_screen_resolution
 
     
     def update(self, dt): # Rewrites parent method to bounce around the screen
-        res = self.game.screen_resolution
+        res = self.getter_screen_res()
 
         self.position += self.velocity * dt
 
@@ -50,9 +49,9 @@ class AsteroidBouncy(Asteroid):
             new_radius = self.radius - ASTEROID_MIN_RADIUS
 
             velocity = self.velocity.rotate(split_angle) * 1.3
-            AsteroidBouncy(self.position, velocity, int(self.max_speed * 1.3), new_radius, self.game)
+            AsteroidBouncy(self.position, velocity, int(self.max_speed * 1.3), new_radius, self.getter_screen_res)
             
             velocity = self.velocity.rotate(-split_angle) * 1.3
-            AsteroidBouncy(self.position, velocity, int(self.max_speed * 1.3), new_radius, self.game)
+            AsteroidBouncy(self.position, velocity, int(self.max_speed * 1.3), new_radius, self.getter_screen_res)
 
         self.kill()

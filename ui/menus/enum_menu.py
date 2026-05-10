@@ -12,4 +12,6 @@ class Menu(Enum): # Remember not to name 2 the same ever fucking again
     HUD = "HUD"
     PAUSE_MENU = "Pause"
     ROUND_END = "Round End"
+
+    RETURN = "Return to the last menu"
     TEST_MENU = "Test Menu"

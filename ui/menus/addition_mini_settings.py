@@ -1,3 +1,7 @@
+from ui.menus.base_menu import _MenuBase
+from ui.menus.enum_action import Action
+from game_state_manager import GameStateManager
+
 from ui.colors import *
 from constants import DEBUG
 from ui.elements.container import Container, Allignment
@@ -11,15 +15,12 @@ from player.player import Player
 def add_mini_settings_and_cheats(
         container_list : list, 
         button_list : list,
-        game,
-        gsm,
-        player_stats : PlayerStats,
-        player : Player,
-        fonts : FontBuilder
+        gsm : GameStateManager,
+        fonts : FontBuilder,
     ):
     """Adds some options and cheats (if found at the buttom part of the screen)."""
 
-    res = game.screen_resolution
+    res = gsm.screen_resolution
     offset_y = 30
     container_size = (95, 20)
     button_size = (120, 20)
@@ -52,7 +53,7 @@ def add_mini_settings_and_cheats(
         [c_settings]
     )
 
-    if player_stats.found_cheats:
+    if gsm.player.stats.found_cheats:
         # Cheats
         c_cheats = Container((res[0]-10-container_size[0], res[1]-offset_y*4), container_size, right_corners)
         c_cheats.add_element(
@@ -67,13 +68,12 @@ def add_mini_settings_and_cheats(
     
     # <> Buttons <>
     
-
     if DEBUG:
         # Low FPS
         s_slow = Switch(
             (10, res[1]-offset_y*5), button_size, left_corners,
-            game.switch_low_fps,
-            game.is_slow
+            gsm.switch_low_fps,
+            gsm.is_slow
         )
         s_slow.add_description(
             TextPlain("DEBUG: Switches max FPS between 75 and 10", fonts.very_small, color_white)
@@ -86,8 +86,8 @@ def add_mini_settings_and_cheats(
         # Show hitbox
         s_hitbox = Switch(
             (10, res[1]-offset_y*4), button_size, left_corners,
-            player.switch_hitbox,
-            player.is_hitbox_shown
+            gsm.player.switch_hitbox,
+            gsm.player.is_hitbox_shown
         )
         s_hitbox.add_description(
             TextPlain("DEBUG: Switches the player hitbox visibility on/off", fonts.very_small, color_white)
@@ -103,8 +103,8 @@ def add_mini_settings_and_cheats(
     # Switch Fullscreen
     s_fullscreen = Switch(
         (10, res[1]-offset_y*2), button_size, left_corners,
-        game.switch_fullscreen,
-        game.is_fullscreen
+        gsm.switch_fullscreen,
+        gsm.is_fullscreen
     )
     s_fullscreen.add_description(
         TextPlain("Switches the FULLSCREEN mode on/off", fonts.very_small, color_white)
@@ -117,7 +117,7 @@ def add_mini_settings_and_cheats(
     # Regenerate background
     b_background = Button(
         (10, res[1]-offset_y*1), button_size, left_corners,
-        game.handler_regenerate_background
+        gsm.handler_regenerate_background
     )
     b_background.add_description(
         TextPlain("Generates new background", fonts.very_small, color_white)
@@ -132,12 +132,12 @@ def add_mini_settings_and_cheats(
         [b_background, s_fullscreen]
     )
 
-    if player_stats.found_cheats:
+    if gsm.player.stats.found_cheats:
         # Cheat - Godmode
         s_godmode = Switch(
             (res[0]-10-button_size[0], res[1]-offset_y*3), button_size, right_corners,
-            player_stats.switch_godmode,
-            player_stats.cheat_godmode
+            gsm.player.stats.switch_godmode,
+            gsm.player.stats.cheat_godmode
         )
         s_godmode.add_description(
             TextPlain("Say `No!` to all damage!", fonts.very_small, color_white)
@@ -151,8 +151,8 @@ def add_mini_settings_and_cheats(
         # Cheat - Money cheat
         s_money = Switch(
             (res[0]-10-button_size[0], res[1]-offset_y*2), button_size, right_corners,
-            player_stats.switch_stonks,
-            player_stats.cheat_stonks
+            gsm.player.stats.switch_stonks,
+            gsm.player.stats.cheat_stonks
         )
         s_money.add_description(
             TextPlain("Sells your Bitcoin before starting a round", fonts.very_small, color_white)
@@ -166,8 +166,8 @@ def add_mini_settings_and_cheats(
         # Cheat - Cleavers
         s_cleavers = Switch(
             (res[0]-10-button_size[0], res[1]-offset_y*1), button_size, right_corners,
-            player_stats.switch_cleavers,
-            player_stats.cheat_cleavers
+            gsm.player.stats.switch_cleavers,
+            gsm.player.stats.cheat_cleavers
         )
         s_cleavers.add_description(
             TextPlain("Meat", fonts.very_small, color_red)

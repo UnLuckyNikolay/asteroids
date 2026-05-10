@@ -1,8 +1,20 @@
 from player.ship import ShipModel
 
 from ui.helpers import get_time_as_text
-from round_state_manager import RoundStateManager
+from round_stats import RoundStats
 
+def get_ship_id(index) -> int:
+    indexes = [
+        ShipModel.POLY1.value,
+        ShipModel.HAWK1.value,
+        ShipModel.HAWK2.value,
+        ShipModel.HAWK3.value,
+        ShipModel.UFO2.value,
+    ]
+    try:
+        return indexes[index]
+    except IndexError:
+        return ShipModel.HAWK3.value
 
 class PlayerStats():
     """Used to keep track of and save certain player stats outside of rounds."""
@@ -14,11 +26,11 @@ class PlayerStats():
         self.longest_run : float = 0 # In seconds
 
         self.unlocked_ships : list[int] = [
-            int(ShipModel.POLY1.value),
-            int(ShipModel.HAWK1.value),
-            int(ShipModel.HAWK2.value),
-            int(ShipModel.HAWK3.value),
-            int(ShipModel.UFO2.value),
+            ShipModel.POLY1.value,
+            ShipModel.HAWK1.value,
+            ShipModel.HAWK2.value,
+            ShipModel.HAWK3.value,
+            # ShipModel.UFO2.value, # Hidden in Leaderboards
         ]
         self.ship_model_index : int = 3 # Index for the .unlocked_ships
         self.ship_color_profile : int = 0
@@ -57,7 +69,7 @@ class PlayerStats():
     def get_current_ship_model(self) -> ShipModel:
         return ShipModel(self.unlocked_ships[self.ship_model_index])
 
-    def process_round_stats(self, rsm : RoundStateManager):
+    def process_round_stats(self, rsm : RoundStats):
         if rsm.score > self.max_score:
             self.max_score = rsm.score
         if rsm.round_time > self.longest_run:

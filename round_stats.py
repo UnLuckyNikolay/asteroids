@@ -27,7 +27,7 @@ class RoundTitle(Enum):
     RECORD_2 = "Top 2!"
     RECORD_3 = "Top 3!"
 
-class RoundStateManager(pygame.sprite.Sprite):
+class RoundStats(pygame.sprite.Sprite):
     def __init__(self, player):
         if hasattr(self, "containers"):
             super().__init__(self.containers) # pyright: ignore[reportAttributeAccessIssue]
@@ -35,8 +35,11 @@ class RoundStateManager(pygame.sprite.Sprite):
             super().__init__()
 
         self.player = player
+        self.reset()
+
+    def reset(self):
         self.score = 0
-        self.old_pb = player.stats.max_score
+        self.old_pb = self.player.stats.max_score
         self.round_time : float = 0 # In seconds
 
         self.is_new_record : bool = False
@@ -57,8 +60,7 @@ class RoundStateManager(pygame.sprite.Sprite):
 
 
     def update(self, delta : float):
-        if self.player.is_alive:
-            self.round_time += delta
+        self.round_time += delta
 
     def get_time_as_text(self) -> str:
         return get_time_as_text(self.round_time)

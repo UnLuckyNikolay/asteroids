@@ -1,58 +1,56 @@
-# pyright: reportAttributeAccessIssue=false
-
 import pygame, json, os
-from typing import Any
+from typing import Callable, Any
+from enum import Enum
 
 from constants import *
 from json_helper.leaderboard.validator import ValidateLeaderboard
 from json_helper.profile.validator import ValidateProfile
 
-from ui.elements.container import Container
-from ui.elements.buttons import ButtonBase, Button, Switch, InfoButton
-from ui.elements.sprites.leaderboard import Leaderboard
-from ui.font_builder import FontBuilder
-
-from ui.menus.enum_menu import Menu
-from ui.menus.addition_mini_settings import add_mini_settings_and_cheats
-from ui.menus.menu_profile_selection import initialize_profile_selection
-from ui.menus.menu_new_profile import initialize_new_profile
-from ui.menus.menu_main import initialize_main_menu
-from ui.menus.menu_player_info import initialize_player_info
-from ui.menus.menu_name_edit import initialize_name_edit
-from ui.menus.menu_leaderboard import initialize_leaderboard
-from ui.menus.menu_hud import initialize_hud
-from ui.menus.menu_pause import initialize_pause_menu
-from ui.menus.menu_round_end import initialize_round_end
-from ui.menus.menu_test import initialize_test_menu
-
 from sfx_manager import SFXManager, SFX
-from round_state_manager import RoundStateManager
-from player.player import Player
-from player.player_stats import PlayerStats
+from groups import GroupManager
+from round_stats import RoundStats
 from player.ship_enums import ShipModel
-
+from player.player import Player
+from world.entity_spawner import EntitySpawner, ESMode
+from world.starfield import StarField
+from ui.menus.enum_menu import Menu
+from vfx.explosions import ExplosionBase, ExplosionSpiky, ExplosionRound
+from asteroids.asteroid import Asteroid
+from ui.menus.enum_action import Action
 
 class GameStateManager(pygame.sprite.Sprite):
-    layer = 100 # pyright: ignore
-    def __init__(self, game, sfxm : SFXManager):
+    def __init__(self, sfxm : SFXManager, gm : GroupManager):
         if hasattr(self, "containers"):
-            super().__init__(self.containers)
+            super().__init__(self.containers) # pyright: ignore[reportAttributeAccessIssue]
         else:
             super().__init__()
 
-        self.game = game
-        self.sfxm = sfxm
-        self.rsm : RoundStateManager = None
-        self.player : Player
-        self.player_stats : PlayerStats
-        self.__containers : list[Container | Leaderboard] = []
-        self.__buttons : list[ButtonBase] = []
-        self.__hovered_button : Button | Switch | None = None
-        self.__current_menu : Menu = Menu.PROFILE_SELECTION # Menu.PROFILE_SELECTION | Menu.TEST_MENU
+        self.screen_resolution_windowed : tuple[int, int] = (SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.screen_resolution_fullscreen : tuple[int, int] = pygame.display.get_desktop_sizes()[0]
+        self.screen_resolution : tuple[int, int] = self.screen_resolution_windowed
+        self.is_fullscreen : bool = False
+        self.is_window_resized : bool = False
+        self.max_fps = MAX_FPS
+        self.is_slow = False
 
-        # Fonts
-        font_path = "./_internal/fonts/anita-semi-square.normaali.ttf" #"../../fonts/anita-semi-square.normaali.ttf"
-        self.__fonts = FontBuilder(font_path)
+        self.is_running : bool = True
+        self.is_round_going : bool = False
+        self.is_paused : bool = False
+        self.is_finishing_a_round : bool = False
+        self.death_timer : float = 0.0
+
+        self.switch_menu : Callable[[Menu], None]
+        self.update_menu : Callable
+        self.held_actions : dict[Action, bool] = {}
+        for action in Action:
+            self.held_actions[action] = False
+
+        self.sfxm = sfxm
+        self.gm = gm
+        self.player : Player = Player(self.get_screen_resolution, sfxm, self.held_actions)
+        self.spawner = EntitySpawner(self.player, self.get_screen_resolution)
+        self.rs : RoundStats = RoundStats(self.player)
+        self.star_field = StarField(self.screen_resolution_fullscreen)
         
         # Checking if ./saves/ folder exists
         self.__saves_folder_path = "./saves/"
@@ -79,116 +77,163 @@ class GameStateManager(pygame.sprite.Sprite):
 
         # Defaults used for loading save in profile selection if something is missing
         self._default_player_name = "Player"
-        self._default_ship_model = ShipModel.HAWK3 # Value of the ShipType Enum
+        self._default_ship_index = ShipModel.HAWK3.value # Value of the ShipType Enum
 
         # Secrets
-        self.__konami_sequence : list[int] = [82, 82, 81, 81, 80, 79, 80, 79, 5, 4, 40] # Scancodes
-        self._konami_progress : int = 0
-
-    def draw(self, screen):
-        for container in self.__containers:
-            container.draw(screen)
-        
-        for button in self.__buttons:
-            button.draw(screen)
-
-        if self.__hovered_button != None:
-            self.__hovered_button.draw_description(screen, self.game.screen_resolution)
+        self.konami_sequence : list[int] = [82, 82, 81, 81, 80, 79, 80, 79, 5, 4, 40] # Scancodes
+        self.konami_progress : int = 0
     
-    def initialize_current_menu(self):
-        run_menu_function = lambda function: function(
-            self.game,
-            self,
-            self.player_stats,
-            self.player,
-            self.__fonts
-        )
-        run_menu_function_with_rsm = lambda function: function(
-            self.game,
-            self,
-            self.rsm,
-            self.player_stats,
-            self.player,
-            self.__fonts
-        )
-        run_addition_function = lambda function: function(
-            self.__containers,
-            self.__buttons,
-            self.game,
-            self,
-            self.player_stats,
-            self.player,
-            self.__fonts
-        )
+    def update(self, dt : float):
+        if self.is_round_going:
+            self.update_gameplay(dt)
+        elif self.is_finishing_a_round:
+            self.update_round_finish(dt)
+        else:
+            self.update_ambient(dt)
 
-        match self.__current_menu:
-            case Menu.PROFILE_SELECTION:
-                self.__containers, self.__buttons = run_menu_function(initialize_profile_selection)
-            case Menu.NEW_PROFILE:
-                self.__containers, self.__buttons = run_menu_function(initialize_new_profile)
-            case Menu.MAIN_MENU:
-                self.__containers, self.__buttons = run_menu_function(initialize_main_menu)
-                run_addition_function(add_mini_settings_and_cheats)
-            case Menu.PLAYER_INFO:
-                self.__containers, self.__buttons = run_menu_function(initialize_player_info)
-                run_addition_function(add_mini_settings_and_cheats)
-            case Menu.NAME_EDIT:
-                self.__containers, self.__buttons = run_menu_function(initialize_name_edit)
-            case Menu.LEADERBOARD:
-                self.__containers, self.__buttons = run_menu_function(initialize_leaderboard)
-            case Menu.HUD:
-                self.__containers, self.__buttons = run_menu_function_with_rsm(initialize_hud)
-            case Menu.PAUSE_MENU:
-                self.__containers, self.__buttons = run_menu_function_with_rsm(initialize_pause_menu)
-            case Menu.ROUND_END:
-                self.__containers, self.__buttons = run_menu_function_with_rsm(initialize_round_end)
-            case Menu.TEST_MENU:
-                self.__containers, self.__buttons = run_menu_function(initialize_test_menu)
-            case _:
-                print(f"> Error: missing menu {self.__current_menu.value} in UserInterface.initialize_current_menu")
+    def update_ambient(self, dt : float):
+        for object in self.gm.moving_objects:
+            if self.check_if_object_is_off_screen(object):
+                object.kill()
 
-    def start_round(self, rsm):
-        self.rsm = rsm
+    def update_gameplay(self, dt : float):
+        if self.player.is_alive and not self.is_paused:
+            self.rs.update(dt)
+
+            for object in self.gm.moving_objects:
+                if self.check_if_object_is_off_screen(object):
+                    if isinstance(object, Asteroid): ##### REWRITE THIS SHITE INSIDE BASE ASTEROID - FUCK IT, USE GM INSTEAD
+                        self.spawner.kill_asteroid(object) # The field kills/splits asteroids to keep count of certain types
+                    else:
+                        object.kill()
+
+            # Colision checks
+            # Player hit
+            for asteroid in self.gm.asteroids:
+                if asteroid.check_colision(self.player) and not self.player.is_invul: # No check for dead asteroids because first loop, only off-screen ones are dead
+                    alive = self.player.take_damage_and_check_if_alive()
+                    if alive:
+                        self.sfxm.play_sound(SFX.PLAYER_HIT)
+                    self.spawner.kill_asteroid(asteroid)
+                    ExplosionSpiky(asteroid.position, asteroid.radius)
+                
+                # Asteroid shot
+                for projectile in self.gm.projectiles:
+                    if projectile.check_colision(asteroid) and not asteroid.is_dead:
+                        if projectile.is_single_use:
+                            projectile.kill()
+                        self.spawner.split_asteroid(asteroid)
+                        ExplosionSpiky(asteroid.position, asteroid.radius)
+                        self.sfxm.play_sound(SFX.ASTEROID_EXPLOSION)
+                        self.rs.score += asteroid.reward
+                        self.rs.increase_count_stat(type(asteroid))
+                
+            # Asteroid exploded
+            for hitbox in self.gm.explosion_hitboxes:
+                for asteroid in self.gm.asteroids:
+                    if hitbox.check_colision(asteroid) and not asteroid.is_dead:
+                        self.spawner.split_asteroid(asteroid)
+                        self.sfxm.play_sound(SFX.ASTEROID_EXPLOSION)
+                        self.rs.score += asteroid.reward
+                        self.rs.increase_count_stat(type(asteroid))
+                hitbox.kill()
+
+            # Loot collected
+            for loot in self.gm.loot:
+                if loot.check_colision(self.player):
+                    self.player.collect_loot(loot.price)
+                    self.sfxm.play_sound(SFX.ORE_COLLECTED)
+                    self.rs.increase_count_stat(type(loot))
+                    loot.kill()
+                elif loot.check_colision(self.player.magnet):
+                    loot.home_towards(dt, self.player.position, self.player.magnet.get_strength())
+
+        elif not self.player.is_alive:
+            self.finish_round()
+
+    def update_round_finish(self, dt : float):
+        if self.death_timer < 2:
+            if self.death_timer > 1:
+                self.player.is_hidden = True
+            self.death_timer += dt
+        else:
+            self.is_finishing_a_round = False
+
+            # Saving score and going back to Main Menu
+            if not self.player.is_sus and self.rs.score > 0:
+                self.rs.is_new_record, self.rs.record_place = self.check_score(self.rs.score)
+                self.player.stats.process_round_stats(self.rs)
+                self.save_profile()
+            self.player.teleport_away()
+            self.switch_menu(Menu.ROUND_END)
+
+    def start_round(self):
+        """
+        Run to start a round.
+        """
+        for object in self.gm.cleanup:
+            object.kill()
+        self.is_round_going = True
+        self.is_paused = False
+        self.player.teleport_and_prepare_for_round((int(self.screen_resolution[0] / 2), int(self.screen_resolution[1] / 2)))
+        self.spawner.switch_mode(ESMode.ASTEROIDS_STANDARD)
         self.switch_menu(Menu.HUD)
 
-    def switch_menu(self, menu : Menu):
-        if self.__current_menu == menu:
-            return
-        
-        self.__current_menu = menu
-        if self.__hovered_button != None and self.__hovered_button._is_hovered:
-            self.__hovered_button.switch_hovered_state()
-        self.__hovered_button = None
-        for object in self.game.ui_updatable:
+    def finish_round(self):
+        """
+        Run when the player dies. Plays the death animation and switches to the Round Statistics screen.
+        """
+        self.is_round_going = False
+        self.is_finishing_a_round = True
+
+        if self.is_paused: # For self-destructing
+            self.is_paused = False
+            self.switch_menu(Menu.HUD)
+
+        self.player.end_round()
+        ExplosionRound(self.player.position)
+        self.sfxm.play_sound(SFX.PLAYER_DEATH)
+        self.death_timer = 0.0
+
+    def cleanup_round(self):
+        """
+        Run to return from the Round Statistics screen to the main menu.
+        """
+        for object in self.gm.cleanup:
             object.kill()
-        self.initialize_current_menu()
+        self.spawner.switch_mode(ESMode.AMBIENT)
+        self.player.reset()
+        self.switch_menu(Menu.MAIN_MENU)
 
-    def check_hovered_button(self):
-        """Checks mouse position against all the buttons in the current menus and tries to run the button function."""
+    def pause_game(self):
+        self.is_paused = True
+        self.switch_menu(Menu.PAUSE_MENU)
 
-        position = pygame.mouse.get_pos()
+    def unpause_game(self):
+        self.is_paused = False
+        self.switch_menu(Menu.HUD)
+    
+    def check_if_object_is_off_screen(self, object) -> bool:
+        offset = 100
+        return (
+            object.position.x < -offset or
+            object.position.x > self.screen_resolution[0]+offset or
+            object.position.y < -offset or
+            object.position.y > self.screen_resolution[1]+offset
+        )
 
-        if self.__hovered_button == None:
+    def handler_turn_off(self):
+        self.is_running = False
 
-            # Check for a button hover
-            for i in range(len(self.__buttons)):
-                if self.__buttons[i].check_cursor_hover(position):
-                    self.__hovered_button = self.__buttons[i]
-                    self.__hovered_button.switch_hovered_state() # pyright: ignore[reportOptionalMemberAccess]
-                    return
-        
-        # Check if cursor moved off the button
-        elif not self.__hovered_button.check_cursor_hover(position):
-            self.__hovered_button.switch_hovered_state()
-            self.__hovered_button = None
+    def handler_regenerate_background(self):
+        self.star_field.regenerate()
 
-    def try_button_press(self):
-        if self.__hovered_button == None:
-            return
-        
-        self.__hovered_button.run_if_possible(self.sfxm)
-        if self.__hovered_button != None and self.__hovered_button.is_active == False:
-            self.__hovered_button = None
+    def get_screen_resolution(self) -> tuple[int, int]:
+        return self.screen_resolution
+    
+    def set_menu_functions(self, function_switch_menu : Callable[[Menu], None], function_update_menu : Callable):
+        self.switch_menu = function_switch_menu
+        self.update_menu = function_update_menu
 
     ### Saving
 
@@ -199,44 +244,40 @@ class GameStateManager(pygame.sprite.Sprite):
         path = self.__profile_paths[self.__current_profile]
         save = {
             "version" : 1,
-            "player_stats_save" : self.player_stats.get_save()
+            "player_stats_save" : self.player.stats.get_save()
         }
         print(f"Saving current profile to `{path}`")
         with open(path, "w") as file:
             json.dump(save, file)
 
-    def _load_profile(self, number):
-        self.__current_profile = number
-        profile = self._profiles[number]
+    def _load_profile(self, index):
+        self.__current_profile = index
+        profile = self._profiles[index]
 
         if profile["version"] >= 1:
-            self.player_stats.load_save(profile["player_stats_save"])
+            self.player.stats.load_save(profile["player_stats_save"])
 
         self.switch_menu(Menu.MAIN_MENU)
 
-    def _new_profile(self, number):
+    def _new_profile(self, index):
         self.switch_menu(Menu.NEW_PROFILE)
-        self.__current_profile = number
-        if self.game.get_player_name():
-            self.switch_menu(Menu.MAIN_MENU)
-        else:
-            self.__current_profile = None # In case game is exited while creating a new profile
+        self.__current_profile = index
 
-    def _delete_profile(self, number):
+    def _delete_profile(self, index):
         try:
-            os.remove(self.__profile_paths[number])
-            print(f"Removed file `{self.__profile_paths[number]}`")
-            self._profiles[number] = None
+            os.remove(self.__profile_paths[index])
+            print(f"Removed file `{self.__profile_paths[index]}`")
+            self._profiles[index] = None
         except Exception as e:
-            print(f"Error removing file `{self.__profile_paths[number]}`: {e}")
-        self.initialize_current_menu()
+            print(f"Error removing file `{self.__profile_paths[index]}`: {e}")
+        self.update_menu()
 
-    def _rename_player(self, starting_menu : Menu):
-        self.switch_menu(Menu.NAME_EDIT)
-        if self.game.get_player_name():
-            self.switch_menu(starting_menu)
-        elif self.player_stats.name == "":
-            self.player_stats.name = "Player"
+    # def _rename_player(self, starting_menu : Menu):
+    #     self.switch_menu(Menu.NAME_EDIT)
+    #     if self.game.get_player_name():
+    #         self.switch_menu(starting_menu)
+    #     elif self.player.stats.name == "":
+    #         self.player.stats.name = "Player"
 
     def _return_to_profile_selection(self):
         """Used to return from the Main Menu back to the Profile Selection."""
@@ -245,7 +286,8 @@ class GameStateManager(pygame.sprite.Sprite):
             self.save_profile()
             self._profiles[self.__current_profile] = ValidateProfile(self.__profile_paths[self.__current_profile])
         self.__current_profile = None
-        self.game.initialize_new_player()
+        self.player.kill()
+        self.player = Player(self.get_screen_resolution, self.sfxm, self.held_actions)
         self.switch_menu(Menu.PROFILE_SELECTION)
 
     def check_score(self, new_score) -> tuple[bool, int]:
@@ -264,7 +306,7 @@ class GameStateManager(pygame.sprite.Sprite):
 
         # Empty
         if len(self._scores) == 0:
-            self._scores.append({"name": self.player_stats.name, "score": new_score})
+            self._scores.append({"name": self.player.stats.name, "score": new_score})
             self.__save_leaderboard()
             return True, 1
 
@@ -273,14 +315,14 @@ class GameStateManager(pygame.sprite.Sprite):
             if new_score > self._scores[i]["score"]:
                 if len(self._scores) == LEADERBOARD_LENGTH:
                     self._scores.pop()
-                self._scores.append({"name": self.player_stats.name, "score": new_score})
+                self._scores.append({"name": self.player.stats.name, "score": new_score})
                 self._scores.sort(key=lambda x: x["score"], reverse=True)
                 self.__save_leaderboard()
                 return True, i+1
             
         # New lowest :sadge:
         if len(self._scores) < LEADERBOARD_LENGTH:
-                self._scores.append({"name": self.player_stats.name, "score": new_score})
+                self._scores.append({"name": self.player.stats.name, "score": new_score})
                 self.__save_leaderboard()
                 return True, len(self._scores)
             
@@ -292,7 +334,7 @@ class GameStateManager(pygame.sprite.Sprite):
     def _reset_leaderboard(self):
         self._scores = []
         self.__save_leaderboard()
-        self.initialize_current_menu()
+        self.update_menu()
 
     def __save_leaderboard(self):
         print(f"Saving leaderboard to `{self.__leaderboard_path}`")
@@ -301,21 +343,37 @@ class GameStateManager(pygame.sprite.Sprite):
 
     ### Secret stuff
 
-    def handle_event_for_secrets(self, event : pygame.event.Event):
-        match self.__current_menu:
-            case Menu.MAIN_MENU:
-                if event.type == pygame.KEYDOWN:
-                    # Cheat visibility
-                    if event.scancode == self.__konami_sequence[self._konami_progress]:
-                        self._konami_progress += 1
-                        if self._konami_progress == 11 and not self.player_stats.found_cheats:
-                            self._konami_progress = 0
-                            self.player_stats.found_cheats = True
-                            self.sfxm.play_sound(SFX.SECRET_CHEATS)
-                            self.initialize_current_menu()
-                    else:
-                        self._konami_progress = 0
+    def unlock_cheats(self):
+        self.player.stats.found_cheats = True
+        self.sfxm.play_sound(SFX.SECRET_CHEATS)
+        self.update_menu()
 
     def unlock_ship(self, ship_type : ShipModel):
-        self.player_stats.unlock_ship(ship_type)
-        self.initialize_current_menu()
+        self.player.stats.unlock_ship(ship_type)
+        self.update_menu()
+
+    def switch_low_fps(self):
+        self.max_fps = 75 if self.max_fps == 10 else 10
+        self.is_slow = False if self.is_slow else True
+
+    def switch_fullscreen(self):
+        if not self.is_fullscreen:
+            self.is_fullscreen = True
+            self.switch_to_fullscreen()
+        else:
+            self.is_fullscreen = False
+            self.switch_to_windowed()
+    
+    def switch_to_fullscreen(self):
+            self.screen_resolution = self.screen_resolution_fullscreen
+            flags = pygame.FULLSCREEN
+            self.screen = pygame.display.set_mode(self.screen_resolution, flags)
+            self.update_menu()
+
+    def switch_to_windowed(self):
+            self.screen_resolution = self.screen_resolution_windowed
+            # Changes mode twice because first change disables fullcreen,
+            # second change changes window size
+            self.screen = pygame.display.set_mode(self.screen_resolution)
+            self.screen = pygame.display.set_mode(self.screen_resolution, pygame.RESIZABLE)
+            self.update_menu()

@@ -1,7 +1,8 @@
 import pygame
-from enum import Enum
+from typing import Callable
 
 from constants import *
+from ui.menus.enum_action import Action
 from sfx_manager import SFXManager
 from shapes.circleshape import CircleShape
 from player.weapons.plasmagun import PlasmaGun
@@ -15,7 +16,7 @@ from player.player_stats import PlayerStats
 
 class Player(CircleShape):
     layer = 50 # pyright: ignore
-    def __init__(self, game, stats, sfxm : SFXManager):
+    def __init__(self, getter_screen_res : Callable[[], tuple[int, int]], sfxm : SFXManager, held_actions : dict[Action, bool]):
         super().__init__(pygame.Vector2(-100, -100), pygame.Vector2(0,0), PLAYER_RADIUS)
         self.velocity_target = pygame.Vector2(0, 0)
         self.rotation : float = 180
@@ -26,11 +27,12 @@ class Player(CircleShape):
         self.state_rotation : int = 0 # -1 - rotating left, 0 - nothing, 1 - rotating right
         self.is_shooting : bool = False
 
-        self.game = game
+        self.getter_screen_res = getter_screen_res
         self.is_hidden : bool = True
         """Used as a check when teleporting the player if off-screen."""
-        self.stats : PlayerStats = stats
+        self.stats : PlayerStats = PlayerStats()
         self.sfxm = sfxm
+        self.held_actions = held_actions
 
         self.timer_invul : float = 0
         self.is_invul : bool = False
@@ -59,6 +61,7 @@ class Player(CircleShape):
         self.weapon_bomblauncher : BombLauncher = BombLauncher(self.sfxm)
         self.weapon_meat : LiterallyAFuckingMeatCleaverLauncher = LiterallyAFuckingMeatCleaverLauncher(self.sfxm)
         self.time_since_last_shot : float = 0
+        self.weapons = [self.weapon_plasmagun, self.weapon_bomblauncher, self.weapon_meat]
         self.weapon_current = self.weapon_plasmagun
 
         self.is_sus : bool = False
@@ -93,13 +96,14 @@ class Player(CircleShape):
         self.stats.switch_ship_model_to_previous()
         self.apply_saved_skin()
 
-    def reset(self):
+    def teleport_away(self):
         self.velocity_target.update(0, 0)
         self.velocity.update(0, 0)
         self.position.update(-100, -100)
         self.rotation = 180
         self.__turning_speed = 0
 
+    def reset(self):
         # For controls in game.handle_event_for_ship_controls()
         self.state_movement = 0 # -1 - going backwards, 0 - nothing, 1 - going forward
         self.state_rotation = 0 # -1 - rotating left, 0 - nothing, 1 - rotating right
@@ -127,6 +131,7 @@ class Player(CircleShape):
         self.weapon_plasmagun = PlasmaGun(self.sfxm)
         self.weapon_bomblauncher = BombLauncher(self.sfxm)
         self.weapon_meat = LiterallyAFuckingMeatCleaverLauncher(self.sfxm)
+        self.weapons = [self.weapon_plasmagun, self.weapon_bomblauncher, self.weapon_meat]
         self.weapon_current = self.weapon_plasmagun
 
     def teleport_and_prepare_for_round(self, position : tuple[int, int]):
@@ -163,22 +168,31 @@ class Player(CircleShape):
         self.rotation += self.turning_speed * dt
 
     def move(self, dt : float):
-        if self.state_movement == 1:
+        if (
+            (self.held_actions[Action.PLAYER_MOVEMENT_FORWARD] or self.held_actions[Action.PLAYER_MOVEMENT_FORWARD_ALT]) 
+            and not (self.held_actions[Action.PLAYER_MOVEMENT_BACKWARD] or self.held_actions[Action.PLAYER_MOVEMENT_BACKWARD_ALT])
+        ):
             self.velocity_target.update(0, 1)
             self.velocity_target.rotate_ip(self.rotation)
             self.velocity.move_towards_ip(self.velocity_target, self.__engine_acceleration_mp * 1.5 * dt)
-        elif self.state_movement == -1:
+            self.is_accelerating = True # For drawing engine animation
+        elif (
+            (self.held_actions[Action.PLAYER_MOVEMENT_BACKWARD] or self.held_actions[Action.PLAYER_MOVEMENT_BACKWARD_ALT]) 
+            and not (self.held_actions[Action.PLAYER_MOVEMENT_FORWARD] or self.held_actions[Action.PLAYER_MOVEMENT_FORWARD_ALT])
+        ):
             self.velocity_target.update(0, -0.5)
             self.velocity_target.rotate_ip(self.rotation)
             self.velocity.move_towards_ip(self.velocity_target, self.__engine_acceleration_mp * 0.8 * dt)
+            self.is_accelerating = False # For drawing engine animation
         else:
             self.velocity_target.update(0, 0)
             self.velocity.move_towards_ip(self.velocity_target, 0.65 * dt)
+            self.is_accelerating = False # For drawing engine animation
         self.position += self.velocity * self.__engine_speed * dt
 
         # Teleports player if off-screen
         if not self.is_hidden:
-            res = self.game.screen_resolution
+            res = self.getter_screen_res()
             if self.position.x < -ASTEROID_MAX_RADIUS:
                 self.position.x = res[0] + ASTEROID_MAX_RADIUS
             elif self.position.x > res[0] + ASTEROID_MAX_RADIUS:
@@ -198,32 +212,36 @@ class Player(CircleShape):
         # Turning
         if self.turning_speed != 0:
             self.rotate(dt)
-        match self.state_rotation:
-            case 1:
-                self.turning_speed += PLAYER_TURNING_ACCELERATION * dt
-            case -1:
-                self.turning_speed -= PLAYER_TURNING_ACCELERATION * dt
-            case 0: # Deceleration
-                amount = PLAYER_TURNING_ACCELERATION * dt / 2
-                if self.turning_speed > 0:
-                    if self.turning_speed < amount:
-                        self.__turning_speed = 0
-                    else:
-                        self.turning_speed -= amount
-                elif self.turning_speed < 0:
-                    if self.turning_speed > -amount:
-                        self.__turning_speed = 0
-                    else:
-                        self.turning_speed += amount
+        if (
+            (self.held_actions[Action.PLAYER_MOVEMENT_RIGHT] or self.held_actions[Action.PLAYER_MOVEMENT_RIGHT_ALT]) 
+            and not (self.held_actions[Action.PLAYER_MOVEMENT_LEFT] or self.held_actions[Action.PLAYER_MOVEMENT_LEFT_ALT])
+        ):
+            self.turning_speed += PLAYER_TURNING_ACCELERATION * dt
+        elif (
+            (self.held_actions[Action.PLAYER_MOVEMENT_LEFT] or self.held_actions[Action.PLAYER_MOVEMENT_LEFT_ALT]) 
+            and not (self.held_actions[Action.PLAYER_MOVEMENT_RIGHT] or self.held_actions[Action.PLAYER_MOVEMENT_RIGHT_ALT])
+        ):
+            self.turning_speed -= PLAYER_TURNING_ACCELERATION * dt
+        else: # Deceleration
+            amount = PLAYER_TURNING_ACCELERATION * dt / 2
+            if self.turning_speed > 0:
+                if self.turning_speed < amount:
+                    self.__turning_speed = 0
+                else:
+                    self.turning_speed -= amount
+            elif self.turning_speed < 0:
+                if self.turning_speed > -amount:
+                    self.__turning_speed = 0
+                else:
+                    self.turning_speed += amount
 
         # Movement
         self.move(dt)
-        self.is_accelerating = True if self.state_movement == 1 else False # For drawing engine animation
 
         # Shooting
         if (
             self.is_alive and
-            (self.is_shooting or self.is_auto_shooting) and 
+            (self.held_actions[Action.PLAYER_SHOOT] or self.is_auto_shooting) and 
             self.attempt_shot(self.time_since_last_shot)
         ):
             self.time_since_last_shot = 0
@@ -286,6 +304,11 @@ class Player(CircleShape):
 
     def switch_hitbox(self):
         self.is_hitbox_shown = False if self.is_hitbox_shown else True
+    
+    def switch_weapon(self, index : int):
+        if index == 2 and not self.stats.cheat_cleavers:
+            return
+        self.weapon_current = self.weapons[index] # God save you if you create an IndexError 
     
     ### Ship
 

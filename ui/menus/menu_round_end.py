@@ -1,188 +1,187 @@
+from typing import Callable
+
+from ui.menus.base_menu import _MenuBase
+from ui.menus.enum_action import Action
+from game_state_manager import GameStateManager
+
 from ui.colors import *
 from ui.elements.container import Container, Allignment
 from ui.elements.buttons import Button, ButtonRound, Switch, InfoButton, ModKey
 from ui.elements.text import TextPlain, TextUpdated, TextAnimated
 from ui.font_builder import FontBuilder
 from ui.menus.enum_menu import Menu
-from round_state_manager import RoundStateManager, RoundTitle
-from player.player_stats import PlayerStats
-from player.player import Player
+from round_stats import RoundStats, RoundTitle
 
-def initialize_round_end(
-    game,
-    gsm,
-    rsm : RoundStateManager,
-    player_stats : PlayerStats,
-    player : Player,
-    fonts : FontBuilder
-) -> tuple[list, list]:
-    
-    containers : list[Container] = []
-    buttons : list[Button | Switch] = []
-    
-    res = game.screen_resolution
-    size_x = 900
-    size_y = 405
-    root_x = int(res[0]/2-size_x/2)
-    root_y = int(res[1]/2-size_y/2)
-
-    nudge_x_1 = 36
-    nudge_x_2 = int(nudge_x_1+size_x/2)
-
-    text_start_y = 50
-    text_row_y = 30
-
-    # <> Containers <>
-
-    # Profile
-    c_background = Container(
-        (root_x, root_y), (size_x, size_y), (30, 30, 30, 30)
-    )
-    c_title = Container(
-        (int(root_x+size_x/2-250), root_y+10), (500, 75), (10, 10, 10, 10)
-    )
-
-    title_text = rsm.get_round_title() # Round Title coloring and animation
-    if title_text in (RoundTitle.RECORD_1, RoundTitle.RECORD_2, RoundTitle.RECORD_3, RoundTitle.RECORD_PB):
-        title = TextAnimated(
-                title_text.value, fonts.big, color_golden
-            )
-        c_title.set_outline_color(color_golden)
-        title.activate_animation_pulse_rotation(4)
-        title.activate_animation_pulse_scale(10)
-    elif title_text in (RoundTitle.EGG_LEET, ):
-        title = TextAnimated(
-                title_text.value, fonts.big, color_green_hacker
-            )
-        c_title.set_outline_color(color_green_hacker)
-    else:
-        title = TextAnimated(
-                title_text.value, fonts.big, color_white
-            )
+class MenuRoundEnd(_MenuBase):
+    def __init__(
+        self,
+        gsm : GameStateManager,
+        fonts : FontBuilder,
+        switch_function : Callable[[Menu], None],
+    ):
+        super().__init__(gsm, switch_function)
         
-    c_title.add_element(
-        title,
-        Allignment.CENTER
-    )
+        res = gsm.screen_resolution
+        size_x = 900
+        size_y = 405
+        root_x = int(res[0]/2-size_x/2)
+        root_y = int(res[1]/2-size_y/2)
 
-    c_stats = Container(
-        (root_x+10, root_y+95), (size_x-20, size_y-165), (10, 10, 10, 10)
-    )
-    c_stats.add_element(
-        TextPlain(
-            "Score: {}", fonts.medium, color_white,
-            rsm.score
-        ),
-        nudge=(nudge_x_1, 11)
-    )
-    c_stats.add_element(
-        TextPlain(
-            "Time: {}", fonts.medium, color_white,
-            rsm.get_time_as_text()
-        ),
-        nudge=(nudge_x_2, 11)
-    )
-    c_stats.add_element(
-        TextPlain(
-            "Asteroids destroyed: {}", fonts.small, color_white,
-            rsm.destroyed_asteroids
-        ),
-        nudge=(nudge_x_1, text_start_y)
-    )
-    c_stats.add_element(
-        TextPlain(
-            "- Basic: {}", fonts.small, color_white,
-            rsm.destroyed_asteroids_basic
-        ),
-        nudge=(nudge_x_1, text_start_y+text_row_y*1)
-    )
-    c_stats.add_element(
-        TextPlain(
-            "- Bouncy: {}", fonts.small, color_white,
-            rsm.destroyed_asteroids_bouncy
-        ),
-        nudge=(nudge_x_1, text_start_y+text_row_y*2)
-    )
-    c_stats.add_element(
-        TextPlain(
-            "- Explosive: {}", fonts.small, color_white,
-            rsm.destroyed_asteroids_explosive
-        ),
-        nudge=(nudge_x_1, text_start_y+text_row_y*3)
-    )
-    c_stats.add_element(
-        TextPlain(
-            "- Homing: {}", fonts.small, color_white,
-            rsm.destroyed_asteroids_homing
-        ),
-        nudge=(nudge_x_1, text_start_y+text_row_y*4)
-    )
-    c_stats.add_element(
-        TextPlain(
-            "- Golden: {}", fonts.small, color_white,
-            rsm.destroyed_asteroids_golden
-        ),
-        nudge=(nudge_x_1, text_start_y+text_row_y*5)
-    )
-    c_stats.add_element(
-        TextPlain(
-            "Loot collected: {}", fonts.small, color_white,
-            rsm.collected_loot
-        ),
-        nudge=(nudge_x_2, text_start_y)
-    )
-    c_stats.add_element(
-        TextPlain(
-            "- Copper ore: {}", fonts.small, color_white,
-            rsm.collected_ores_copper
-        ),
-        nudge=(nudge_x_2, text_start_y+text_row_y*1)
-    )
-    c_stats.add_element(
-        TextPlain(
-            "- Silver ore: {}", fonts.small, color_white,
-            rsm.collected_ores_silver
-        ),
-        nudge=(nudge_x_2, text_start_y+text_row_y*2)
-    )
-    c_stats.add_element(
-        TextPlain(
-            "- Golden ore: {}", fonts.small, color_white,
-            rsm.collected_ores_golden
-        ),
-        nudge=(nudge_x_2, text_start_y+text_row_y*3)
-    )
-    c_stats.add_element(
-        TextPlain(
-            "- Diamonds: {}", fonts.small, color_white,
-            rsm.collected_diamonds
-        ),
-        nudge=(nudge_x_2, text_start_y+text_row_y*4)
-    )
-    # personal_sprite = get_personal_sprite(self.player_stats.name)
-    # if personal_sprite != None:
-    #     c_round_stats.add_element(
-    #         personal_sprite(10, -10),
-    #         Allignment.BOTTOM_LEFT_CORNER
-    #     )
+        nudge_x_1 = 36
+        nudge_x_2 = int(nudge_x_1+size_x/2)
 
-    containers.extend(
-        [c_background, c_stats, c_title]
-    )
-    
-    # <> Buttons <>
+        text_start_y = 50
+        text_row_y = 30
 
-    b_confirm = Button(
-        (int(root_x+size_x/2-100), root_y+size_y-60), (200, 50), (3, 10, 3, 10),
-        game.finish_round
-    )
-    b_confirm.add_element(
-        TextPlain("Confirm", fonts.medium, color_blue),
-        Allignment.CENTER
-    )
+        # <> Containers <>
 
-    buttons.extend(
-        [b_confirm]
-    )
+        # Profile
+        c_background = Container(
+            (root_x, root_y), (size_x, size_y), (30, 30, 30, 30)
+        )
+        c_title = Container(
+            (int(root_x+size_x/2-250), root_y+10), (500, 75), (10, 10, 10, 10)
+        )
 
-    return containers, buttons
+        title_text = gsm.rs.get_round_title() # Round Title coloring and animation
+        if title_text in (RoundTitle.RECORD_1, RoundTitle.RECORD_2, RoundTitle.RECORD_3, RoundTitle.RECORD_PB):
+            title = TextAnimated(
+                    title_text.value, fonts.big, color_golden
+                )
+            c_title.set_outline_color(color_golden)
+            title.activate_animation_pulse_rotation(4)
+            title.activate_animation_pulse_scale(10)
+        elif title_text in (RoundTitle.EGG_LEET, ):
+            title = TextAnimated(
+                    title_text.value, fonts.big, color_green_hacker
+                )
+            c_title.set_outline_color(color_green_hacker)
+        else:
+            title = TextAnimated(
+                    title_text.value, fonts.big, color_white
+                )
+            
+        c_title.add_element(
+            title,
+            Allignment.CENTER
+        )
+
+        c_stats = Container(
+            (root_x+10, root_y+95), (size_x-20, size_y-165), (10, 10, 10, 10)
+        )
+        c_stats.add_element(
+            TextPlain(
+                "Score: {}", fonts.medium, color_white,
+                gsm.rs.score
+            ),
+            nudge=(nudge_x_1, 11)
+        )
+        c_stats.add_element(
+            TextPlain(
+                "Time: {}", fonts.medium, color_white,
+                gsm.rs.get_time_as_text()
+            ),
+            nudge=(nudge_x_2, 11)
+        )
+        c_stats.add_element(
+            TextPlain(
+                "Asteroids destroyed: {}", fonts.small, color_white,
+                gsm.rs.destroyed_asteroids
+            ),
+            nudge=(nudge_x_1, text_start_y)
+        )
+        c_stats.add_element(
+            TextPlain(
+                "- Basic: {}", fonts.small, color_white,
+                gsm.rs.destroyed_asteroids_basic
+            ),
+            nudge=(nudge_x_1, text_start_y+text_row_y*1)
+        )
+        c_stats.add_element(
+            TextPlain(
+                "- Bouncy: {}", fonts.small, color_white,
+                gsm.rs.destroyed_asteroids_bouncy
+            ),
+            nudge=(nudge_x_1, text_start_y+text_row_y*2)
+        )
+        c_stats.add_element(
+            TextPlain(
+                "- Explosive: {}", fonts.small, color_white,
+                gsm.rs.destroyed_asteroids_explosive
+            ),
+            nudge=(nudge_x_1, text_start_y+text_row_y*3)
+        )
+        c_stats.add_element(
+            TextPlain(
+                "- Homing: {}", fonts.small, color_white,
+                gsm.rs.destroyed_asteroids_homing
+            ),
+            nudge=(nudge_x_1, text_start_y+text_row_y*4)
+        )
+        c_stats.add_element(
+            TextPlain(
+                "- Golden: {}", fonts.small, color_white,
+                gsm.rs.destroyed_asteroids_golden
+            ),
+            nudge=(nudge_x_1, text_start_y+text_row_y*5)
+        )
+        c_stats.add_element(
+            TextPlain(
+                "Loot collected: {}", fonts.small, color_white,
+                gsm.rs.collected_loot
+            ),
+            nudge=(nudge_x_2, text_start_y)
+        )
+        c_stats.add_element(
+            TextPlain(
+                "- Copper ore: {}", fonts.small, color_white,
+                gsm.rs.collected_ores_copper
+            ),
+            nudge=(nudge_x_2, text_start_y+text_row_y*1)
+        )
+        c_stats.add_element(
+            TextPlain(
+                "- Silver ore: {}", fonts.small, color_white,
+                gsm.rs.collected_ores_silver
+            ),
+            nudge=(nudge_x_2, text_start_y+text_row_y*2)
+        )
+        c_stats.add_element(
+            TextPlain(
+                "- Golden ore: {}", fonts.small, color_white,
+                gsm.rs.collected_ores_golden
+            ),
+            nudge=(nudge_x_2, text_start_y+text_row_y*3)
+        )
+        c_stats.add_element(
+            TextPlain(
+                "- Diamonds: {}", fonts.small, color_white,
+                gsm.rs.collected_diamonds
+            ),
+            nudge=(nudge_x_2, text_start_y+text_row_y*4)
+        )
+        # personal_sprite = get_personal_sprite(self.player_stats.name)
+        # if personal_sprite != None:
+        #     c_round_stats.add_element(
+        #         personal_sprite(10, -10),
+        #         Allignment.BOTTOM_LEFT_CORNER
+        #     )
+
+        self._containers.extend(
+            [c_background, c_stats, c_title]
+        )
+        
+        # <> Buttons <>
+
+        b_confirm = Button(
+            (int(root_x+size_x/2-100), root_y+size_y-60), (200, 50), (3, 10, 3, 10),
+            gsm.cleanup_round
+        )
+        b_confirm.add_element(
+            TextPlain("Confirm", fonts.medium, color_blue),
+            Allignment.CENTER
+        )
+
+        self._buttons.extend(
+            [b_confirm]
+        )

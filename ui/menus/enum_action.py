@@ -1,6 +1,6 @@
 from enum import Enum
 
-class Controls(Enum):
+class Action(Enum):
     MENU_BACK = "MENU_BACK"
     MENU_CONFIRM = "MENU_CONFIRM"
 
