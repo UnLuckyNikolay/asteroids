@@ -87,4 +87,5 @@ A classic game of Asteroids built using Pygame as a Boot.dev project and then en
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Versions prior to 2.0 are licensed under the MIT License.
+Starting with version 2.0, this project is licensed under the GNU General Public License v3.0 (GPL-3.0). See the [LICENSE](LICENSE) file for details.
