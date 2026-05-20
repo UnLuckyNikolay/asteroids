@@ -3,7 +3,7 @@ from typing import Callable
 
 from ui.helpers import draw_polygon
 
-class HealthBar():
+class HealthBar(pygame.sprite.Sprite):
     def __init__(
             self, 
             local_position : tuple[int, int], 
@@ -12,6 +12,11 @@ class HealthBar():
             handler_lives : Callable,
             is_godmode : bool
     ):
+        if hasattr(self, "containers"):
+            super().__init__(self.containers) # pyright: ignore[reportAttributeAccessIssue]
+        else:
+            super().__init__()
+            
         self.pos = local_position
         self.corner_topright = corner_topright
         self.corner_bottomright = corner_bottomright

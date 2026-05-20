@@ -1,16 +1,22 @@
+import pygame
+
 from constants import LEADERBOARD_LENGTH
 from ui.elements.container import Container, Allignment
 from ui.elements.text import TextPlain
 
-class Leaderboard():
+class Leaderboard(pygame.sprite.Sprite): # THIS SHIT NEEDS TO BE REWRITTEN YESTERDAY
     def __init__(self, x, y, font, scores):
+        if hasattr(self, "containers"):
+            super().__init__(self.containers) # pyright: ignore[reportAttributeAccessIssue]
+        else:
+            super().__init__()
+
         self.x = x
         self.y = y
         self.font = font
         self.scores = scores
 
-    def draw(self, screen):
-        containers = []
+        self._containers = []
         
         for i in range(0, min(len(self.scores), LEADERBOARD_LENGTH)):
             match i:
@@ -37,7 +43,13 @@ class Leaderboard():
                 Allignment.LEFT_WALL,
                 nudge=(13, 0)
             )
-            containers.append(c_next_board)
-        
-        for container in containers:
-            container.draw(screen)
+            self._containers.append(c_next_board)
+
+    def draw(self, screen):
+        for c in self._containers:
+            c.draw(screen)
+
+    def kill(self):
+        for c in self._containers:
+            c.kill()
+        super().kill()

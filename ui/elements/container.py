@@ -54,6 +54,15 @@ class Container(pygame.sprite.Sprite):
         for cd, ovr in self._conditional_overrides:
             if cd():
                 ovr()
+    
+    def kill(self):
+        for e in self._elements:
+            try:
+                e[0].kill()
+            except AttributeError:
+                pass
+
+        super().kill()
 
     def add_conditional_override(self, condition : Callable[[], bool], override : Callable):
         self._conditional_overrides.append((condition, override))

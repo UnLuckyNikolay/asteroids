@@ -25,6 +25,12 @@ class _MenuBase:
         if self._hovered_button != None:
             self._hovered_button.draw_description(screen, self.gsm.screen_resolution)
 
+    def kill(self):
+        for c in self._containers:
+            c.kill()
+        for b in self._buttons:
+            b.kill()
+
     def check_special_input(self, input : pygame.event.Event):
         pass
 

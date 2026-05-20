@@ -1,7 +1,13 @@
+import pygame
 from abc import ABC, abstractmethod
 
-class SimpleSprite():
+class SimpleSprite(pygame.sprite.Sprite):
     def __init__(self, local_x, local_y, color):
+        if hasattr(self, "containers"):
+            super().__init__(self.containers) # pyright: ignore[reportAttributeAccessIssue]
+        else:
+            super().__init__()
+            
         self.x = local_x
         self.y = local_y
         self.color = color

@@ -3,6 +3,7 @@ from enum import Enum
 class Action(Enum):
     MENU_BACK = "MENU_BACK"
     MENU_CONFIRM = "MENU_CONFIRM"
+    MENU_SWITCH_DEBUG = "MENU_SWITCH_DEBUG"
 
     PLAYER_SHOOT = "PLAYER_SHOOT"
 

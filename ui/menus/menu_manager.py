@@ -21,6 +21,7 @@ from ui.menus.menu_hud import MenuHud
 from ui.menus.menu_pause import MenuPause
 from ui.menus.menu_round_end import MenuRoundEnd
 # from ui.menus.menu_test import initialize_test_menu
+from ui.menus.menu_debug import MenuDebug
 
 
 class MenuManager(pygame.sprite.Sprite):
@@ -58,9 +59,13 @@ class MenuManager(pygame.sprite.Sprite):
         self._hovered_button : Button | Switch | None = None
         self.initialize_current_menu()
 
+        self._is_debug_menu_shown : bool = False
+        self._debug_menu : MenuDebug = self._initialize_menu(MenuDebug)
+
         self._mapped_actions : dict[int, Action] = {
             41 : Action.MENU_BACK, # Escape
             49 : Action.MENU_CONFIRM, # Enter
+            65 : Action.MENU_SWITCH_DEBUG, # F8
 
             44 : Action.PLAYER_SHOOT, # Space
             26 : Action.PLAYER_MOVEMENT_FORWARD, # W
@@ -85,6 +90,8 @@ class MenuManager(pygame.sprite.Sprite):
 
         if self._hovered_button != None:
             self._hovered_button.draw_description(screen, self.gsm.screen_resolution)
+
+        self._debug_menu.draw(screen)
     
     def check_keyboard_input_pressed(self, event_keydown : pygame.event.Event):
         if event_keydown.type != pygame.KEYDOWN:
@@ -104,6 +111,7 @@ class MenuManager(pygame.sprite.Sprite):
 
         # Button pressed
         self._current_menu.check_action(action)
+        self._debug_menu.check_action(action)
 
     def check_keyboard_input_unpressed(self, event_keyup : pygame.event.Event):
         if event_keyup.type != pygame.KEYUP:
@@ -119,11 +127,16 @@ class MenuManager(pygame.sprite.Sprite):
         self.gsm.held_actions[action] = False
     
     def switch_menu(self, menu : Menu):
+        if menu == self._current_menu_type:
+            return
+
         if menu == Menu.RETURN:
             self._last_menu_type, self._current_menu_type = self._current_menu_type, self._last_menu_type
         else:
             self._last_menu_type = self._current_menu_type
             self._current_menu_type = menu
+            
+        self._current_menu.kill()
         self.initialize_current_menu()
         self._hovered_button = None
         # self.check_hovered_button()
