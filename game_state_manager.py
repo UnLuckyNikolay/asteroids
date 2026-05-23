@@ -2,7 +2,7 @@ import pygame, json, os
 from typing import Callable, Any
 from enum import Enum
 
-from constants import *
+import globals as g
 from json_helper.leaderboard.validator import ValidateLeaderboard
 from json_helper.profile.validator import ValidateProfile
 
@@ -19,18 +19,18 @@ from asteroids.asteroid import Asteroid
 from ui.menus.enum_action import Action
 
 class GameStateManager(pygame.sprite.Sprite):
-    def __init__(self, sfxm : SFXManager, gm : GroupManager):
+    def __init__(self, sfxm : SFXManager):
         if hasattr(self, "containers"):
             super().__init__(self.containers) # pyright: ignore[reportAttributeAccessIssue]
         else:
             super().__init__()
 
-        self.screen_resolution_windowed : tuple[int, int] = (SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.screen_resolution_windowed : tuple[int, int] = (g.SCREEN_WIDTH, g.SCREEN_HEIGHT)
         self.screen_resolution_fullscreen : tuple[int, int] = pygame.display.get_desktop_sizes()[0]
         self.screen_resolution : tuple[int, int] = self.screen_resolution_windowed
         self.is_fullscreen : bool = False
         self.is_window_resized : bool = False
-        self.max_fps = MAX_FPS
+        self.max_fps = g.MAX_FPS
         self.is_slow = False
 
         self.is_running : bool = True
@@ -46,7 +46,6 @@ class GameStateManager(pygame.sprite.Sprite):
             self.held_actions[action] = False
 
         self.sfxm = sfxm
-        self.gm = gm
         self.player : Player = Player(self.get_screen_resolution, sfxm, self.held_actions)
         self.spawner = EntitySpawner(self.player, self.get_screen_resolution)
         self.rs : RoundStats = RoundStats(self.player)
@@ -92,7 +91,7 @@ class GameStateManager(pygame.sprite.Sprite):
             self.update_ambient(dt)
 
     def update_ambient(self, dt : float):
-        for object in self.gm.moving_objects:
+        for object in g.GM.moving_objects:
             if self.check_if_object_is_off_screen(object):
                 object.kill()
 
@@ -100,7 +99,7 @@ class GameStateManager(pygame.sprite.Sprite):
         if self.player.is_alive and not self.is_paused:
             self.rs.update(dt)
 
-            for object in self.gm.moving_objects:
+            for object in g.GM.moving_objects:
                 if self.check_if_object_is_off_screen(object):
                     if isinstance(object, Asteroid): ##### REWRITE THIS SHITE INSIDE BASE ASTEROID - FUCK IT, USE GM INSTEAD
                         self.spawner.kill_asteroid(object) # The field kills/splits asteroids to keep count of certain types
@@ -109,7 +108,7 @@ class GameStateManager(pygame.sprite.Sprite):
 
             # Colision checks
             # Player hit
-            for asteroid in self.gm.asteroids:
+            for asteroid in g.GM.asteroids:
                 if asteroid.check_colision(self.player) and not self.player.is_invul: # No check for dead asteroids because first loop, only off-screen ones are dead
                     alive = self.player.take_damage_and_check_if_alive()
                     if alive:
@@ -118,7 +117,7 @@ class GameStateManager(pygame.sprite.Sprite):
                     ExplosionSpiky(asteroid.position, asteroid.radius)
                 
                 # Asteroid shot
-                for projectile in self.gm.projectiles:
+                for projectile in g.GM.projectiles:
                     if projectile.check_colision(asteroid) and not asteroid.is_dead:
                         if projectile.is_single_use:
                             projectile.kill()
@@ -129,8 +128,8 @@ class GameStateManager(pygame.sprite.Sprite):
                         self.rs.increase_count_stat(type(asteroid))
                 
             # Asteroid exploded
-            for hitbox in self.gm.explosion_hitboxes:
-                for asteroid in self.gm.asteroids:
+            for hitbox in g.GM.explosion_hitboxes:
+                for asteroid in g.GM.asteroids:
                     if hitbox.check_colision(asteroid) and not asteroid.is_dead:
                         self.spawner.split_asteroid(asteroid)
                         self.sfxm.play_sound(SFX.ASTEROID_EXPLOSION)
@@ -139,7 +138,7 @@ class GameStateManager(pygame.sprite.Sprite):
                 hitbox.kill()
 
             # Loot collected
-            for loot in self.gm.loot:
+            for loot in g.GM.loot:
                 if loot.check_colision(self.player):
                     self.player.collect_loot(loot.price)
                     self.sfxm.play_sound(SFX.ORE_COLLECTED)
@@ -171,7 +170,7 @@ class GameStateManager(pygame.sprite.Sprite):
         """
         Run to start a round.
         """
-        for object in self.gm.cleanup:
+        for object in g.GM.cleanup:
             object.kill()
         self.is_round_going = True
         self.is_paused = False
@@ -199,7 +198,7 @@ class GameStateManager(pygame.sprite.Sprite):
         """
         Run to return from the Round Statistics screen to the main menu.
         """
-        for object in self.gm.cleanup:
+        for object in g.GM.cleanup:
             object.kill()
         self.spawner.switch_mode(ESMode.AMBIENT)
         self.player.reset()
@@ -300,7 +299,7 @@ class GameStateManager(pygame.sprite.Sprite):
         is_updated = False
 
         # Overfilled
-        while len(self._scores) > LEADERBOARD_LENGTH:   # Shortens leaderboard if max length was reduced
+        while len(self._scores) > g.LEADERBOARD_LENGTH:   # Shortens leaderboard if max length was reduced
             is_updated = True
             self._scores.pop()
 
@@ -313,7 +312,7 @@ class GameStateManager(pygame.sprite.Sprite):
         # Full/Partially filled
         for i in range(len(self._scores)):
             if new_score > self._scores[i]["score"]:
-                if len(self._scores) == LEADERBOARD_LENGTH:
+                if len(self._scores) == g.LEADERBOARD_LENGTH:
                     self._scores.pop()
                 self._scores.append({"name": self.player.stats.name, "score": new_score})
                 self._scores.sort(key=lambda x: x["score"], reverse=True)
@@ -321,7 +320,7 @@ class GameStateManager(pygame.sprite.Sprite):
                 return True, i+1
             
         # New lowest :sadge:
-        if len(self._scores) < LEADERBOARD_LENGTH:
+        if len(self._scores) < g.LEADERBOARD_LENGTH:
                 self._scores.append({"name": self.player.stats.name, "score": new_score})
                 self.__save_leaderboard()
                 return True, len(self._scores)

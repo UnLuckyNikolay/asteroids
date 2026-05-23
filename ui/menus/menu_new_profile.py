@@ -5,7 +5,7 @@ from ui.menus.base_menu import _MenuBase
 from ui.menus.enum_action import Action
 from game_state_manager import GameStateManager
 
-from constants import PLAYER_MAX_NAME_LENGTH
+from globals import PLAYER_MAX_NAME_LENGTH
 from ui.colors import *
 from ui.elements.container import Container, Allignment
 from ui.elements.buttons import Button, ButtonRound, Switch, InfoButton, ModKey

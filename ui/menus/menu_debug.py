@@ -4,6 +4,7 @@ from ui.menus.base_menu import _MenuBase
 from ui.menus.enum_action import Action
 from game_state_manager import GameStateManager
 
+import globals as g
 from ui.colors import *
 from ui.elements.container import Container, Allignment
 from ui.elements.buttons import ButtonBase, Button, ButtonRound, Switch, InfoButton, ModKey
@@ -52,28 +53,28 @@ class MenuDebug(_MenuBase):
         c_debug.add_element(
             TextUpdated(
                 "Drawable: {}", fonts.very_small, color_green_hacker,
-                lambda: gsm.gm.drawable.__len__()
+                lambda: g.GM.drawable.__len__()
             ),
             nudge=(text_nudge_x, text_start_y+text_row_y*1)
         )
         c_debug.add_element(
             TextUpdated(
                 "Updatable UI: {}", fonts.very_small, color_green_hacker,
-                lambda: gsm.gm.updatable_ui.__len__()
+                lambda: g.GM.updatable_ui.__len__()
             ),
             nudge=(text_nudge_x, text_start_y+text_row_y*2)
         )
         c_debug.add_element(
             TextUpdated(
                 "Updatable Gameplay: {}", fonts.very_small, color_green_hacker,
-                lambda: gsm.gm.updatable_gameplay.__len__()
+                lambda: g.GM.updatable_gameplay.__len__()
             ),
             nudge=(text_nudge_x, text_start_y+text_row_y*3)
         )
         c_debug.add_element(
             TextUpdated(
                 "Asteroids: {}", fonts.very_small, color_green_hacker,
-                lambda: gsm.gm.asteroids.__len__()
+                lambda: g.GM.asteroids.__len__()
             ),
             nudge=(text_nudge_x, text_start_y+text_row_y*4)
         )

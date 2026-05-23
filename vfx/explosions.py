@@ -1,6 +1,6 @@
 import pygame, pygame.gfxdraw, random, math
 
-from constants import *
+from globals import *
 from shapes.circleshape import CircleShape
 
 

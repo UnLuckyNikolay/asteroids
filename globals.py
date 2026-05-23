@@ -1,3 +1,5 @@
+from groups import GroupManager
+
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 MAX_FPS = 75
@@ -36,3 +38,5 @@ PLAYER_TIMER_INVUL = 2
 PLAYER_MAX_NAME_LENGTH = 20
 
 LEADERBOARD_LENGTH = 12
+
+GM = GroupManager()

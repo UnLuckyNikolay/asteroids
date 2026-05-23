@@ -2,12 +2,10 @@
 
 import pygame
 
-from constants import *
+import globals as g
 from game_state_manager import GameStateManager
 from ui.menus.menu_manager import MenuManager
 from sfx_manager import SFXManager
-from groups import GroupManager
-from round_stats import RoundStats
 
 from player.player import Player
 from player.weapons.projectiles.projectileplasma import ProjectilePlasma
@@ -33,7 +31,7 @@ class Game():
             buffer=1024,
         )
         pygame.init()
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE, display=0)
+        self.screen = pygame.display.set_mode((g.SCREEN_WIDTH, g.SCREEN_HEIGHT), pygame.RESIZABLE, display=0)
         pygame.display.set_caption("Asteroids from Outer Space")
 
         self.clock = pygame.time.Clock()
@@ -43,86 +41,85 @@ class Game():
         self.getting_player_name : bool = False
         self.is_round_end : bool = False
 
-        self.gm = GroupManager()
         self.initialize_groups()
         self.sfxm = SFXManager() # All sfx file paths are stored inside SFXManager
-        self.gsm = GameStateManager(self.sfxm, self.gm)
+        self.gsm = GameStateManager(self.sfxm)
         self.mm = MenuManager(self.gsm, self.sfxm)
         self.gsm.set_menu_functions(self.mm.switch_menu, self.mm.initialize_current_menu)
 
     def initialize_groups(self):
         MenuManager.containers = (
-            self.gm.drawable
+            g.GM.drawable
         )
         GameStateManager.containers = (
-            self.gm.updatable_gameplay,
+            g.GM.updatable_gameplay,
         )
         SFXManager.containers = (
-            self.gm.updatable_gameplay,
+            g.GM.updatable_gameplay,
         )
 
         TextAnimated.containers = (
-            self.gm.updatable_ui,
+            g.GM.updatable_ui,
         )
         Container.containers = (
-            self.gm.updatable_ui,
+            g.GM.updatable_ui,
         )
 
         StarField.containers = (
-            self.gm.drawable,
+            g.GM.drawable,
         )
         ExplosionBase.containers = (
-            self.gm.updatable_gameplay, 
-            self.gm.drawable, 
-            self.gm.cleanup,
+            g.GM.updatable_gameplay, 
+            g.GM.drawable, 
+            g.GM.cleanup,
         )
 
         Player.containers = (
-            self.gm.updatable_gameplay, 
-            self.gm.drawable,
+            g.GM.updatable_gameplay, 
+            g.GM.drawable,
         )
         ProjectilePlasma.containers = (
-            self.gm.projectiles, 
-            self.gm.updatable_gameplay, 
-            self.gm.drawable, 
-            self.gm.moving_objects, 
-            self.gm.cleanup,
+            g.GM.projectiles, 
+            g.GM.updatable_gameplay, 
+            g.GM.drawable, 
+            g.GM.moving_objects, 
+            g.GM.cleanup,
         )
         Bomb.containers = (
-            self.gm.drawable, 
-            self.gm.updatable_gameplay, 
-            self.gm.cleanup,
+            g.GM.drawable, 
+            g.GM.updatable_gameplay, 
+            g.GM.cleanup,
         )
         BombExplosion.containers = (
-            self.gm.explosion_hitboxes, 
-            self.gm.cleanup,
+            g.GM.explosion_hitboxes, 
+            g.GM.cleanup,
         )
         LiterallyAFuckingMeatCleaverBase.containers = (
-            self.gm.projectiles, 
-            self.gm.updatable_gameplay, 
-            self.gm.drawable, 
-            self.gm.moving_objects, 
-            self.gm.cleanup,
+            g.GM.projectiles, 
+            g.GM.updatable_gameplay, 
+            g.GM.drawable, 
+            g.GM.moving_objects, 
+            g.GM.cleanup,
         )
 
         EntitySpawner.containers = (
-            self.gm.updatable_gameplay, 
-            self.gm.updatable_ambient, 
+            g.GM.updatable_gameplay, 
+            g.GM.updatable_ambient, 
         )
         Asteroid.containers = (
-            self.gm.asteroids, 
-            self.gm.updatable_gameplay, 
-            self.gm.updatable_ambient, 
-            self.gm.drawable, 
-            self.gm.moving_objects, 
-            self.gm.cleanup,
+            g.GM.asteroids, 
+            g.GM.updatable_gameplay, 
+            g.GM.updatable_ambient, 
+            g.GM.drawable, 
+            g.GM.moving_objects, 
+            g.GM.cleanup,
         )
         Ore.containers = (
-            self.gm.loot, 
-            self.gm.updatable_gameplay, 
-            self.gm.drawable, 
-            self.gm.moving_objects, 
-            self.gm.cleanup,
+            g.GM.loot, 
+            g.GM.updatable_gameplay, 
+            g.GM.drawable, 
+            g.GM.moving_objects, 
+            g.GM.cleanup,
         )
 
     ### THE MAIN LOOP
@@ -141,15 +138,15 @@ class Game():
         self.gsm.save_profile() # Save on exit
     
     def update_all(self):
-        for object in self.gm.updatable_ui:
+        for object in g.GM.updatable_ui:
             object.update(self.dt)
         
         if not self.gsm.is_round_going and not self.gsm.is_finishing_a_round:
-            for object in self.gm.updatable_ambient:
+            for object in g.GM.updatable_ambient:
                 object.update(self.dt)
         
         elif (self.gsm.is_round_going and not self.gsm.is_paused) or self.gsm.is_finishing_a_round:
-            for object in self.gm.updatable_gameplay:
+            for object in g.GM.updatable_gameplay:
                 object.update(self.dt)
 
     def process_and_refresh(self) -> float:
@@ -192,7 +189,7 @@ class Game():
         """
 
         self.mm.check_hovered_button()
-        for object in sorted(list(self.gm.drawable), key = lambda object: object.layer):
+        for object in sorted(list(g.GM.drawable), key = lambda object: object.layer):
             object.draw(self.screen)
 
         pygame.display.flip()
@@ -237,7 +234,7 @@ class Game():
                         continue
                     else:
                         k = event.dict["unicode"]
-                        if k != "" and len(self.player_stats.name) < PLAYER_MAX_NAME_LENGTH:
+                        if k != "" and len(self.player_stats.name) < g.PLAYER_MAX_NAME_LENGTH:
                             self.player_stats.name = self.player_stats.name + k
                 else:
                     self.handle_event(event)

@@ -1,6 +1,6 @@
 import pygame
 
-from constants import *
+from globals import *
 from asteroids.asteroid import Asteroid
 from asteroids.asteroidbasic import AsteroidBasic
 

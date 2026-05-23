@@ -1,6 +1,6 @@
 import pygame
 
-from constants import LEADERBOARD_LENGTH
+from globals import LEADERBOARD_LENGTH
 from ui.elements.container import Container, Allignment
 from ui.elements.text import TextPlain
 

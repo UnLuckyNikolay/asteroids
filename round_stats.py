@@ -1,7 +1,7 @@
 import pygame
 from enum import Enum
 
-from constants import *
+from globals import *
 from ui.helpers import get_time_as_text
 from asteroids.asteroid import Asteroid
 from asteroids.asteroidbasic import AsteroidBasic

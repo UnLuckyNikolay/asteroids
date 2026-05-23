@@ -1,7 +1,7 @@
 import pygame, pygame.gfxdraw, opensimplex, numpy
 from random import randint
 
-from constants import *
+from globals import *
 
 
 class StarField(pygame.sprite.Sprite):

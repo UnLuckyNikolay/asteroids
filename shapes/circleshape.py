@@ -1,7 +1,7 @@
 import pygame
 from copy import deepcopy
 
-from constants import *
+from globals import *
 
 
 class CircleShape(pygame.sprite.Sprite):

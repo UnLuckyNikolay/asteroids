@@ -1,6 +1,6 @@
 import random
 
-from constants import *
+from globals import *
 from asteroids.asteroid import Asteroid
 from asteroids.ores import GoldenOre
 
