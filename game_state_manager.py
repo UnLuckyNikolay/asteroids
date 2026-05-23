@@ -176,6 +176,7 @@ class GameStateManager(pygame.sprite.Sprite):
         self.is_paused = False
         self.player.teleport_and_prepare_for_round((int(self.screen_resolution[0] / 2), int(self.screen_resolution[1] / 2)))
         self.spawner.switch_mode(ESMode.ASTEROIDS_STANDARD)
+        self.rs.reset()
         self.switch_menu(Menu.HUD)
 
     def finish_round(self):
