@@ -4,7 +4,7 @@ import pygame
 
 import globals as g
 from game_state_manager import GameStateManager
-from ui.menus.menu_manager import MenuManager
+from ui.menus.manager_menu import MenuManager
 from sfx_manager import SFXManager
 
 from player.player import Player

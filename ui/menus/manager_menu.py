@@ -16,6 +16,7 @@ from ui.menus.menu_new_profile import MenuNewProfile
 from ui.menus.menu_main import MenuMain
 from ui.menus.menu_player_info import MenuPlayerInfo
 from ui.menus.menu_name_edit import MenuNameEdit
+from ui.menus.menu_ship_constructor import MenuShipContructor
 from ui.menus.menu_leaderboard import MenuLeaderboard
 from ui.menus.menu_hud import MenuHud
 from ui.menus.menu_pause import MenuPause
@@ -45,6 +46,7 @@ class MenuManager(pygame.sprite.Sprite):
             Menu.MAIN_MENU : (lambda: self._initialize_menu(MenuMain)),
             Menu.PLAYER_INFO : (lambda: self._initialize_menu(MenuPlayerInfo)),
             Menu.NAME_EDIT : (lambda: self._initialize_menu(MenuNameEdit)),
+            Menu.SHIP_CONSTRUCTOR : (lambda: self._initialize_menu(MenuShipContructor)),
             Menu.LEADERBOARD : (lambda: self._initialize_menu(MenuLeaderboard)),
             Menu.HUD : (lambda: self._initialize_menu(MenuHud)),
             Menu.PAUSE_MENU : (lambda: self._initialize_menu(MenuPause)),

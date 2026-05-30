@@ -23,8 +23,8 @@ class MenuLeaderboard(_MenuBase):
     ):
         super().__init__(gsm, switch_function)
 
-        self._containers : list[Container | Leaderboard] = []
-        self._buttons : list[Button | Switch] = []
+        self.input_handlers = {
+        }
 
         res = gsm.screen_resolution
         
@@ -57,9 +57,6 @@ class MenuLeaderboard(_MenuBase):
             Allignment.CENTER
         )
         
-        self._buttons.extend(
-            [b_back]
-        )
         # Reset the leaderboard
         b_reset = Button(
             (res[0]-200, 68), (100, 36), (3, 6, 3, 6), 

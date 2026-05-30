@@ -8,6 +8,7 @@ class Menu(Enum): # Remember not to name 2 the same ever fucking again
     MAIN_MENU = "Main Menu"
     PLAYER_INFO = "Player Info"
     NAME_EDIT = "Name edit"
+    SHIP_CONSTRUCTOR = "Ship constructor"
     LEADERBOARD = "Leaderboard"
     HUD = "HUD"
     PAUSE_MENU = "Pause"

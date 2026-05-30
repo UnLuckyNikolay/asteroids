@@ -1,0 +1,40 @@
+from typing import Callable
+
+import globals as g
+from ui.menus.base_menu import _MenuBase
+from ui.menus.enum_action import Action
+from game_state_manager import GameStateManager
+
+from ui.colors import *
+from ui.elements.container import Container, Allignment
+from ui.elements.buttons import ButtonBase, Button, ButtonRound, Switch, InfoButton, ModKey
+from ui.elements.text import TextPlain, TextUpdated
+from ui.font_builder import FontBuilder
+from ui.menus.enum_menu import Menu
+from ui.elements.simple_sprites.symbols import *
+from ui.elements.personal_sprites.getter import get_personal_sprite
+from ui.menus.addition_mini_settings import add_mini_settings_and_cheats
+
+class MenuDebug(_MenuBase):
+    def __init__(
+        self,
+        gsm : GameStateManager,
+        fonts : FontBuilder,
+        switch_function : Callable[[Menu], None],
+    ):
+        super().__init__(gsm, switch_function)
+
+        self.input_handlers = {
+        }
+
+        # <> Containers <>
+
+        self._containers.extend(
+            []
+        )
+
+        # <> Buttons <>
+
+        self._buttons.extend(
+            []
+        )

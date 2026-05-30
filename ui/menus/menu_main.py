@@ -138,10 +138,19 @@ class MenuMain(_MenuBase):
             TextPlain("Exit", fonts.big, color_blue),
             Allignment.CENTER
         )
+
+        b_test = Button(
+            (center_x-700, b_offset_y+100*0), (370, 72), (8, 8, 20, 20), 
+            lambda: switch_function(Menu.SHIP_CONSTRUCTOR)
+        )
+        b_test.add_element(
+            TextPlain("Ship Constructor", fonts.big, color_blue),
+            Allignment.CENTER
+        )
         
         self._buttons.extend(
             [b_start, b_leaderboard, b_exit, b_profiles, b_open_info,
-                b_rename]
+                b_rename, b_test]
         )
 
         add_mini_settings_and_cheats(self._containers, self._buttons, gsm, fonts)

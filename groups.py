@@ -2,12 +2,9 @@
 
 import pygame
 
-import globals
-
 class GroupManager:
     def __init__(self):
         # Updatables
-        print(f"{globals.SCREEN_HEIGHT} x {globals.SCREEN_WIDTH}")
         self.updatable_ui = pygame.sprite.Group()         # Always updated, cleaned in GSM.switch_menu, DO NOT use with other updatable groups
         self.updatable_gameplay = pygame.sprite.Group()   # For player/asteroids/etc during a round
         self.updatable_ambient = pygame.sprite.Group()    # For asteroids in menus
