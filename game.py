@@ -24,16 +24,8 @@ from asteroids.ores import Ore
 
 
 class Game():
-    def __init__(self):
-        pygame.mixer.pre_init(
-            frequency=44100,
-            size=-16,
-            channels=2,
-            buffer=1024,
-        )
-        pygame.init()
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE, display=0)
-        pygame.display.set_caption("Asteroids from Outer Space")
+    def __init__(self, screen):
+        self.screen = screen
 
         self.clock = pygame.time.Clock()
         self.dt = 0

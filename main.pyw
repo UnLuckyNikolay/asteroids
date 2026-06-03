@@ -1,11 +1,26 @@
-import os, traceback, datetime
+import os, traceback, datetime, pygame
+
+from config import *
 from game import Game
 
 
 def main():
     try:
-        game = Game()
+        # Pygame initialization
+        pygame.mixer.pre_init(
+            frequency=44100,
+            size=-16,
+            channels=2,
+            buffer=1024,
+        )
+        pygame.init()
+        screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE, display=0)
+        pygame.display.set_caption("Asteroids from Outer Space")
+
+        # Game loop starts
+        game = Game(screen)
         game.run()
+
     except Exception:
         # Creating a `crashlogs` folder
         crashlog_folder_path = "./crashlogs/"
