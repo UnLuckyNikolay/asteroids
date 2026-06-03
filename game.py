@@ -30,9 +30,8 @@ class Game():
         self.dt = 0
 
         self.initialize_groups()
-        self.sfxm : SFXManager = SFXManager() # All sfx file paths are stored inside SFXManager
-        self.gsm : GameStateManager = GameStateManager(self.sfxm)
-        self.mm : MenuManager = MenuManager(self.gsm, self.sfxm)
+        self.gsm : GameStateManager = GameStateManager()
+        self.mm : MenuManager = MenuManager(self.gsm)
         self.gsm.set_menu_functions(self.mm.switch_menu, self.mm.initialize_current_menu)
 
     def initialize_groups(self):

@@ -1,6 +1,6 @@
 import pygame, math, pygame.gfxdraw
 
-from sfx_manager import SFXManager, SFX
+from sfx_manager import SFX
 from shapes.circleshape import CircleShape
 from player.weapons.projectiles.bombexplosion import BombExplosion
 from vfx.explosions import ExplosionSpiky
@@ -8,9 +8,8 @@ from vfx.explosions import ExplosionSpiky
 
 class Bomb(CircleShape):
     layer = 20 # pyright: ignore
-    def __init__(self, position, velocity, explosion_radius, fuse_timer, sfxm : SFXManager):
+    def __init__(self, position, velocity, explosion_radius, fuse_timer):
         super().__init__(position, velocity, 15)
-        self.sfxm = sfxm
 
         self.time = 0
         self.color_change = 0
@@ -29,7 +28,7 @@ class Bomb(CircleShape):
                                          (int(155 + self.color_change * 50), int(self.color_change / 2 * 255), int(self.color_change / 2 * 255)))
             pygame.draw.circle(screen, (115, 0, 0), self.position, self.radius + 2, 3)
         else: 
-            self.sfxm.play_sound(SFX.PLAYER_BOMB_EXPLOSION)
+            g.SFXM.play_sound(SFX.PLAYER_BOMB_EXPLOSION)
             ExplosionSpiky(self.position, self.explosion_radius)
             BombExplosion(self.position, self.explosion_radius)
             self.kill()

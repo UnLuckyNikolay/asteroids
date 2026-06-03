@@ -3,7 +3,6 @@ from typing import Callable
 
 from config import *
 from ui.menus.enum_action import Action
-from sfx_manager import SFXManager
 from shapes.circleshape import CircleShape
 from player.weapons.plasmagun import PlasmaGun
 from player.weapons.bomblauncher import BombLauncher
@@ -16,7 +15,7 @@ from player.player_stats import PlayerStats
 
 class Player(CircleShape):
     layer = 50 # pyright: ignore
-    def __init__(self, getter_screen_res : Callable[[], tuple[int, int]], sfxm : SFXManager, held_actions : dict[Action, bool]):
+    def __init__(self, getter_screen_res : Callable[[], tuple[int, int]], held_actions : dict[Action, bool]):
         super().__init__(pygame.Vector2(-100, -100), pygame.Vector2(0,0), PLAYER_RADIUS)
         self.velocity_target = pygame.Vector2(0, 0)
         self.rotation : float = 180
@@ -31,7 +30,6 @@ class Player(CircleShape):
         self.is_hidden : bool = True
         """Used as a check when teleporting the player if off-screen."""
         self.stats : PlayerStats = PlayerStats()
-        self.sfxm = sfxm
         self.held_actions = held_actions
 
         self.timer_invul : float = 0
@@ -57,9 +55,9 @@ class Player(CircleShape):
         self.__level_max_engine_acceleration : int = 3
         self.__engine_acceleration_mp : float = 0.8
         self.magnet : Magnet = Magnet(self.position)
-        self.weapon_plasmagun : PlasmaGun = PlasmaGun(self.sfxm)
-        self.weapon_bomblauncher : BombLauncher = BombLauncher(self.sfxm)
-        self.weapon_meat : LiterallyAFuckingMeatCleaverLauncher = LiterallyAFuckingMeatCleaverLauncher(self.sfxm)
+        self.weapon_plasmagun : PlasmaGun = PlasmaGun()
+        self.weapon_bomblauncher : BombLauncher = BombLauncher()
+        self.weapon_meat : LiterallyAFuckingMeatCleaverLauncher = LiterallyAFuckingMeatCleaverLauncher()
         self.time_since_last_shot : float = 0
         self.weapons = [self.weapon_plasmagun, self.weapon_bomblauncher, self.weapon_meat]
         self.weapon_current = self.weapon_plasmagun
@@ -128,9 +126,9 @@ class Player(CircleShape):
         self.times_healed = 0
 
         self.time_since_last_shot = 0
-        self.weapon_plasmagun = PlasmaGun(self.sfxm)
-        self.weapon_bomblauncher = BombLauncher(self.sfxm)
-        self.weapon_meat = LiterallyAFuckingMeatCleaverLauncher(self.sfxm)
+        self.weapon_plasmagun = PlasmaGun()
+        self.weapon_bomblauncher = BombLauncher()
+        self.weapon_meat = LiterallyAFuckingMeatCleaverLauncher()
         self.weapons = [self.weapon_plasmagun, self.weapon_bomblauncher, self.weapon_meat]
         self.weapon_current = self.weapon_plasmagun
 

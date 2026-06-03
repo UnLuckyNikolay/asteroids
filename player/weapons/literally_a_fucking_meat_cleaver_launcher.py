@@ -1,6 +1,6 @@
 import pygame
 
-from sfx_manager import SFXManager, SFX
+from sfx_manager import SFX
 from player.weapons.weapon import Weapon
 from player.weapons.projectiles.literally_a_fucking_meat_cleaver import (
     LiterallyAFuckingMeatCleaverSprite1,
@@ -11,9 +11,8 @@ from player.weapons.projectiles.literally_a_fucking_meat_cleaver import (
 
 # https://www.youtube.com/watch?v=vjBFftpQxxM is fire
 class LiterallyAFuckingMeatCleaverLauncher(Weapon):
-    def __init__(self, sfxm : SFXManager):
+    def __init__(self):
         super().__init__("MeatCleavers")
-        self.sfxm = sfxm
 
         self._projectile_speed = 300
         self._cooldown = 1.0
@@ -36,7 +35,7 @@ class LiterallyAFuckingMeatCleaverLauncher(Weapon):
 
     def attempt_shot(self, position, rotation, time_since_last_shot):
         if time_since_last_shot >= self._cooldown:
-            self.sfxm.play_sound(SFX.PLAYER_CLEAVERS)
+            g.SFXM.play_sound(SFX.PLAYER_CLEAVERS)
             if self._level == 222:
                 self._spawn_cleaver(LiterallyAFuckingMeatCleaverSprite2, (0, 33), position, rotation)
             elif self._level == 444:

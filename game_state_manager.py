@@ -7,7 +7,7 @@ from config import *
 from json_helper.leaderboard.validator import ValidateLeaderboard
 from json_helper.profile.validator import ValidateProfile
 
-from sfx_manager import SFXManager, SFX
+from sfx_manager import SFX
 from groups import GroupManager
 from round_stats import RoundStats
 from player.ship_enums import ShipModel
@@ -31,7 +31,7 @@ class GameState(Enum):
     """Should be used during the player's death. Updates all the entities but the player."""
 
 class GameStateManager(pygame.sprite.Sprite):
-    def __init__(self, sfxm : SFXManager):
+    def __init__(self):
         if hasattr(self, "containers"):
             super().__init__(self.containers) # pyright: ignore[reportAttributeAccessIssue]
         else:
@@ -55,8 +55,7 @@ class GameStateManager(pygame.sprite.Sprite):
         for action in Action:
             self.held_actions[action] = False
 
-        self.sfxm = sfxm
-        self.player : Player = Player(self.get_screen_resolution, sfxm, self.held_actions)
+        self.player : Player = Player(self.get_screen_resolution, self.held_actions)
         self.spawner = EntitySpawner(self.player, self.get_screen_resolution)
         self.rs : RoundStats = RoundStats(self.player)
         self.star_field = StarField(self.screen_resolution_fullscreen)
@@ -126,7 +125,7 @@ class GameStateManager(pygame.sprite.Sprite):
             if asteroid.check_colision(self.player) and not self.player.is_invul: # No check for dead asteroids because first loop, only off-screen ones are dead
                 alive = self.player.take_damage_and_check_if_alive()
                 if alive:
-                    self.sfxm.play_sound(SFX.PLAYER_HIT)
+                    g.SFXM.play_sound(SFX.PLAYER_HIT)
                 self.spawner.kill_asteroid(asteroid)
                 ExplosionSpiky(asteroid.position, asteroid.radius)
             
@@ -137,7 +136,7 @@ class GameStateManager(pygame.sprite.Sprite):
                         projectile.kill()
                     self.spawner.split_asteroid(asteroid)
                     ExplosionSpiky(asteroid.position, asteroid.radius)
-                    self.sfxm.play_sound(SFX.ASTEROID_EXPLOSION)
+                    g.SFXM.play_sound(SFX.ASTEROID_EXPLOSION)
                     self.rs.score += asteroid.reward
                     self.rs.increase_count_stat(type(asteroid))
             
@@ -146,7 +145,7 @@ class GameStateManager(pygame.sprite.Sprite):
             for asteroid in g.GM.asteroids:
                 if hitbox.check_colision(asteroid) and not asteroid.is_dead:
                     self.spawner.split_asteroid(asteroid)
-                    self.sfxm.play_sound(SFX.ASTEROID_EXPLOSION)
+                    g.SFXM.play_sound(SFX.ASTEROID_EXPLOSION)
                     self.rs.score += asteroid.reward
                     self.rs.increase_count_stat(type(asteroid))
             hitbox.kill()
@@ -155,7 +154,7 @@ class GameStateManager(pygame.sprite.Sprite):
         for loot in g.GM.loot:
             if loot.check_colision(self.player):
                 self.player.collect_loot(loot.price)
-                self.sfxm.play_sound(SFX.ORE_COLLECTED)
+                g.SFXM.play_sound(SFX.ORE_COLLECTED)
                 self.rs.increase_count_stat(type(loot))
                 loot.kill()
             elif loot.check_colision(self.player.magnet):
@@ -200,7 +199,7 @@ class GameStateManager(pygame.sprite.Sprite):
 
         self.player.end_round()
         ExplosionRound(self.player.position)
-        self.sfxm.play_sound(SFX.PLAYER_DEATH)
+        g.SFXM.play_sound(SFX.PLAYER_DEATH)
         self.death_timer = 0.0
 
     def cleanup_round(self):
@@ -296,7 +295,7 @@ class GameStateManager(pygame.sprite.Sprite):
             self._profiles[self.__current_profile] = ValidateProfile(self.__profile_paths[self.__current_profile])
         self.__current_profile = None
         self.player.kill()
-        self.player = Player(self.get_screen_resolution, self.sfxm, self.held_actions)
+        self.player = Player(self.get_screen_resolution, self.held_actions)
         self.switch_menu(Menu.PROFILE_SELECTION)
 
     def check_score(self, new_score) -> tuple[bool, int]:
@@ -354,7 +353,7 @@ class GameStateManager(pygame.sprite.Sprite):
 
     def unlock_cheats(self):
         self.player.stats.found_cheats = True
-        self.sfxm.play_sound(SFX.SECRET_CHEATS)
+        g.SFXM.play_sound(SFX.SECRET_CHEATS)
         self.update_menu()
 
     def unlock_ship(self, ship_type : ShipModel):

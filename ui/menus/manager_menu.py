@@ -4,7 +4,6 @@ from enum import Enum
 
 from ui.font_builder import FontBuilder
 from game_state_manager import GameStateManager
-from sfx_manager import SFXManager
 
 from ui.menus.enum_action import Action
 from ui.menus.enum_menu import Menu
@@ -27,14 +26,13 @@ from ui.menus.menu_debug import MenuDebug
 
 class MenuManager(pygame.sprite.Sprite):
     layer = 100 # pyright: ignore
-    def __init__(self, gsm : GameStateManager, sfxm : SFXManager):
+    def __init__(self, gsm : GameStateManager):
         if hasattr(self, "containers"):
             super().__init__(self.containers) # pyright: ignore[reportAttributeAccessIssue]
         else:
             super().__init__()
 
         self.gsm = gsm
-        self.sfxm = sfxm
 
         # Fonts
         font_path = "./_internal/fonts/anita-semi-square.normaali.ttf" #"../../fonts/anita-semi-square.normaali.ttf"
@@ -174,6 +172,6 @@ class MenuManager(pygame.sprite.Sprite):
         if self._hovered_button == None:
             return
         
-        self._hovered_button.run_if_possible(self.sfxm)
+        self._hovered_button.run_if_possible()
         if self._hovered_button != None and self._hovered_button.is_active == False:
             self._hovered_button = None
