@@ -1,6 +1,6 @@
 import pygame, json, os
 from typing import Callable, Any
-from enum import Enum
+from enum import Enum, auto
 
 import globals as g
 from config import *
@@ -19,6 +19,17 @@ from vfx.explosions import ExplosionBase, ExplosionSpiky, ExplosionRound
 from asteroids.asteroid import Asteroid
 from ui.menus.enum_action import Action
 
+
+class GameState(Enum):
+    MENUS = auto()
+    """Should be used in all the menus outside gameplay."""
+    PLAYING = auto()
+    """Should be used during gameplay. Updates all the entities."""
+    PAUSED = auto()
+    """Should be used when the game is paused or during End of Round screen."""
+    PLAYER_BEING_REDUCED_TO_ATOMS = auto()
+    """Should be used during the player's death. Updates all the entities but the player."""
+
 class GameStateManager(pygame.sprite.Sprite):
     def __init__(self, sfxm : SFXManager):
         if hasattr(self, "containers"):
@@ -35,9 +46,7 @@ class GameStateManager(pygame.sprite.Sprite):
         self.is_slow = False
 
         self.is_running : bool = True
-        self.is_round_going : bool = False
-        self.is_paused : bool = False
-        self.is_finishing_a_round : bool = False
+        self.game_state : GameState = GameState.MENUS
         self.death_timer : float = 0.0
 
         self.switch_menu : Callable[[Menu], None]
@@ -84,12 +93,13 @@ class GameStateManager(pygame.sprite.Sprite):
         self.konami_progress : int = 0
     
     def update(self, dt : float):
-        if self.is_round_going:
-            self.update_gameplay(dt)
-        elif self.is_finishing_a_round:
-            self.update_round_finish(dt)
-        else:
-            self.update_ambient(dt)
+        match self.game_state:
+            case GameState.PLAYING:
+                self.update_gameplay(dt)
+            case GameState.PLAYER_BEING_REDUCED_TO_ATOMS:
+                self.update_round_finish(dt)
+            case _:
+                self.update_ambient(dt)
 
     def update_ambient(self, dt : float):
         for object in g.GM.moving_objects:
@@ -97,59 +107,59 @@ class GameStateManager(pygame.sprite.Sprite):
                 object.kill()
 
     def update_gameplay(self, dt : float):
-        if self.player.is_alive and not self.is_paused:
-            self.rs.update(dt)
-
-            for object in g.GM.moving_objects:
-                if self.check_if_object_is_off_screen(object):
-                    if isinstance(object, Asteroid): ##### REWRITE THIS SHITE INSIDE BASE ASTEROID - FUCK IT, USE GM INSTEAD
-                        self.spawner.kill_asteroid(object) # The field kills/splits asteroids to keep count of certain types
-                    else:
-                        object.kill()
-
-            # Colision checks
-            # Player hit
-            for asteroid in g.GM.asteroids:
-                if asteroid.check_colision(self.player) and not self.player.is_invul: # No check for dead asteroids because first loop, only off-screen ones are dead
-                    alive = self.player.take_damage_and_check_if_alive()
-                    if alive:
-                        self.sfxm.play_sound(SFX.PLAYER_HIT)
-                    self.spawner.kill_asteroid(asteroid)
-                    ExplosionSpiky(asteroid.position, asteroid.radius)
-                
-                # Asteroid shot
-                for projectile in g.GM.projectiles:
-                    if projectile.check_colision(asteroid) and not asteroid.is_dead:
-                        if projectile.is_single_use:
-                            projectile.kill()
-                        self.spawner.split_asteroid(asteroid)
-                        ExplosionSpiky(asteroid.position, asteroid.radius)
-                        self.sfxm.play_sound(SFX.ASTEROID_EXPLOSION)
-                        self.rs.score += asteroid.reward
-                        self.rs.increase_count_stat(type(asteroid))
-                
-            # Asteroid exploded
-            for hitbox in g.GM.explosion_hitboxes:
-                for asteroid in g.GM.asteroids:
-                    if hitbox.check_colision(asteroid) and not asteroid.is_dead:
-                        self.spawner.split_asteroid(asteroid)
-                        self.sfxm.play_sound(SFX.ASTEROID_EXPLOSION)
-                        self.rs.score += asteroid.reward
-                        self.rs.increase_count_stat(type(asteroid))
-                hitbox.kill()
-
-            # Loot collected
-            for loot in g.GM.loot:
-                if loot.check_colision(self.player):
-                    self.player.collect_loot(loot.price)
-                    self.sfxm.play_sound(SFX.ORE_COLLECTED)
-                    self.rs.increase_count_stat(type(loot))
-                    loot.kill()
-                elif loot.check_colision(self.player.magnet):
-                    loot.home_towards(dt, self.player.position, self.player.magnet.get_strength())
-
-        elif not self.player.is_alive:
+        if not self.player.is_alive: # Checks if player is alive
             self.finish_round()
+            return
+
+        self.rs.update(dt) # Updates game time
+
+        for object in g.GM.moving_objects:
+            if self.check_if_object_is_off_screen(object):
+                if isinstance(object, Asteroid): ##### REWRITE THIS SHITE INSIDE BASE ASTEROID - FUCK IT, USE GM INSTEAD
+                    self.spawner.kill_asteroid(object) # The field kills/splits asteroids to keep count of certain types
+                else:
+                    object.kill()
+
+        # Colision checks
+        # Player hit
+        for asteroid in g.GM.asteroids:
+            if asteroid.check_colision(self.player) and not self.player.is_invul: # No check for dead asteroids because first loop, only off-screen ones are dead
+                alive = self.player.take_damage_and_check_if_alive()
+                if alive:
+                    self.sfxm.play_sound(SFX.PLAYER_HIT)
+                self.spawner.kill_asteroid(asteroid)
+                ExplosionSpiky(asteroid.position, asteroid.radius)
+            
+            # Asteroid shot
+            for projectile in g.GM.projectiles:
+                if projectile.check_colision(asteroid) and not asteroid.is_dead:
+                    if projectile.is_single_use:
+                        projectile.kill()
+                    self.spawner.split_asteroid(asteroid)
+                    ExplosionSpiky(asteroid.position, asteroid.radius)
+                    self.sfxm.play_sound(SFX.ASTEROID_EXPLOSION)
+                    self.rs.score += asteroid.reward
+                    self.rs.increase_count_stat(type(asteroid))
+            
+        # Asteroid exploded
+        for hitbox in g.GM.explosion_hitboxes:
+            for asteroid in g.GM.asteroids:
+                if hitbox.check_colision(asteroid) and not asteroid.is_dead:
+                    self.spawner.split_asteroid(asteroid)
+                    self.sfxm.play_sound(SFX.ASTEROID_EXPLOSION)
+                    self.rs.score += asteroid.reward
+                    self.rs.increase_count_stat(type(asteroid))
+            hitbox.kill()
+
+        # Loot collected
+        for loot in g.GM.loot:
+            if loot.check_colision(self.player):
+                self.player.collect_loot(loot.price)
+                self.sfxm.play_sound(SFX.ORE_COLLECTED)
+                self.rs.increase_count_stat(type(loot))
+                loot.kill()
+            elif loot.check_colision(self.player.magnet):
+                loot.home_towards(dt, self.player.position, self.player.magnet.get_strength())
 
     def update_round_finish(self, dt : float):
         if self.death_timer < 2:
@@ -157,7 +167,7 @@ class GameStateManager(pygame.sprite.Sprite):
                 self.player.is_hidden = True
             self.death_timer += dt
         else:
-            self.is_finishing_a_round = False
+            self.game_state = GameState.PAUSED
 
             # Saving score and going back to Main Menu
             if not self.player.is_sus and self.rs.score > 0:
@@ -173,8 +183,7 @@ class GameStateManager(pygame.sprite.Sprite):
         """
         for object in g.GM.cleanup:
             object.kill()
-        self.is_round_going = True
-        self.is_paused = False
+        self.game_state = GameState.PLAYING
         self.player.teleport_and_prepare_for_round((int(self.screen_resolution[0] / 2), int(self.screen_resolution[1] / 2)))
         self.spawner.switch_mode(ESMode.ASTEROIDS_STANDARD)
         self.rs.reset()
@@ -184,12 +193,10 @@ class GameStateManager(pygame.sprite.Sprite):
         """
         Run when the player dies. Plays the death animation and switches to the Round Statistics screen.
         """
-        self.is_round_going = False
-        self.is_finishing_a_round = True
-
-        if self.is_paused: # For self-destructing
-            self.is_paused = False
+        if self.game_state == GameState.PAUSED: # For self-destructing
             self.switch_menu(Menu.HUD)
+
+        self.game_state = GameState.PLAYER_BEING_REDUCED_TO_ATOMS
 
         self.player.end_round()
         ExplosionRound(self.player.position)
@@ -204,14 +211,15 @@ class GameStateManager(pygame.sprite.Sprite):
             object.kill()
         self.spawner.switch_mode(ESMode.AMBIENT)
         self.player.reset()
+        self.game_state = GameState.MENUS
         self.switch_menu(Menu.MAIN_MENU)
 
     def pause_game(self):
-        self.is_paused = True
+        self.game_state = GameState.PAUSED
         self.switch_menu(Menu.PAUSE_MENU)
 
     def unpause_game(self):
-        self.is_paused = False
+        self.game_state = GameState.PLAYING
         self.switch_menu(Menu.HUD)
     
     def check_if_object_is_off_screen(self, object) -> bool:

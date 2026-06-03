@@ -4,7 +4,7 @@ import pygame
 
 import globals as g
 from config import *
-from game_state_manager import GameStateManager
+from game_state_manager import GameStateManager, GameState
 from ui.menus.manager_menu import MenuManager
 from sfx_manager import SFXManager
 
@@ -43,9 +43,9 @@ class Game():
         self.is_round_end : bool = False
 
         self.initialize_groups()
-        self.sfxm = SFXManager() # All sfx file paths are stored inside SFXManager
-        self.gsm = GameStateManager(self.sfxm)
-        self.mm = MenuManager(self.gsm, self.sfxm)
+        self.sfxm : SFXManager = SFXManager() # All sfx file paths are stored inside SFXManager
+        self.gsm : GameStateManager = GameStateManager(self.sfxm)
+        self.mm : MenuManager = MenuManager(self.gsm, self.sfxm)
         self.gsm.set_menu_functions(self.mm.switch_menu, self.mm.initialize_current_menu)
 
     def initialize_groups(self):
@@ -139,16 +139,17 @@ class Game():
         self.gsm.save_profile() # Save on exit
     
     def update_all(self):
+        """Updates current UI, and needed entities according to the current game state."""
         for object in g.GM.updatable_ui:
             object.update(self.dt)
-        
-        if not self.gsm.is_round_going and not self.gsm.is_finishing_a_round:
-            for object in g.GM.updatable_ambient:
-                object.update(self.dt)
-        
-        elif (self.gsm.is_round_going and not self.gsm.is_paused) or self.gsm.is_finishing_a_round:
-            for object in g.GM.updatable_gameplay:
-                object.update(self.dt)
+
+        match self.gsm.game_state:
+            case GameState.PLAYING:
+                for object in g.GM.updatable_ambient:
+                    object.update(self.dt)
+            case GameState.PLAYING | GameState.PLAYER_BEING_REDUCED_TO_ATOMS:
+                for object in g.GM.updatable_gameplay:
+                    object.update(self.dt)
 
     def process_and_refresh(self) -> float:
         """
