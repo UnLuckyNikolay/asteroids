@@ -2,7 +2,7 @@ import pygame, random
 from typing import Callable, Any
 from enum import Enum
 
-from globals import *
+from config import *
 from asteroids.asteroidbasic import AsteroidBasic
 from asteroids.asteroidgolden import AsteroidGolden
 from asteroids.asteroidexplosive import AsteroidExplosive

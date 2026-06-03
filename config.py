@@ -1,0 +1,38 @@
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
+MAX_FPS = 75
+DEBUG = False
+
+ASTEROID_MIN_RADIUS = 20
+ASTEROID_KINDS = 3
+ASTEROID_SPAWN_RATE = 0.8  # seconds
+ASTEROID_MAX_RADIUS = ASTEROID_MIN_RADIUS * ASTEROID_KINDS
+LOOT_SLOWDOWN = 0.5
+
+CHANCE_GOLDEN = 5 #5
+CHANCE_HOMING = 5 #5
+CHANCE_EXPLOSIVE = 10 #10
+CHANCE_BOUNCY = 10 #10
+
+HOMING_SPEED = 300 #300
+DIFFICULTY_INCREASE_MP = 0.92 #0.92 float, should be less than 1, spawn time of asteroids is multiplied by it every N seconds
+DIFFICULTY_INCREASE_TIMER = 15.0 #15 seconds
+
+STAR_BIG_MULT = 5
+STAR_MEDIUM_MULT = 30
+STAR_SMALL_MULT = 50
+SPACE_COLOR_LIST = [(0, 0, 0), 
+                    (10, 20, 70), (5, 10, 35), 
+                    (40, 0, 40), (20, 0, 20), 
+                    (30, 30, 70), (15, 15, 35), 
+                    (0, 60, 50), (0, 30, 25), 
+                    (59, 87, 196), (30, 50, 127)]
+
+PLAYER_RADIUS = 20
+PLAYER_TURNING_MAX = 200
+PLAYER_TURNING_ACCELERATION = 1500 # Per second
+PLAYER_TIMER_INVUL = 2
+
+PLAYER_MAX_NAME_LENGTH = 20
+
+LEADERBOARD_LENGTH = 12

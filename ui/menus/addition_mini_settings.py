@@ -3,7 +3,7 @@ from ui.menus.enum_action import Action
 from game_state_manager import GameStateManager
 
 from ui.colors import *
-from globals import DEBUG
+from config import DEBUG
 from ui.elements.container import Container, Allignment
 from ui.elements.buttons import Button, ButtonRound, Switch, InfoButton, ModKey
 from ui.elements.text import TextPlain, TextUpdated

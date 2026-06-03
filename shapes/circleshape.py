@@ -1,8 +1,6 @@
 import pygame
 from copy import deepcopy
 
-from globals import *
-
 
 class CircleShape(pygame.sprite.Sprite):
     def __init__(self, position, velocity, radius, create_copy_of_position=True):

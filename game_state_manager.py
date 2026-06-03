@@ -3,6 +3,7 @@ from typing import Callable, Any
 from enum import Enum
 
 import globals as g
+from config import *
 from json_helper.leaderboard.validator import ValidateLeaderboard
 from json_helper.profile.validator import ValidateProfile
 
@@ -25,12 +26,12 @@ class GameStateManager(pygame.sprite.Sprite):
         else:
             super().__init__()
 
-        self.screen_resolution_windowed : tuple[int, int] = (g.SCREEN_WIDTH, g.SCREEN_HEIGHT)
+        self.screen_resolution_windowed : tuple[int, int] = (SCREEN_WIDTH, SCREEN_HEIGHT)
         self.screen_resolution_fullscreen : tuple[int, int] = pygame.display.get_desktop_sizes()[0]
         self.screen_resolution : tuple[int, int] = self.screen_resolution_windowed
         self.is_fullscreen : bool = False
         self.is_window_resized : bool = False
-        self.max_fps = g.MAX_FPS
+        self.max_fps = MAX_FPS
         self.is_slow = False
 
         self.is_running : bool = True
@@ -300,7 +301,7 @@ class GameStateManager(pygame.sprite.Sprite):
         is_updated = False
 
         # Overfilled
-        while len(self._scores) > g.LEADERBOARD_LENGTH:   # Shortens leaderboard if max length was reduced
+        while len(self._scores) > LEADERBOARD_LENGTH:   # Shortens leaderboard if max length was reduced
             is_updated = True
             self._scores.pop()
 
@@ -313,7 +314,7 @@ class GameStateManager(pygame.sprite.Sprite):
         # Full/Partially filled
         for i in range(len(self._scores)):
             if new_score > self._scores[i]["score"]:
-                if len(self._scores) == g.LEADERBOARD_LENGTH:
+                if len(self._scores) == LEADERBOARD_LENGTH:
                     self._scores.pop()
                 self._scores.append({"name": self.player.stats.name, "score": new_score})
                 self._scores.sort(key=lambda x: x["score"], reverse=True)
@@ -321,7 +322,7 @@ class GameStateManager(pygame.sprite.Sprite):
                 return True, i+1
             
         # New lowest :sadge:
-        if len(self._scores) < g.LEADERBOARD_LENGTH:
+        if len(self._scores) < LEADERBOARD_LENGTH:
                 self._scores.append({"name": self.player.stats.name, "score": new_score})
                 self.__save_leaderboard()
                 return True, len(self._scores)

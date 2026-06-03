@@ -3,6 +3,7 @@
 import pygame
 
 import globals as g
+from config import *
 from game_state_manager import GameStateManager
 from ui.menus.manager_menu import MenuManager
 from sfx_manager import SFXManager
@@ -31,7 +32,7 @@ class Game():
             buffer=1024,
         )
         pygame.init()
-        self.screen = pygame.display.set_mode((g.SCREEN_WIDTH, g.SCREEN_HEIGHT), pygame.RESIZABLE, display=0)
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE, display=0)
         pygame.display.set_caption("Asteroids from Outer Space")
 
         self.clock = pygame.time.Clock()
@@ -234,7 +235,7 @@ class Game():
                         continue
                     else:
                         k = event.dict["unicode"]
-                        if k != "" and len(self.player_stats.name) < g.PLAYER_MAX_NAME_LENGTH:
+                        if k != "" and len(self.player_stats.name) < PLAYER_MAX_NAME_LENGTH:
                             self.player_stats.name = self.player_stats.name + k
                 else:
                     self.handle_event(event)

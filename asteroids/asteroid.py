@@ -1,7 +1,7 @@
 import pygame, random, math, pygame.gfxdraw
 from abc import ABC, abstractmethod
 
-from globals import *
+from config import *
 from shapes.circleshape import CircleShape
 
 

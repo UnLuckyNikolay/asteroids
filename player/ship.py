@@ -1,7 +1,7 @@
 import pygame, pygame.gfxdraw
 from player.ship_enums import ShipModel
 
-from globals import *
+from config import *
 
 
 class Ship():

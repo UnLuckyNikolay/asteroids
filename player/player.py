@@ -1,7 +1,7 @@
 import pygame
 from typing import Callable
 
-from globals import *
+from config import *
 from ui.menus.enum_action import Action
 from sfx_manager import SFXManager
 from shapes.circleshape import CircleShape
