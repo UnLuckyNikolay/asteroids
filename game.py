@@ -26,13 +26,8 @@ from asteroids.ores import Ore
 class Game():
     def __init__(self, screen):
         self.screen = screen
-
         self.clock = pygame.time.Clock()
         self.dt = 0
-        self.is_running : bool = True
-        self.is_paused : bool = False
-        self.getting_player_name : bool = False
-        self.is_round_end : bool = False
 
         self.initialize_groups()
         self.sfxm : SFXManager = SFXManager() # All sfx file paths are stored inside SFXManager
@@ -189,51 +184,3 @@ class Game():
         pygame.display.flip()
         dt = self.clock.tick(self.gsm.max_fps) / 1000
         return dt
-
-    ### Helpers
-
-    def handle_keyboard_event_for_ship_controls(self, event : pygame.event.Event):
-        """Used for handling inputs for controlling the ship during gameplay and pause."""
-
-        if self.rsm == None:
-            return
-
-        match event.scancode:
-            # Weapon switching
-            case 30 | 89: # 1 | Keypad1
-                if event.type == pygame.KEYDOWN and not self.is_paused:
-                    self.player.weapon_current = self.player.weapon_plasmagun
-            case 31 | 90: # 2 | Keypad2
-                if event.type == pygame.KEYDOWN and not self.is_paused:
-                    self.player.weapon_current = self.player.weapon_bomblauncher
-            case 32 | 91: # 3 | Keypad3
-                if self.player_stats.cheat_cleavers and event.type == pygame.KEYDOWN and not self.is_paused:
-                    self.player.weapon_current = self.player.weapon_meat
-    
-    def get_player_name(self) -> bool: # Used in profile creation in game_state_manager
-        self.getting_player_name = True
-        while self.getting_player_name:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.is_running = False
-                    return False
-                elif event.type == pygame.KEYDOWN:
-                    #print(event)
-                    if event.key == pygame.K_BACKSPACE:
-                        self.player_stats.name = self.player_stats.name[:-1]
-                    elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
-                        if len(self.player_stats.name.strip()) > 0:
-                            self.getting_player_name = False
-                    elif event.key == pygame.K_TAB or event.key == pygame.K_ESCAPE:
-                        continue
-                    else:
-                        k = event.dict["unicode"]
-                        if k != "" and len(self.player_stats.name) < PLAYER_MAX_NAME_LENGTH:
-                            self.player_stats.name = self.player_stats.name + k
-                else:
-                    self.handle_event(event)
-            
-            self.redraw_objects_and_ui()
-
-        self.player_stats.name = self.player_stats.name.strip()
-        return True
