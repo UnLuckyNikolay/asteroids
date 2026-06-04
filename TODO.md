@@ -100,12 +100,17 @@ DISTANT/POSSIBLE IDEAS:
         - [ ] Move them up in player info
 
 TO CHECK/FIX FOR 2.0:
-- Homing Asteroid limit
-- Bounct Asteroid updating
-- Check which classes should be Sprite children (bcs of containers)
-- Player - use reset in init
-- Player - check name when exiting in profile creation
-- Check exiting
-- Player reset into init
-- Ship isn't updated in profile selection
-- Get some sleep
+- [ ] Check _check_element_color for buttons, maybe possible to only leave one in Base
+- [ ] Check how missing characters look
+- [ ] Add Enter (to name select menus) and Escape to move between menus
+- [ ] Reshuffle the ui folder
+- [ ] Input button
+- [ ] Change color names to upper case
+- [ ] Homing Asteroid limit
+- [ ] Bounct Asteroid updating
+- [ ] Check which classes should be Sprite children (bcs of containers)
+- [ ] Player - use reset in init
+- [ ] Player - check name when exiting in profile creation
+- [ ] Check exiting
+- [ ] Ship isn't updated in profile selection
+- [ ] Get some sleep

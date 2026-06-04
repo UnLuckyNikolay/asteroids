@@ -355,11 +355,11 @@ class InfoButton(ButtonBase):
     """
 
     def __init__(
-            self,
-            position : tuple[int, int], 
-            size : tuple[int, int], 
-            corners : tuple[int, int, int, int],
-            active_condition : bool | Callable[[], bool]
+        self,
+        position : tuple[int, int], 
+        size : tuple[int, int], 
+        corners : tuple[int, int, int, int],
+        active_condition : bool | Callable[[], bool]
     ):
         super().__init__(
             position, 
@@ -411,3 +411,87 @@ class InfoButton(ButtonBase):
         else:
             self._set_element_color(self._color_outline)
     
+
+class InputButton(ButtonBase):
+    """
+    Button used for input. Only one can be active at once.
+
+    Remember to add the same getter as a TextUpdated to see the changes!
+    """
+
+    def __init__(
+        self,
+        position : tuple[int, int], 
+        size : tuple[int, int], 
+        corners : tuple[int, int, int, int],
+        input_string_getter : Callable[[None], string],
+        input_string_setter : Callable[[string], None],
+        max_length : int | None = None
+    ):
+        super().__init__(
+            position, 
+            size,
+            corners,
+        )
+        self._color_outline = color_blue
+        self._color_outline_active = color_orange
+        self._color_fill_hover = self._get_divided_color_tuple(self._color_outline, 2, 150)
+        self._color_fill_hover_active = self._get_divided_color_tuple(self._color_outline_active, 2, 150)
+
+        self._getter = input_string_getter
+        self._setter = input_string_setter
+        self._max_length = max_length
+
+    def draw(self, screen):
+        self._check_element_color()
+        if self._is_hovered and self._is_active:
+            fill = self._color_fill_hover_active
+        elif self._is_hovered and not self._is_active:
+            fill = self._color_fill_hover
+        else:
+            fill = self._color_fill
+        if self._is_active:
+            outline = self._color_outline_active
+        else:
+            outline = self._color_outline
+
+        self._draw_box(screen, fill, outline)
+
+    def run_if_possible(self) -> bool:
+        """Always possible, sets the input button as the active one."""
+
+        g.SET_INPUT_BUTTON(self)
+        self._is_active = True
+        return True
+    
+    def deactivate(self):
+        g.SET_INPUT_BUTTON(None)
+        self._is_active = False
+
+    def check_if_possible(self) -> bool:
+        """Always possible."""
+
+        return True
+
+    def _check_element_color(self):
+        if self._is_active:
+            self._set_element_color(self._color_outline_active)
+        else:
+            self._set_element_color(self._color_outline)
+    
+    def backspace(self):
+        text = self.getter()
+        if len(text > 1):
+            self.setter(text[:-1])
+
+    def add_char(self, char : string):
+        """Only adds the first character of the string"""
+        text = self.getter()
+        if (
+            len(char) > 0
+            and
+                (self._max_length == None 
+                or 
+                (self._max_length != None and len(text) < self._max_length))
+        ):
+            self.setter(text + char[0])

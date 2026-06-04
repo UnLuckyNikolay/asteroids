@@ -8,7 +8,7 @@ from game_state_manager import GameStateManager
 from ui.menus.enum_action import Action
 from ui.menus.enum_menu import Menu
 from ui.menus.base_menu import _MenuBase
-from ui.elements.buttons import Button, Switch
+from ui.elements.buttons import Button, Switch, InputButton
 # from ui.menus.addition_mini_settings import add_mini_settings_and_cheats
 from ui.menus.menu_profile_selection import MenuProfileSelection
 from ui.menus.menu_new_profile import MenuNewProfile
@@ -57,6 +57,7 @@ class MenuManager(pygame.sprite.Sprite):
         self._last_menu_type : Menu
         self._current_menu : _MenuBase
         self._hovered_button : Button | Switch | None = None
+        self._input_button : InputButton | None = None
         self.initialize_current_menu()
 
         self._is_debug_menu_shown : bool = False
@@ -84,6 +85,13 @@ class MenuManager(pygame.sprite.Sprite):
             90 : Action.PLAYER_WEAPON_TWO_ALT, # K2
             91 : Action.PLAYER_WEAPON_THREE_ALT, # K3
         }
+
+        self._set_global_functions()
+    
+    def _set_global_functions(self):
+        g.SWITCH_MENU = self.switch_menu
+        g.SET_INPUT_BUTTON = self.set_input_button
+        g.REINIT_CURRENT_MENU = self.initialize_current_menu
     
     def draw(self, screen):
         self._current_menu.draw(screen)
@@ -97,8 +105,22 @@ class MenuManager(pygame.sprite.Sprite):
         if event_keydown.type != pygame.KEYDOWN:
             return
         
+        # Check text input
+        if self._input_button != None:
+            if event.key == pygame.K_BACKSPACE:
+                self._input_button.backspace()
+                return
+            else:
+                k = event.dict["unicode"]
+                if k != "":
+                    self._input_button.add_char(k)
+                    return
+
+
         # Check special presses
         self._current_menu.check_special_input(event_keydown)
+        # Current special inputs:
+        # - main menu: Konami code to activate cheats
 
         # Get Action
         try:
@@ -136,6 +158,8 @@ class MenuManager(pygame.sprite.Sprite):
             self._last_menu_type = self._current_menu_type
             self._current_menu_type = menu
             
+        if self._input_button != None:
+            self._input_button.deactivate()
         self._current_menu.kill()
         self.initialize_current_menu()
         self._hovered_button = None
@@ -172,6 +196,14 @@ class MenuManager(pygame.sprite.Sprite):
         if self._hovered_button == None:
             return
         
+        if self._input_button != None and self._hovered_button == self._input_button:
+            return
+        elif self._input_button != None:
+            self._input_button.deactivate()
+        
         self._hovered_button.run_if_possible()
         if self._hovered_button != None and self._hovered_button.is_active == False:
             self._hovered_button = None
+    
+    def set_input_button(self, button : InputButton):
+        self._input_button = button
