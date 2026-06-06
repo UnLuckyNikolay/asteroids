@@ -32,6 +32,9 @@ class _MenuBase:
             b.kill()
 
     def check_special_input(self, input : pygame.event.Event):
+        """
+        Override this method to add more complicated chains of imputs (for example for cheat sequences).
+        """
         pass
 
     def check_action(self, action : Action):

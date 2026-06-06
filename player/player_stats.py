@@ -155,6 +155,9 @@ class PlayerStats():
         self.collected_ores_silver = player_stats_save.get("collected_ores_silver", self.collected_ores_silver)
         self.collected_ores_golden = player_stats_save.get("collected_ores_golden", self.collected_ores_golden)
         self.collected_diamonds = player_stats_save.get("collected_diamonds", self.collected_diamonds)
+    
+    def set_player_name(self, name : string):
+        self.name = string
 
     def get_longest_time_as_text(self) -> str:
         return get_time_as_text(self.longest_run)

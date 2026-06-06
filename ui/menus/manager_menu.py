@@ -53,16 +53,6 @@ class MenuManager(pygame.sprite.Sprite):
             Menu.RETURN : (lambda: self._menu_classes[self._last_menu_type]),
         }
 
-        self._current_menu_type : Menu = Menu.PROFILE_SELECTION
-        self._last_menu_type : Menu
-        self._current_menu : _MenuBase
-        self._hovered_button : Button | Switch | None = None
-        self._input_button : InputButton | None = None
-        self.initialize_current_menu()
-
-        self._is_debug_menu_shown : bool = False
-        self._debug_menu : MenuDebug = self._initialize_menu(MenuDebug)
-
         self._mapped_actions : dict[int, Action] = {
             41 : Action.MENU_BACK, # Escape
             49 : Action.MENU_CONFIRM, # Enter
@@ -85,6 +75,16 @@ class MenuManager(pygame.sprite.Sprite):
             90 : Action.PLAYER_WEAPON_TWO_ALT, # K2
             91 : Action.PLAYER_WEAPON_THREE_ALT, # K3
         }
+
+        self._current_menu_type : Menu = Menu.PROFILE_SELECTION
+        self._last_menu_type : Menu
+        self._current_menu : _MenuBase
+        self._hovered_button : Button | Switch | None = None
+        self._input_button : InputButton | None = None
+        self.initialize_current_menu()
+
+        self._is_debug_menu_shown : bool = False
+        self._debug_menu : MenuDebug = self._initialize_menu(MenuDebug)
 
         self._set_global_functions()
     

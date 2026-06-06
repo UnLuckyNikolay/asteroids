@@ -24,6 +24,7 @@ class MenuLeaderboard(_MenuBase):
         super().__init__(gsm, switch_function)
 
         self.input_handlers = {
+            Action.MENU_BACK : lambda: g.SWITCH_MENU(Menu.MAIN_MENU)
         }
 
         res = gsm.screen_resolution

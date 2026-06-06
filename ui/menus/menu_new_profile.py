@@ -5,10 +5,11 @@ from ui.menus.base_menu import _MenuBase
 from ui.menus.enum_action import Action
 from game_state_manager import GameStateManager
 
-from globals import PLAYER_MAX_NAME_LENGTH
+import globals as g
+from config import PLAYER_MAX_NAME_LENGTH
 from ui.colors import *
 from ui.elements.container import Container, Allignment
-from ui.elements.buttons import Button, ButtonRound, Switch, InfoButton, ModKey
+from ui.elements.buttons import Button, ButtonRound, Switch, InfoButton, ModKey, InputButton
 from ui.elements.text import TextPlain, TextUpdated
 from ui.font_builder import FontBuilder
 from ui.menus.enum_menu import Menu
@@ -21,6 +22,10 @@ class MenuNewProfile(_MenuBase):
         switch_function : Callable[[Menu], None],
     ):
         super().__init__(gsm, switch_function)
+
+        self.input_handlers = {
+            Action.MENU_CONFIRM : self._check_name_and_continue
+        }
 
         root_x = int(gsm.screen_resolution[0]/2-225)
         root_y = int(gsm.screen_resolution[1]/2-105)
@@ -37,20 +42,26 @@ class MenuNewProfile(_MenuBase):
             nudge=(15, 47)
         )
 
-        c_name = Container((root_x+10, root_y+90), (430, 50), (3, 10, 3, 10))
-        c_name.add_element(
+        self._containers.extend(
+            [c_background]
+        )
+        
+        # <> Buttons <>
+
+        b_name = InputButton(
+            (root_x+10, root_y+90), (430, 50), (3, 10, 3, 10),
+            lambda: gsm.player.stats.name
+            gsm.player.stats.set_player_name,
+            max_legth=PLAYER_MAX_NAME_LENGTH
+        )
+        b_name.add_element(
             TextUpdated(
                 "{}", fonts.medium, color_white, 
                 lambda: gsm.player.stats.name
             ),
+            Allignment.LEFT_WALL,
             nudge=(10, 8)
         )
-
-        self._containers.extend(
-            [c_background, c_name]
-        )
-        
-        # <> Buttons <>
 
         b_confirm = Button(
             (root_x+125, root_y+150), (200, 50), (3, 10, 3, 10),
@@ -63,18 +74,12 @@ class MenuNewProfile(_MenuBase):
         )
 
         self._buttons.extend(
-            [b_confirm]
+            [b_confirm, b_name]
         )
 
-    def check_special_input(self, event : pygame.event.Event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_BACKSPACE:
-                self.gsm.player.stats.name = self.gsm.player.stats.name[:-1]
-            elif event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
-                if len(self.gsm.player.stats.name.strip()) > 0:
-                    self.switch_menu(Menu.MAIN_MENU)
-            else:
-                k = event.dict["unicode"]
-                if k != "" and len(self.gsm.player.stats.name) < PLAYER_MAX_NAME_LENGTH:
-                    self.gsm.player.stats.name = self.gsm.player.stats.name + k
+        g.SET_INPUT_BUTTON(b_name)
+
+    def _check_name_and_continue(self):
+        if len(gsm.player.stats.name.strip()) > 0:
+            g.SWITCH_MENU(Menu.MAIN_MENU)
     
