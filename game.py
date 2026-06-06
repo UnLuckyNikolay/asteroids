@@ -84,6 +84,7 @@ class Game():
         LiterallyAFuckingMeatCleaverBase.containers = (
             g.GM.projectiles, 
             g.GM.updatable_gameplay, 
+            g.GM.updatable_ambient, 
             g.GM.drawable, 
             g.GM.moving_objects, 
             g.GM.cleanup,

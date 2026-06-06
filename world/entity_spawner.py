@@ -1,6 +1,6 @@
 import pygame, random
 from typing import Callable, Any
-from enum import Enum
+from enum import Enum, auto
 
 from config import *
 from asteroids.asteroidbasic import AsteroidBasic
@@ -8,11 +8,16 @@ from asteroids.asteroidgolden import AsteroidGolden
 from asteroids.asteroidexplosive import AsteroidExplosive
 from asteroids.asteroidhoming import AsteroidHoming
 from asteroids.asteroidbouncy import AsteroidBouncy
+from player.weapons.projectiles.literally_a_fucking_meat_cleaver import (
+    LiterallyAFuckingMeatCleaverSprite1,
+    LiterallyAFuckingMeatCleaverSprite2,
+    LiterallyAFuckingMeatCleaverSprite3
+)
 
 
 class ESMode(Enum):
-    AMBIENT = 0
-    ASTEROIDS_STANDARD = 1
+    AMBIENT = auto()
+    ASTEROIDS_STANDARD = auto()
 
 class EntitySpawner(pygame.sprite.Sprite):
     def __init__(self, player, getter_screen_resolution : Callable[[], tuple[int, int]]):
@@ -49,6 +54,12 @@ class EntitySpawner(pygame.sprite.Sprite):
         self._chance_homing = self._chance_golden + CHANCE_HOMING
         self._chance_explosive = self._chance_homing + CHANCE_EXPLOSIVE
         self._chance_bouncy = self._chance_explosive + CHANCE_BOUNCY
+
+        self._cleavers = [
+            LiterallyAFuckingMeatCleaverSprite1,
+            LiterallyAFuckingMeatCleaverSprite2,
+            LiterallyAFuckingMeatCleaverSprite3
+        ]
 
         self.update_spawns(getter_screen_resolution())
         self.reset()
@@ -141,4 +152,8 @@ class EntitySpawner(pygame.sprite.Sprite):
             AsteroidBasic(position, velocity, speed, radius)
     
     def _spawn_ambient(self, radius, position, velocity, speed):
-        AsteroidBasic(position, velocity, speed, radius)
+        roll = random.randint(1, 1000)
+        if roll < 3:
+            random.choice(self._cleavers)(position, velocity, 0)
+        else:
+            AsteroidBasic(position, velocity, speed, radius)

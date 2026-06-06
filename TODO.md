@@ -114,3 +114,6 @@ TO CHECK/FIX FOR 2.0:
 - [ ] Check exiting
 - [ ] Ship isn't updated in profile selection
 - [ ] Get some sleep
+- [ ] why asteroids need speed to init but cleavers don't
+- [ ] Bool for players (is_active) to get rid of updatable_ambient group
+- [ ] async functions for colissions/updates?

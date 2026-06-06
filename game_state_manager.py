@@ -105,6 +105,9 @@ class GameStateManager(pygame.sprite.Sprite):
             if self.check_if_object_is_off_screen(object):
                 object.kill()
 
+        self._delete_objects_off_screen()
+        self._check_asteroids_hit()
+
     def update_gameplay(self, dt : float):
         if not self.player.is_alive: # Checks if player is alive
             self.finish_round()
@@ -112,11 +115,19 @@ class GameStateManager(pygame.sprite.Sprite):
 
         self.rs.update(dt) # Updates game time
 
+        self._delete_objects_off_screen()
+        self._check_player_hit()
+        self._check_asteroids_hit()
+        self._check_asteroids_exploded()
+        self._check_loot_collected()
+
+    ### Colision checks
+    def _delete_objects_off_screen(self):
         for object in g.GM.moving_objects:
             if self.check_if_object_is_off_screen(object):
                 object.kill()
 
-        # Colision checks
+    def _check_player_hit(self):
         # Player hit
         for asteroid in g.GM.asteroids:
             if asteroid.check_colision(self.player) and not self.player.is_invul: # No check for dead asteroids because first loop, only off-screen ones are dead
@@ -125,9 +136,11 @@ class GameStateManager(pygame.sprite.Sprite):
                     g.SFXM.play_sound(SFX.PLAYER_HIT)
                 asteroid.kill()
                 ExplosionSpiky(asteroid.position, asteroid.radius)
-            
-            # Asteroid shot
-            for projectile in g.GM.projectiles:
+    
+    def _check_asteroids_hit(self):
+        # Asteroid shot
+        for projectile in g.GM.projectiles:
+            for asteroid in g.GM.asteroids:
                 if projectile.check_colision(asteroid) and not asteroid.is_dead:
                     if projectile.is_single_use:
                         projectile.kill()
@@ -136,7 +149,8 @@ class GameStateManager(pygame.sprite.Sprite):
                     g.SFXM.play_sound(SFX.ASTEROID_EXPLOSION)
                     self.rs.score += asteroid.reward
                     self.rs.increase_count_stat(type(asteroid))
-            
+    
+    def _check_asteroids_exploded(self):
         # Asteroid exploded
         for hitbox in g.GM.explosion_hitboxes:
             for asteroid in g.GM.asteroids:
@@ -147,6 +161,7 @@ class GameStateManager(pygame.sprite.Sprite):
                     self.rs.increase_count_stat(type(asteroid))
             hitbox.kill()
 
+    def _check_loot_collected(self):
         # Loot collected
         for loot in g.GM.loot:
             if loot.check_colision(self.player):
