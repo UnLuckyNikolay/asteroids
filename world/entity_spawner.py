@@ -31,7 +31,7 @@ class EntitySpawner(pygame.sprite.Sprite):
 
         self._edges : list[tuple[pygame.Vector2, Callable[[Any], pygame.Vector2]]]
 
-        self._amount_homing : int = 0
+        self._group_homing : pygame.sprite.Group = pygame.sprite.Group()
         self._amount_homing_max : int = 3
 
         self._difficulty_increase_timer : float = DIFFICULTY_INCREASE_TIMER
@@ -81,22 +81,6 @@ class EntitySpawner(pygame.sprite.Sprite):
             ),
         ]
         self._spawn_time = (ASTEROID_SPAWN_RATE * (1280*720) / (screen_resolution[0]*screen_resolution[1])) # Very elegant, I know
-
-    def kill_asteroid(self, asteroid):
-        if not asteroid.is_dead:
-            self._check_asteroid(asteroid)
-            asteroid.is_dead = True
-            asteroid.kill()
-
-    def split_asteroid(self, asteroid):
-        if not asteroid.is_dead:
-            self._check_asteroid(asteroid)
-            asteroid.is_dead = True
-            asteroid.split()
-
-    def _check_asteroid(self, asteroid):
-        if isinstance(asteroid, AsteroidHoming):
-            self._amount_homing -= 1
     
     def switch_mode(self, mode : ESMode):
         self._mode = mode
@@ -146,9 +130,9 @@ class EntitySpawner(pygame.sprite.Sprite):
         roll = random.randint(1, 100)
         if roll <= self._chance_golden:
             AsteroidGolden(position, velocity*3, speed*3)
-        elif roll <= self._chance_homing and self._amount_homing < self._amount_homing_max:
-            self._amount_homing += 1
-            AsteroidHoming(position, velocity*2, speed*2, self.player)
+        elif roll <= self._chance_homing and len(self._group_homing.sprite()) < self._amount_homing_max:
+            asteroid = AsteroidHoming(position, velocity*2, speed*2, self.player)
+            self._group_homing.add(asteroid)
         elif roll <= self._chance_explosive:
             AsteroidExplosive(position, velocity, speed)
         elif roll <= self._chance_bouncy:

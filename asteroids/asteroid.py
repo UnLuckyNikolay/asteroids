@@ -32,6 +32,9 @@ class Asteroid(CircleShape):
     def split(self):
         pass
 
+    def kill(self):
+        self.is_dead = True
+        super().kill()
     
     def draw(self, screen):
         new_points = self.__recalculate_points_for_drawing()

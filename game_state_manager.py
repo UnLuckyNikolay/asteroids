@@ -114,10 +114,7 @@ class GameStateManager(pygame.sprite.Sprite):
 
         for object in g.GM.moving_objects:
             if self.check_if_object_is_off_screen(object):
-                if isinstance(object, Asteroid): ##### REWRITE THIS SHITE INSIDE BASE ASTEROID - FUCK IT, USE GM INSTEAD
-                    self.spawner.kill_asteroid(object) # The field kills/splits asteroids to keep count of certain types
-                else:
-                    object.kill()
+                object.kill()
 
         # Colision checks
         # Player hit
@@ -126,7 +123,7 @@ class GameStateManager(pygame.sprite.Sprite):
                 alive = self.player.take_damage_and_check_if_alive()
                 if alive:
                     g.SFXM.play_sound(SFX.PLAYER_HIT)
-                self.spawner.kill_asteroid(asteroid)
+                asteroid.kill()
                 ExplosionSpiky(asteroid.position, asteroid.radius)
             
             # Asteroid shot
@@ -134,7 +131,7 @@ class GameStateManager(pygame.sprite.Sprite):
                 if projectile.check_colision(asteroid) and not asteroid.is_dead:
                     if projectile.is_single_use:
                         projectile.kill()
-                    self.spawner.split_asteroid(asteroid)
+                    asteroid.split()
                     ExplosionSpiky(asteroid.position, asteroid.radius)
                     g.SFXM.play_sound(SFX.ASTEROID_EXPLOSION)
                     self.rs.score += asteroid.reward
@@ -144,7 +141,7 @@ class GameStateManager(pygame.sprite.Sprite):
         for hitbox in g.GM.explosion_hitboxes:
             for asteroid in g.GM.asteroids:
                 if hitbox.check_colision(asteroid) and not asteroid.is_dead:
-                    self.spawner.split_asteroid(asteroid)
+                    asteroid.split()
                     g.SFXM.play_sound(SFX.ASTEROID_EXPLOSION)
                     self.rs.score += asteroid.reward
                     self.rs.increase_count_stat(type(asteroid))
